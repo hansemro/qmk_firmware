@@ -7,7 +7,7 @@
 #define GD24Q40_PAGES           2048
 #define GD25Q40_PAGE_BYTES      256
 
-#define GD24Q40_BYTES   (GD25Q40_SECTORS * GD25Q40_SECTOR_BYTES)
+#define GD25Q40_BYTES   (GD25Q40_SECTORS * GD25Q40_SECTOR_BYTES)
 
 #define GD25Q_WREN      0x06    // Write Enable
 #define GD25Q_WRDI      0x04    // Write Disable

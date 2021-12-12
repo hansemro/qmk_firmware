@@ -16,13 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "quantum.h"
+#include "pok3r_rgb.h"
+#include "gd25q_flash.h"
 #include "raw_hid.h"
 #include "debug.h"
 #include "version.h"
-
-#include "pok3r_rgb.h"
-#include "gd25q_flash.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -40,16 +38,37 @@
 const uint8_t firmware_id[] __attribute__ ((section (".id.firmware"))) =
     "qmk_pok3r;" NAME_SLUG ";" QMK_VERSION ";" QMK_BUILDDATE;
 
+void matrix_init_pins(void){
+    const pin_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
+    for (uint8_t i = 0; i < MATRIX_COLS; ++i){
+        palSetLineMode(col_pins[i],
+                       PAL_MODE_ALTERNATE(AFIO_GPIO) | PAL_MODE_INPUT_PULLUP);
+    }
+
+    const pin_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
+    for (uint8_t i = 0; i < MATRIX_ROWS; ++i){
+        palSetLineMode(row_pins[i],
+                       PAL_MODE_ALTERNATE(AFIO_GPIO) | PAL_MODE_OUTPUT_PUSHPULL);
+    }
+}
+
 void bootloader_jump(void) {
 //    printf("Bootloader Jump\n");
     firmware_reset(RESET_BL_MAGIC);
 }
 
-void check_boot_keys(void) {
-#if HAS_WIPE_SWITCH
-    // check DIP switch and erase version page if set
-//    if (matrix_scan_key(WIPE_SWITCH_ROW, WIPE_SWITCH_COL)) {
-//        flash_erase_page(VERSION_ADDR);
-//    }
+bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
+    if (!process_record_user(keycode, record)) { return false; }
+
+    // If console is enabled, it will print the matrix position and status of each key pressed
+#ifdef CONSOLE_ENABLE
+    printf("KL: kc: 0x%04X, col: %u, row: %u, pressed: %b, time: %u, interrupt: %b, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
+#endif
+    return true;
+}
+
+void virtser_recv(uint8_t c) {
+#ifdef CONSOLE_ENABLE
+    printf("VS: %c\n", c);
 #endif
 }

@@ -36,32 +36,32 @@
  */
 
 // outputs (rows driven low)
-#define LINE_ROW1                   PAL_LINE(IOPORTC, 4)
-#define LINE_ROW2                   PAL_LINE(IOPORTA, 11)
-#define LINE_ROW3                   PAL_LINE(IOPORTB, 6)
-#define LINE_ROW4                   PAL_LINE(IOPORTA, 0)
-#define LINE_ROW5                   PAL_LINE(IOPORTD, 0)
-#define LINE_ROW6                   PAL_LINE(IOPORTA, 1)
-#define LINE_ROW7                   PAL_LINE(IOPORTB, 11)
-#define LINE_ROW8                   PAL_LINE(IOPORTA, 2)
-#define LINE_ROW9                   PAL_LINE(IOPORTA, 3)
-#define LINE_ROW10                  PAL_LINE(IOPORTA, 4)
+#define LINE_ROW1                   PAL_LINE(GPIOC, 4)
+#define LINE_ROW2                   PAL_LINE(GPIOA, 11)
+#define LINE_ROW3                   PAL_LINE(GPIOB, 6)
+#define LINE_ROW4                   PAL_LINE(GPIOA, 0)
+#define LINE_ROW5                   PAL_LINE(GPIOD, 0)
+#define LINE_ROW6                   PAL_LINE(GPIOA, 1)
+#define LINE_ROW7                   PAL_LINE(GPIOB, 11)
+#define LINE_ROW8                   PAL_LINE(GPIOA, 2)
+#define LINE_ROW9                   PAL_LINE(GPIOA, 3)
+#define LINE_ROW10                  PAL_LINE(GPIOA, 4)
 
 // inputs (columns sampled)
-#define LINE_COL1                   PAL_LINE(IOPORTC, 9)
-#define LINE_COL2                   PAL_LINE(IOPORTA, 5)
-#define LINE_COL3                   PAL_LINE(IOPORTA, 6)
-#define LINE_COL4                   PAL_LINE(IOPORTA, 7)
-#define LINE_COL5                   PAL_LINE(IOPORTC, 11)
-#define LINE_COL6                   PAL_LINE(IOPORTC, 13)
-#define LINE_COL7                   PAL_LINE(IOPORTC, 14)
-#define LINE_COL8                   PAL_LINE(IOPORTC, 15)
+#define LINE_COL1                   PAL_LINE(GPIOC, 9)
+#define LINE_COL2                   PAL_LINE(GPIOA, 5)
+#define LINE_COL3                   PAL_LINE(GPIOA, 6)
+#define LINE_COL4                   PAL_LINE(GPIOA, 7)
+#define LINE_COL5                   PAL_LINE(GPIOC, 11)
+#define LINE_COL6                   PAL_LINE(GPIOC, 13)
+#define LINE_COL7                   PAL_LINE(GPIOC, 14)
+#define LINE_COL8                   PAL_LINE(GPIOC, 15)
 
 // SPI
-#define LINE_SPI_SCK                PAL_LINE(IOPORTB, 7)
-#define LINE_SPI_MOSI               PAL_LINE(IOPORTB, 8)
-#define LINE_SPI_MISO               PAL_LINE(IOPORTB, 9)
-#define LINE_SPI_CS                 PAL_LINE(IOPORTB, 10)
+#define LINE_SPI_SCK                B7
+#define LINE_SPI_MOSI               B8
+#define LINE_SPI_MISO               B9
+#define LINE_SPI_CS                 B10
 
 // DIP switches
 #define LINE_DIP1_ROW               LINE_ROW10

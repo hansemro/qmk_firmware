@@ -2,8 +2,8 @@
 
 SRC = \
 	ht32.c \
-	util.c
-#	eeprom.c
+	util.c \
+	eeprom_gd25.c
 
 # MCU
 MCU = cortex-m3
@@ -20,7 +20,8 @@ MCU_LDSCRIPT = pok3r_rgb
 
 BOARD = CYKB167_D_V03
 
-OPT_DEFS = -DCORTEX_VTOR_INIT=0x3400 -Wno-unused-function -fdump-rtl-dfinish -fstack-usage
+#OPT_DEFS = -DCORTEX_VTOR_INIT=0x3400 -Wno-unused-function -fdump-rtl-dfinish -fstack-usage
+OPT_DEFS = -DDEBUG_EEPROM_OUTPUT
 #EXTRALDFLAGS = -Wl,--print-memory-usage
 
 LAYOUTS = 60_ansi
@@ -40,13 +41,13 @@ DIP_SWITCH_ENABLE = yes
 #RGB_MATRIX_ENABLE = yes
 #RGB_MATRIX_DRIVER = custom
 
+EEPROM_DRIVER = custom
+
 # Other featues
 #BOOTMAGIC_ENABLE = yes
-#CONSOLE_ENABLE = yes
+#VIA_ENABLE = yes
+CONSOLE_ENABLE = yes
 #COMMAND_ENABLE = yes
 #RAW_ENABLE = yes
 #MIDI_ENABLE = no
 #VIRTSER_ENABLE = no
-
-# EEPROM
-#EEPROM_CUSTOM_DRIVER = yes

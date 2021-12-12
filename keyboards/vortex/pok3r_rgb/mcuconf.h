@@ -14,8 +14,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _MCUCONF_H_
-#define _MCUCONF_H_
+#pragma once
 
 #define HT32F1654_MCUCONF
 
@@ -46,14 +45,7 @@
 #define HT32_SPI_USE_SPI1                   TRUE
 #define HT32_SPI1_IRQ_PRIORITY              6
 
-#define HT32_UART_USE_USART0                TRUE
-#define HT32_USART0_IRQ_PRIORITY            6
-
 // USB driver settings
 
 #define HT32_USB_USE_USB0                   TRUE
 #define HT32_USB_USB0_IRQ_PRIORITY          5
-
-#define HT32_PWM_USE_MCTM0                  TRUE
-
-#endif /* _MCUCONF_H_ */

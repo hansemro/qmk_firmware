@@ -18,11 +18,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-/* USB Device descriptor parameter */
-#define VENDOR_ID       0x04d9
-#define PRODUCT_ID      0x0167
-#define DEVICE_VER      0x0001
-#define MANUFACTURER    Holtek
 #define PRODUCT         Vortex POK3R RGB
 
 #define DESCRIPTION     Vortex POK3R RGB with qmk_pok3r
@@ -45,6 +40,17 @@
 #define DIP_SWITCH_MATRIX_GRID { { 9, 4 }, { 9, 5 }, { 9, 6 }, { 9, 7 } }
 
 #define GPIO_INPUT_PIN_DELAY 10
+
+// SPI EERPOM
+#define SPI_DRIVER          SPID1
+#define SPI_SCK_PIN         B7
+#define SPI_SCK_PAL_MODE    AFIO_SPI
+#define SPI_MOSI_PIN        B8
+#define SPI_MOST_PAL_MODE   AFIO_SPI
+#define SPI_MISO_PIN        B9
+#define SPI_MISO_PIN_MODE   ADIO_SPI
+
+#define EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN    B10
 
 // Max available layers
 //#define MAX_LAYERS 8
@@ -142,40 +148,6 @@
     K33,  K34,  K35,               K53,              K59,  K60,  K61,  K62, \
                                                         XXX, XXX, XXX, XXX  \
 )
-
-/* number of backlight levels */
-//#define BACKLIGHT_LEVELS 10
-
-/* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
-//#define LOCKING_SUPPORT_ENABLE
-/* Locking resynchronize hack */
-//#define LOCKING_RESYNC_ENABLE
-
-/* If defined, GRAVE_ESC will always act as ESC when CTRL is held.
- * This is userful for the Windows task manager shortcut (ctrl+shift+esc).
- */
-// #define GRAVE_ESC_CTRL_OVERRIDE
-
-/*
- * Force NKRO
- *
- * Force NKRO (nKey Rollover) to be enabled by default, regardless of the saved
- * state in the bootmagic EEPROM settings. (Note that NKRO must be enabled in the
- * makefile for this to work.)
- *
- * If forced on, NKRO can be disabled via magic key (default = LShift+RShift+N)
- * until the next keyboard reset.
- *
- * NKRO may prevent your keystrokes from being detected in the BIOS, but it is
- * fully operational during normal computer usage.
- *
- * For a less heavy-handed approach, enable NKRO via magic key (LShift+RShift+N)
- * or via bootmagic (hold SPACE+N while plugging in the keyboard). Once set by
- * bootmagic, NKRO mode will always be enabled until it is toggled again during a
- * power-up.
- *
- */
-//#define FORCE_NKRO
 
 /*
  * Magic Key Options
