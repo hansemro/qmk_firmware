@@ -9,6 +9,8 @@ MCU_STARTUP = ht32f165x
 
 BOARD = MASTERKEYS_PROSRGB
 
+BOOTMAGIC_ENABLE = yes
+
 # Custom RGB matrix handling
 # RGB_MATRIX_ENABLE = yes
 # RGB_MATRIX_DRIVER = custom

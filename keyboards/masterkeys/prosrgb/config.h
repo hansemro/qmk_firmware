@@ -4,3 +4,7 @@
 #pragma once
 
 #include "pin_defs.h"
+
+// Bootmagic key on Esc
+#define BOOTMAGIC_LITE_COLUMN 12
+#define BOOTMAGIC_LITE_ROW 0
