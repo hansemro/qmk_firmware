@@ -1,0 +1,28 @@
+# MCU
+MCU = cortex-m3
+ARMV = 7
+USE_FPU = no
+MCU_FAMILY = HT32
+MCU_SERIES = HT32F165x
+MCU_LDSCRIPT = HT32F1654_PROSRGB
+MCU_STARTUP = ht32f165x
+
+BOARD = MASTERKEYS_PROSRGB
+
+# Custom RGB matrix handling
+# RGB_MATRIX_ENABLE = yes
+# RGB_MATRIX_DRIVER = custom
+
+# Keys
+CUSTOM_MATRIX = lite
+KEY_LOCK_ENABLE = no
+
+# Other features
+RAW_ENABLE = no
+MIDI_ENABLE = no
+VIRTSER_ENABLE = no
+COMBO_ENABLE = no
+
+LAYOUTS = tkl_ansi
+
+SRC += matrix.c
