@@ -17,6 +17,8 @@
 #include "hal.h"
 #include "prosrgb.h"
 
+#include "mbia043.h"
+
 #define FMC_SBVT1 0x40080304
 #define RESET_AP_MAGIC 0x55aafaf0
 #define RESET_IAP_MAGIC 0x55aafaf5
@@ -34,4 +36,9 @@ void bootloader_jump(void) {
     *((uint32_t *)FMC_SBVT1) = RESET_IAP_MAGIC;
     wait_us(50000); // 50 ms
     NVIC_SystemReset();
+}
+
+void keyboard_post_init_user(void) {
+    wait_ms(5000);
+    mbia043_init();
 }

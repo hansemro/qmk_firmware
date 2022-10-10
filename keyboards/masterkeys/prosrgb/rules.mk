@@ -26,3 +26,4 @@ COMBO_ENABLE = no
 LAYOUTS = tkl_ansi
 
 SRC += matrix.c
+SRC += mbia043.c

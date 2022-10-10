@@ -28,6 +28,17 @@
 
 #define FLASH_SIZE (0x10000 - 0x4000) // 64kB - 16kB
 
+// MCU -> MBIA_R -> MBIA_G -> MBIA_G -> MCU
+#define MBIA_COUNT 3 // one MBIA IC for each color channel
+// MBIA pins
+#define MBIA_GCLK_PIN       PAL_LINE(IOPORTC, 0)
+#define MBIA_DCLK_PIN       PAL_LINE(IOPORTA, 14)
+#define MBIA_SDI_PIN        PAL_LINE(IOPORTC, 2) // data sent to first MBIA from MCU
+#define MBIA_SDO_PIN        PAL_LINE(IOPORTB, 0) // data sent to CPU from last MBIA
+#define MBIA_LE_PIN         PAL_LINE(IOPORTA, 15)
+// MBIA 3.3V power enable
+#define MBIA_PWRCTRL_PIN    PAL_LINE(IOPORTC, 1)
+
 #if !defined(_FROM_ASM_)
 #    ifdef __cplusplus
 extern "C" {
