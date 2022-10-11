@@ -179,65 +179,179 @@ void mbia043_init(void) {
         gptStartContinuous(&GPTD_BFTM1, 60000UL);
     }
 
-    for (int i = 0; i < 1024; i++) {
-        mbia043_shift_data(0, 10);
-        mbia043_shift_data(0, 10);
-        mbia043_shift_data(0, 10);
-    }
     mbia043_send_instruction(0x12);
     mbia043_shift_data(0x300, 10);
     mbia043_shift_data(0x300, 10);
     mbia043_shift_data(0x0, 2);
     palClearLine(MBIA_DCLK_PIN);
     palSetLine(MBIA_LE_PIN);
+    _delay(10);
     mbia043_shift_data(0xc00, 8);
+    _delay(10);
     palClearLine(MBIA_SDI_PIN);
     palClearLine(MBIA_LE_PIN);
     _delay(10);
-    // input direction
-    // enable input
-    // no pull resistor
-    gpio_reset();
 
+    uint32_t _red = 0x0000;
+    uint32_t _green = 0xffff;
+    uint32_t _blue = 0x0000;
+    uint32_t width = GPTM1_config.period / 2;
 
     while (true) {
+        //if (counter == 50) {
+        //    printf("%d\n", counter);
+        //    _red += 1;
+        //    _green += 1;
+        //    _blue += 1;
+        //}
         gpio_reset();
+        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
+        GPIOB->DIRCR |= (1 << 2);
+        GPIOB->RR |= (1 << 2);
+        pwmDisableChannel(&PWMD_GPTM1, 0);
+        for (int i = 0; i < 16; i++) {
+            // Blue
+            mbia043_shift_data(_blue, 10);
+            // Green
+            mbia043_shift_data(_green, 10);
+            // Red
+            mbia043_shift_data(_red, 10);
+            //_delay(10);
+            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
+            //_delay(10);
+        }
+        pwmEnableChannel(&PWMD_GPTM1, 0, width);
+        //_delay(10);
+        gpio_reset();
+        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
+        GPIOB->DIRCR |= (2 << 2);
+        GPIOB->RR |= (2 << 2);
+        pwmDisableChannel(&PWMD_GPTM1, 0);
+        for (int i = 0; i < 16; i++) {
+            // Blue
+            mbia043_shift_data(_blue, 10);
+            // Green
+            mbia043_shift_data(_green, 10);
+            // Red
+            mbia043_shift_data(_red, 10);
+            //_delay(10);
+            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
+            //_delay(10);
+        }
+        pwmEnableChannel(&PWMD_GPTM1, 0, width);
+        //_delay(10);
+        gpio_reset();
+        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
+        GPIOB->DIRCR |= (4 << 2);
+        GPIOB->RR |= (4 << 2);
+        pwmDisableChannel(&PWMD_GPTM1, 0);
+        for (int i = 0; i < 16; i++) {
+            // Blue
+            mbia043_shift_data(_blue, 10);
+            // Green
+            mbia043_shift_data(_green, 10);
+            // Red
+            mbia043_shift_data(_red, 10);
+            //_delay(10);
+            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
+            //_delay(10);
+        }
+        pwmEnableChannel(&PWMD_GPTM1, 0, width);
+        //_delay(10);
+        gpio_reset();
+        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
+        GPIOB->DIRCR |= (8 << 2);
+        GPIOB->RR |= (8 << 2);
+        pwmDisableChannel(&PWMD_GPTM1, 0);
+        for (int i = 0; i < 16; i++) {
+            // Blue
+            mbia043_shift_data(_blue, 10);
+            // Green
+            mbia043_shift_data(_green, 10);
+            // Red
+            mbia043_shift_data(_red, 10);
+            //_delay(10);
+            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
+            //_delay(10);
+        }
+        pwmEnableChannel(&PWMD_GPTM1, 0, width);
+        //_delay(10);
+        gpio_reset();
+        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
         GPIOC->DIRCR |= (1 << 5);
         GPIOC->RR |= (1 << 5);
+        pwmDisableChannel(&PWMD_GPTM1, 0);
         for (int i = 0; i < 16; i++) {
-            mbia043_shift_data(0xaaaa, 10);
-            mbia043_shift_data(0xaaaa, 10);
-            mbia043_shift_data(0xaaaa, 10);
-            _delay(100);
-            mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-            _delay(100);
+            // Blue
+            mbia043_shift_data(_blue, 10);
+            // Green
+            mbia043_shift_data(_green, 10);
+            // Red
+            mbia043_shift_data(_red, 10);
+            //_delay(10);
+            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
+            //_delay(10);
         }
-        _delay(100);
-
+        pwmEnableChannel(&PWMD_GPTM1, 0, width);
+        //_delay(10);
         gpio_reset();
+        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
         GPIOC->DIRCR |= (2 << 5);
         GPIOC->RR |= (2 << 5);
+        pwmDisableChannel(&PWMD_GPTM1, 0);
         for (int i = 0; i < 16; i++) {
-            mbia043_shift_data(0xaaaa, 10);
-            mbia043_shift_data(0xaaaa, 10);
-            mbia043_shift_data(0xaaaa, 10);
-            _delay(100);
-            mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-            _delay(100);
+            // Blue
+            mbia043_shift_data(_blue, 10);
+            // Green
+            mbia043_shift_data(_green, 10);
+            // Red
+            mbia043_shift_data(_red, 10);
+            //_delay(10);
+            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
+            //_delay(10);
         }
-        _delay(100);
-
+        pwmEnableChannel(&PWMD_GPTM1, 0, width);
+        //_delay(10);
         gpio_reset();
+        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
         GPIOC->DIRCR |= (4 << 5);
         GPIOC->RR |= (4 << 5);
+        pwmDisableChannel(&PWMD_GPTM1, 0);
         for (int i = 0; i < 16; i++) {
-            mbia043_shift_data(0xaaaa, 10);
-            mbia043_shift_data(0xaaaa, 10);
-            mbia043_shift_data(0xaaaa, 10);
-            _delay(100);
-            mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-            _delay(100);
+            // Blue
+            mbia043_shift_data(_blue, 10);
+            // Green
+            mbia043_shift_data(_green, 10);
+            // Red
+            mbia043_shift_data(_red, 10);
+            //_delay(10);
+            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
+            //_delay(10);
         }
+        pwmEnableChannel(&PWMD_GPTM1, 0, width);
+        //_delay(10);
+        gpio_reset();
+        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
+        GPIOC->DIRCR |= (8 << 5);
+        GPIOC->RR |= (8 << 5);
+        pwmDisableChannel(&PWMD_GPTM1, 0);
+        for (int i = 0; i < 16; i++) {
+            // Blue
+            mbia043_shift_data(_blue, 10);
+            // Green
+            mbia043_shift_data(_green, 10);
+            // Red
+            mbia043_shift_data(_red, 10);
+            //_delay(10);
+            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
+            //_delay(10);
+        }
+        pwmEnableChannel(&PWMD_GPTM1, 0, width);
+        //_delay(10);
+    }
+    mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
+    while (true) {
+        __NOP();
     }
 
     mbia043_shift_data(0, 10);
@@ -271,17 +385,27 @@ void mbia043_init(void) {
 void mbia043_send_instruction(uint32_t instr) {
     if (mbia043_initialized) {
         palClearLine(MBIA_LE_PIN);
-        _delay(10);
+        //_delay(10);
+        __NOP();
+        __NOP();
         // assert MBIA_LE high
         palSetLine(MBIA_LE_PIN);
-        _delay(10);
+        //_delay(10);
+        __NOP();
+        __NOP();
         // instruction number of DCLK rising edges while MBIA_LE is asserted
         while (instr--) {
+            __NOP();
+            __NOP();
             palClearLine(MBIA_DCLK_PIN);
-            _delay(10);
+            //_delay(10);
+            __NOP();
+            __NOP();
             palSetLine(MBIA_DCLK_PIN);
-            _delay(10);
+            //_delay(10);
         }
+        __NOP();
+        __NOP();
         // deassert MBIA_LE
         palClearLine(MBIA_LE_PIN);
     }
@@ -292,18 +416,17 @@ void mbia043_shift_data(uint16_t value, uint16_t shift_amount) {
     if (mbia043_initialized) {
         while (shift_amount--) {
             __NOP();
-            _delay(10);
+            __NOP();
             // deassert MBIA_DCLK
             palClearLine(MBIA_DCLK_PIN);
-            _delay(10);
             // set MBIA_SDI to value_be[15] bit
-            if ((value << 0x10) == 1) {
+            if ((int)(value << 0x10) < 0) {
                 palSetLine(MBIA_SDI_PIN);
             } else {
                 palClearLine(MBIA_SDI_PIN);
             }
             __NOP();
-            _delay(10);
+            __NOP();
             // shift bit to shift register
             palSetLine(MBIA_DCLK_PIN);
             // shift value_be
@@ -318,23 +441,22 @@ uint16_t mbia043_shift_recv(uint16_t value, uint16_t shift_amount) {
     if (mbia043_initialized) {
         while (shift_amount--) {
             __NOP();
-            _delay(10);
+            __NOP();
             palClearLine(MBIA_DCLK_PIN);
             printf("%ld\n", palReadLine(MBIA_SDO_PIN));
             //recv = (recv << 1) | palReadLine(MBIA_SDO_PIN);
-            _delay(10);
             if (value & 0x200) {
                 palSetLine(MBIA_SDI_PIN);
             } else {
                 palClearLine(MBIA_SDI_PIN);
             }
-            _delay(10);
+            __NOP();
+            __NOP();
             palSetLine(MBIA_DCLK_PIN);
             value = (value & 0x1ff) << 1;
         }
         __NOP();
         __NOP();
-        _delay(10);
         //recv = ((recv << 1) | palReadLine(MBIA_SDO_PIN)) & 0xfff;
         //recv = palReadLine(MBIA_SDO_PIN);
         printf("%ld\n", palReadLine(MBIA_SDO_PIN));
@@ -385,19 +507,20 @@ void _mbia043_reset(void) {
 }
 
 void _mbia043_deactivate_row_pins(void) {
-    //for (int row = 0; row < MATRIX_ROWS; row++) {
-    //    // input direction
-    //    // enable input
-    //    // no pull resistor
-    //}
-    // Q1
-    // Q2
-    // Q3
-    // Q4
-    // Q5
-    // Q6
-    // Q7
-    // Q8
+    // input direction
+    GPIOB->DIRCR &= ~(0xf << 2);
+    // enable input
+    GPIOB->INER |= (0xf << 2);
+    // no pull resistor
+    GPIOB->PUR &= ~(0xf << 2);
+    GPIOB->PDR &= ~(0xf << 2);
+    // input direction
+    GPIOC->DIRCR &= ~(0xf << 5);
+    // enable input
+    GPIOC->INER |= (0xf << 5);
+    // no pull resistor
+    GPIOC->PUR &= ~(0xf << 5);
+    GPIOC->PDR &= ~(0xf << 5);
     return;
 }
 
@@ -408,8 +531,12 @@ void mbia043_update_RGB_buffers(void) {
         // Green channel
         mbia043_shift_data(mbia043_rgb_matrix[mbia043_row][i].green<<2, 10);
         // Red channel
-        mbia043_shift_data(mbia043_rgb_matrix[mbia043_row][i].red<<2, 10);
+        mbia043_shift_data(mbia043_rgb_matrix[mbia043_row][i].red<<2, 9);
+        // write data in shift registers to buffers
+        mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
     }
+    // move data in buffers to channel comparators
+    // mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
 
     return;
 }
