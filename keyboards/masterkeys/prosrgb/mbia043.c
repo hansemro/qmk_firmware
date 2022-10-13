@@ -43,9 +43,12 @@ static inline void set_color_all(uint16_t red, uint16_t green, uint16_t blue) {
     return;
 }
 
-static uint16_t _red = 0x0900;
-static uint16_t _green = 0x0500;
-static uint16_t _blue = 0x0500;
+static int state = 0;
+static int counter = 0;
+static int c2 = 0;
+static uint8_t _red = 0x00;
+static uint8_t _green = 0x00;
+static uint8_t _blue = 0x00;
 
 // BFTM1 callback routine
 static void timer_callback(GPTDriver *gptp) {
@@ -55,7 +58,100 @@ static void timer_callback(GPTDriver *gptp) {
     setPinOutput(LED_GPIO_PINS[LED_PIN_NUM]);
     writePinLow(LED_GPIO_PINS[LED_PIN_NUM]);
     LED_PIN_NUM = (LED_PIN_NUM + 1) & 0x7;
-    set_color_all(_red, _green, _blue);
+    set_color_all(_red << 8, _green << 8, _blue << 8);
+    if (counter >= 0x00000050) {
+        switch (state) {
+            case 0:
+                if (_red < 0xff) {
+                    _red += 0x1;
+                } else {
+                    _red = 0xff;
+                    _green = 0x00;
+                    _blue = 0x00;
+                    state = 1;
+                    printf("s1\n");
+                }
+                break;
+            case 1:
+                if (_red > 0x00) {
+                    _red -= 0x1;
+                } else {
+                    _red = 0;
+                    _green = 0;
+                    _blue = 0;
+                    state = 2;
+                    printf("s2\n");
+                }
+                break;
+            case 2:
+                if (_green < 0xff) {
+                    _green += 0x1;
+                } else {
+                    _red = 0;
+                    _green = 0xff;
+                    _blue = 0;
+                    state = 3;
+                    printf("s3\n");
+                }
+                break;
+            case 3:
+                if (_green > 0x00) {
+                    _green -= 0x1;
+                } else {
+                    _red = 0;
+                    _green = 0;
+                    _blue = 0;
+                    state = 4;
+                    printf("s4\n");
+                }
+                break;
+            case 4:
+                if (_blue < 0x40) {
+                    if (c2 <= 0x1) {
+                        c2++;
+                    } else {
+                        _blue += 0x1;
+                        //printf("b%d\n", _blue);
+                        c2 = 0;
+                    }
+                } else {
+                    _red = 0;
+                    _green = 0;
+                    _blue = 0x40;
+                    state = 5;
+                    printf("s5\n");
+                }
+                break;
+            case 5:
+                if (_blue > 0x00) {
+                    if (c2 <= 0x0) {
+                        c2++;
+                    } else {
+                        _blue -= 0x1;
+                        //printf("b5%d\n", _blue);
+                        c2 = 0;
+                    }
+                } else {
+                    _red = 0;
+                    _green = 0;
+                    _blue = 0;
+                    state = 0;
+                    printf("s0\n");
+                }
+                break;
+            default:
+                _red = 0;
+                _green = 0;
+                _blue = 0;
+                state = 0;
+        }
+        //_red -= 0x1800;
+        //_green -= 0x2000;
+        //_blue -= 0x1000;
+        counter = 0;
+    } else {
+        counter++;
+    }
     return;
 }
 
