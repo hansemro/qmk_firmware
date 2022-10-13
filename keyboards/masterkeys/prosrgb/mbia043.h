@@ -1,72 +1,80 @@
-// Copyright (c) 2022 Hansem Ro <hansemro@outlook.com
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SDPX-License-Identifier: GPL-2.0-or-later
+// Copyright 2022 (c) Hansem Ro
 
 #pragma once
 
 #include <stdint.h>
-#include <stdbool.h>
 
-extern bool mbia043_initialized;
-extern bool mbia043_is_on;
-extern bool mbia043_gclk_enabled;
-
-#define MBIA_NUM_CHANNELS 16
-#define MBIA_SHIFT_REGISTER_WIDTH 10 // bits
-#define MBIA_NUM_CASCADE 3
-
-#ifndef MBIA_LE_PIN
-    #error "MBIA_LE_PIN is not defined"
+#define MBIA043_NUM_CHANNELS 16
+#define MBIA043_SHIFT_REGISTER_WIDTH 10 // bits
+#ifndef MBIA043_NUM_CASCADE
+    #error "MBIA043_NUM_CASCADE is not defined"
 #endif
 
-#ifndef MBIA_SDI_PIN
-    #error "MBIA_SDI_PIN is not defined"
+// Required pin defines
+//  - MBIA043_LE_PIN
+//  - MBIA043_SDI_PIN
+//  - MBIA043_SDO_PIN
+//  - MBIA043_DCLK_PIN
+//  - MBIA043_GCLK_PIN
+//  - MBIA043_PWRCTRL_PIN
+
+#ifndef MBIA043_LE_PIN
+    #error "MBIA043_LE_PIN is not defined"
 #endif
 
-#ifndef MBIA_SDO_PIN
-    #error "MBIA_SDO_PIN is not defined"
+#ifndef MBIA043_SDI_PIN
+    #error "MBIA043_SDI_PIN is not defined"
 #endif
 
-#ifndef MBIA_DCLK_PIN
-    #error "MBIA_DCLK_PIN is not defined"
+#ifndef MBIA043_SDO_PIN
+    #error "MBIA043_SDO_PIN is not defined"
 #endif
 
-#ifndef MBIA_GCLK_PIN
-    #error "MBIA_GCLK_PIN is not defined"
+#ifndef MBIA043_DCLK_PIN
+    #error "MBIA043_DCLK_PIN is not defined"
 #endif
 
-// Move data in shift register to buffers
-#define MBIA043_INSTR_DATA_LATCH 1
-// Move data in shift register to comparators
-#define MBIA043_INSTR_OVERALL_LATCH 2
+#ifndef MBIA043_GCLK_PIN
+    #error "MBIA043_GCLK_PIN is not defined"
+#endif
 
+// Pin used to control power supply to MBIA(s)
+#ifdef MBIA043_HAS_POWER_PIN
+#ifndef MBIA043_DCLK_PIN
+    #error "MBIA043_DCLK_PIN is not defined"
+#endif
+#endif
+
+// INSTRUCTIONS:
+// Move data in shift-register to a single buffer
+#define MBIA043_DATA_LATCH                  1
+// Move data in all buffers to comparators
+#define MBIA043_GLOBAL_LATCH                2
+// Move configuration register to shift-register
+#define MBIA043_READ_CONFIGURATION          4
+// If previous instruction was MBIA043_ENABLE_WRITE_CONFIGURATION, then move
+// data in shift-register to configuration register
+#define MBIA043_WRITE_CONFIGURATION         8
+// Enable MBIA043_WRITE_CONFIGURATION
+#define MBIA043_ENABLE_WRITE_CONFIGURATION  18
+
+// Enable power, start PWM, and configure MBIA pins
 void mbia043_init(void);
 
-void mbia043_send_instruction(uint32_t instr);
-void mbia043_shift_data(uint16_t value_be, uint16_t shift_amount);
-// for testing
-uint16_t mbia043_shift_recv(uint16_t value_be, uint16_t shift_amount);
+void _mbia043_send_instruction(int instr);
+void mbia043_send_instruction(int instr);
+void _mbia043_shift_data(uint16_t data, int shift_amount);
+void mbia043_shift_data(uint16_t data, int shift_amount);
+void mbia043_shift_data_instr(uint16_t data, int shift_amount, int instr);
+uint16_t mbia043_shift_recv(uint16_t data, int shift_amount);
 
-#ifdef RGB_MATRIX_ENABLE
+// MBIA043 has 10-bit (undocumented) configuration register.
+// By default, it is configured to 0b0000000010.
+// On several boards, it is reconfigured to 0b0000001100.
+void mbia043_read_configuration(uint16_t *dst);
+void mbia043_write_configuration(uint16_t *src);
 
-//#define MATRIX_COLS (MBIA_NUM_CHANNELS)
-#define MATRIX_ROWS 8
-#define RGB_MATRIX_LED_FLUSH_LIMIT 16
-
-typedef struct {
-    uint16_t red;
-    uint16_t green;
-    uint16_t blue;
-} mbia043_led_t;
-
-extern mbia043_led_t mbia043_rgb_matrix[MATRIX_ROWS][MBIA_NUM_CHANNELS];
-extern bool mbia043_needs_flush;
-extern uint8_t mbia043_row;
-
-void _mbia043_reset(void);
-void _mbia043_deactivate_row_pins(void);
-void mbia043_update_RGB_buffers(void);
-void mbia043_flush(void);
-void mbia043_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
-void mbia043_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
-
-#endif
+// Debug functions
+void mbia043_test_shift_register(void);
+int mbia043_get_shift_register_length(void);

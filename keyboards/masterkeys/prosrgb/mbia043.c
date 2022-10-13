@@ -1,54 +1,65 @@
-// Copyright (c) 2022 Hansem Ro <hansemro@outlook.com
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SDPX-License-Identifier: GPL-2.0-or-later
+// Copyright 2022 (c) Hansem Ro
 
 #include "hal.h"
+#include "gpio.h"
 #include "mbia043.h"
-#ifdef RGB_MATRIX_ENABLE
-#include "rgb_matrix.h"
 
-led_config_t g_led_config = {
-    { // Key Matrix to LED Index
-        { 15, 17, 19, 21, 23, 25, 27,     43, 83,     NO_LED, NO_LED, NO_LED, 0,      4,      7},
-        { 16, 18, 20, 22, 24, 26, 28,     82, NO_LED, NO_LED, NO_LED, NO_LED, 1,      5,      8},
-        { 29, 31, 33, 35, 37, 39, 41,     57, 85,     NO_LED, NO_LED, 72,     2,      6,      9},
-        { 30, 32, 34, 36, 38, 40, 42,     84, 10,     NO_LED, NO_LED, 71,     3,      81,     NO_LED},
-        { 44, 46, 48, 50, 52, 54, 56,     77, 11,     NO_LED, NO_LED, 73,     NO_LED, NO_LED, NO_LED},
-        { 45, 47, 49, 51, 53, 55, NO_LED, 70, 12,     NO_LED, NO_LED, 74,     NO_LED, NO_LED, NO_LED},
-        { 58, 60, 62, 64, 66, 68, 78,     80, 86,     NO_LED, NO_LED, 75,     13,     NO_LED, NO_LED},
-        { 59, 61, 63, 65, 67, 69, NO_LED, 79, NO_LED, NO_LED, NO_LED, 76,     14,     NO_LED, NO_LED},
-    }, { // LED Index to Physical Position
-        {  0,   0}, { 26,   0}, { 39,   0}, { 52,   0}, { 65,   0}, { 84,   0}, { 97,   0}, {110,   0}, {123,   0}, {143,   0}, {156,   0}, {169,   0}, {182,   0}, {198,   0}, {211,   0}, {224,   0},
-        {  0,  17}, { 13,  17}, { 26,  17}, { 39,  17}, { 52,  17}, { 65,  17}, { 78,  17}, { 91,  17}, {104,  17}, {117,  17}, {130,  17}, {143,  17}, {156,  17}, {175,  17}, {198,  17}, {211,  17}, {224,  17},
-        {  3,  29}, { 19,  29}, { 32,  29}, { 45,  29}, { 58,  29}, { 71,  29}, { 84,  29}, { 97,  29}, {110,  29}, {123,  29}, {136,  29}, {149,  29}, {162,  29}, {172,  29}, {198,  29}, {211,  29}, {224,  29},
-        {  5,  41}, { 23,  41}, { 36,  41}, { 49,  41}, { 62,  41}, { 75,  41}, { 88,  41}, {101,  41}, {114,  41}, {127,  41}, {140,  41}, {153,  41}, {174,  41},
-        {  8,  52}, { 29,  52}, { 42,  52}, { 55,  52}, { 68,  52}, { 81,  52}, { 94,  52}, {107,  52}, {120,  52}, {133,  52}, {146,  52}, {170,  52}, {211,  52},
-        {  2,  64}, { 18,  64}, { 34,  64}, { 83,  64}, {131,  64}, {148,  64}, {164,  64}, {180,  64}, {198,  64}, {211,  64}, {224,  64},
-    }, { // LED Index to Flag
-        4,    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,  4, 4, 4,
-        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,  4, 4, 4,
-        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,  4, 4, 4,
-        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,    4,
-        1,    4, 4, 4, 4, 4, 4, 4, 4, 4, 4,    1,     4,
-        1, 1, 1,          4,          1, 1, 1, 1,  4, 4, 4,
-    }
-};
-
+#ifdef MBIA043_DEBUG
+#include "print.h"
 #endif
 
-#include "print.h"
+#define RGB_LEVELS 10
 
-bool mbia043_initialized = false;
+static uint32_t LED_GPIO_PINS[8] = {
+    Q1_Ctrl,
+    Q2_Ctrl,
+    Q3_Ctrl,
+    Q4_Ctrl,
+    Q5_Ctrl,
+    Q6_Ctrl,
+    Q7_Ctrl,
+    Q8_Ctrl,
+};
+static int LED_PIN_NUM = 0;
 
-static void _delay(int n) {
-    n = n * 20;
-    while (n--) {
-        __NOP();
+static void led_gpio_pin_reset(void) {
+    for (int i = 0; i < 8; i++) {
+        setPinInput(LED_GPIO_PINS[i]);
     }
     return;
 }
 
-// GCLK @ channel 0 of GPTM1
-// 3.6 MHz PWM signal
+static inline void set_color_all(uint16_t red, uint16_t green, uint16_t blue) {
+    writePinLow(MBIA043_LE_PIN);
+    for (int i = 0; i < MBIA043_NUM_CHANNELS; i++) {
+        _mbia043_shift_data(blue, 10);
+        _mbia043_shift_data(green, 10);
+        mbia043_shift_data_instr(red, 10, MBIA043_DATA_LATCH);
+    }
+    mbia043_send_instruction(MBIA043_GLOBAL_LATCH);
+    return;
+}
+
+static uint16_t _red = 0x0900;
+static uint16_t _green = 0x0500;
+static uint16_t _blue = 0x0500;
+
+// BFTM1 callback routine
+static void timer_callback(GPTDriver *gptp) {
+    led_gpio_pin_reset();
+    setPinOutput(LED_GPIO_PINS[LED_PIN_NUM]);
+    writePinLow(LED_GPIO_PINS[LED_PIN_NUM]);
+    LED_PIN_NUM = (LED_PIN_NUM + 1) & 0x7;
+    set_color_all(_red, _green, _blue);
+    return;
+}
+
+static const GPTConfig BFTM1_config = {
+    .frequency = HT32_CK_AHB_FREQUENCY,
+    .callback = timer_callback,
+};
+
 static const PWMConfig GPTM1_config = {
     .frequency = HT32_CK_AHB_FREQUENCY,
     .period = (HT32_CK_AHB_FREQUENCY / 3600000) - 1,
@@ -61,511 +72,239 @@ static const PWMConfig GPTM1_config = {
     },
 };
 
-static int counter = 15;
-static uint16_t number = 0x7ff;
+void mbia043_init(void) {
+#ifdef MBIA043_DEBUG
+    printf("%s START\n", __func__);
+#endif
 
-// BFTM1 timer interrupt callback
-static void timer_callback(GPTDriver *gptp) {
-    //printf("%s START\n", __func__);
-    // deactivate Qn pins
-    //_mbia043_deactivate_row_pins();
-    //_delay(10);
-    // send overall latch instruction
-    //mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-    // set MBIA_LE pin high
-    //palSetLine(MBIA_LE_PIN);
-    // set mbia043_row pin direction to out
-    // set mbia043_row pin low
-    // increment mbia043_row (wrap to 0 when mbia043_row == MBIA_NUM_ROWS)
-    //mbia043_row++;
-    // shift RGB data to MBIA
-    //mbia043_update_RGB_buffers();
-    //printf("%s mbia043_row: %d\n", __func__, mbia043_row);
+    // configure MBIA pins
+    setPinOutput(MBIA043_DCLK_PIN);
+    setPinOutput(MBIA043_GCLK_PIN);
+    setPinOutput(MBIA043_LE_PIN);
+    setPinOutput(MBIA043_SDI_PIN);
+    writePinHigh(MBIA043_DCLK_PIN);
+    writePinHigh(MBIA043_LE_PIN);
+    writePinHigh(MBIA043_SDI_PIN);
+    setPinInput(MBIA043_SDO_PIN);
 
-    return;
-}
+#ifdef MBIA043_HAS_POWER_PIN
+    // power on MBIA
+    setPinOutput(MBIA043_PWRCTRL_PIN);
+    writePinHigh(MBIA043_PWRCTRL_PIN);
+#endif
 
-static const GPTConfig BFTM1_config = {
-    .frequency = HT32_CK_AHB_FREQUENCY,
-    .callback = timer_callback,
-};
+    // start/configure PWM (at GCLK pin)
+    pwmStart(&PWMD_GPTM1, &GPTM1_config);
+    writePinHigh(MBIA043_GCLK_PIN);
+    palSetLineMode(MBIA043_GCLK_PIN, PAL_MODE_OUTPUT_PUSHPULL |
+            PAL_MODE_HT32_AF(AFIO_TM));
 
-uint8_t mbia043_shift_register_length(void) {
-    uint8_t len = 0;
-    palClearLine(MBIA_LE_PIN);
-    palSetLine(MBIA_SDI_PIN);
-    palClearLine(MBIA_DCLK_PIN);
-    _delay(10);
-    palSetLine(MBIA_DCLK_PIN);
-    _delay(10);
-    uint32_t out = palReadLine(MBIA_SDO_PIN);
-    while (!out) {
-        len++;
-        palClearLine(MBIA_DCLK_PIN);
-        out = palReadLine(MBIA_SDO_PIN);
-        _delay(10);
-        palSetLine(MBIA_DCLK_PIN);
-        _delay(10);
+    int len = 0;
+    // wait until shift register becomes ready
+    while (len != MBIA043_NUM_CASCADE * MBIA043_SHIFT_REGISTER_WIDTH) {
+        len = mbia043_get_shift_register_length();
     }
 
-    return len;
-}
+    uint16_t mbia043_config[MBIA043_NUM_CASCADE] = { 0 };
+    // read configuration
+    mbia043_read_configuration(mbia043_config);
+    // set configuration
+    mbia043_config[0] = 0xc;
+    mbia043_config[1] = 0xc;
+    mbia043_config[2] = 0xc;
+    mbia043_write_configuration(mbia043_config);
+    // read configuration
+    mbia043_read_configuration(mbia043_config);
 
-void gpio_reset(void) {
-    GPIOB->DIRCR &= ~(0xf << 2);
-    GPIOB->INER |= (0xf << 2);
-    GPIOB->PUR &= ~(0xf << 2);
-    GPIOB->PDR &= ~(0xf << 2);
-    GPIOC->DIRCR &= ~(0xf << 5);
-    GPIOC->INER |= (0xf << 5);
-    GPIOC->PUR &= ~(0xf << 5);
-    GPIOC->PDR &= ~(0xf << 5);
-    return;
-}
-
-void mbia043_init(void) {
-    printf("%s START\n", __func__);
-    // enable AFIO clock
-    CKCU->APBCCR0 |= CKCU_APBCCR0_AFIOEN;
-    // enable clocks for GPIO A,B,C
-    CKCU->AHBCCR |= 7 << 16;
-    // setup MBIA GPIO pins
-    GPIOA->INER &= ~(3 << 14); // A14/MBIA_DCLK & A15/MBIA_LE
-    GPIOA->PUR &= ~(3 << 14); // A14/MBIA_DCLK & A15/MBIA_LE
-    GPIOA->PDR &= ~(3 << 14); // A14/MBIA_DCLK & A15/MBIA_LE
-    GPIOC->SRR |= 3 << 1; // C1/MBIA_PWRCTRL & C2/MBIA_SDI
-    GPIOC->ODR &= ~(3 << 1); // C1/MBIA_PWRCTRL & C2/MBIA_SDI
-    GPIOC->DIRCR |= 3 << 1; // C1/MBIA_PWRCTRL & C2/MBIA_SDI
-    //GPIOA->SRR |= 3 << 14; // A14/MBIA_DCLK & A15/MBIA_LE
-    GPIOA->ODR &= ~(3 << 14); // A14/MBIA_DCLK & A15/MBIA_LE
-    GPIOA->DIRCR |= 3 << 14; // A14/MBIA_DCLK & A15/MBIA_LE
-    GPIOB->INER |= 1 << 0; // B0/MBIA_SDO
-    mbia043_initialized = true;
-
-    // setup GPTM1...
-    //  enable GPTM1 clock
-    //  config GPTM1 PWM
-    //   frequency = CK_AHB
-    //   period = (CK_AHB/3,600,000) - 1
-    //   active low (with PWM mode 1)
-    // start/enable GPTM1
-    pwmStart(&PWMD_GPTM1, &GPTM1_config);
-    // no pull resistor on MBIA_GCLK
-    GPIOC->PUR &= ~(1 << 0); // C0/MBIA_GCLK
-    GPIOC->PDR &= ~(1 << 0); // C0/MBIA_GCLK
-    // set MBIA_GCLK AFIO to AF4/GT_CH0
-    AFIO->GPCCFGR[0] |= (AFIO_TM << 0);
-    // enable channel 0 on GPTM1 with width = period / 2
-    pwmEnableChannel(&PWMD_GPTM1, 0, GPTM1_config.period / 2);
-    // setup BFTM1...
-    //  enable BFTM1 clock
-    //  set BFTM1 compare value to 60,000
-    //  set BFTM1 counter to 0
-    //  enable BFTM1
-    //   frequency = CK_AHB
-    //   period = 60,000 ticks
-    //  enable BFTM1 compare match interrupt
-    //  enable BFTM1 interrupt (IRQ42)
+    // TODO remove
+    pwmEnableChannel(&PWMD_GPTM1, 0, PWM_FRACTION_TO_WIDTH(&PWMD_GPTM1, RGB_LEVELS, 5));
     gptStart(&GPTD_BFTM1, &BFTM1_config);
-#ifdef RGB_MATRIX_ENABLE
-    _mbia043_reset();
-#else
-    number = 0x7ff;
-    palClearLine(MBIA_LE_PIN);
-    _delay(1000);
-    // start BFTM1 continous
     if (GPTD_BFTM1.state == GPT_READY) {
-        // 60,000 ticks
         gptStartContinuous(&GPTD_BFTM1, 60000UL);
     }
 
-    mbia043_send_instruction(0x12);
-    mbia043_shift_data(0x300, 10);
-    mbia043_shift_data(0x300, 10);
-    mbia043_shift_data(0x0, 2);
-    palClearLine(MBIA_DCLK_PIN);
-    palSetLine(MBIA_LE_PIN);
-    _delay(10);
-    mbia043_shift_data(0xc00, 8);
-    _delay(10);
-    palClearLine(MBIA_SDI_PIN);
-    palClearLine(MBIA_LE_PIN);
-    _delay(10);
-
-    uint32_t _red = 0x0000;
-    uint32_t _green = 0xffff;
-    uint32_t _blue = 0x0000;
-    uint32_t width = GPTM1_config.period / 2;
-
-    while (true) {
-        //if (counter == 50) {
-        //    printf("%d\n", counter);
-        //    _red += 1;
-        //    _green += 1;
-        //    _blue += 1;
-        //}
-        gpio_reset();
-        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-        GPIOB->DIRCR |= (1 << 2);
-        GPIOB->RR |= (1 << 2);
-        pwmDisableChannel(&PWMD_GPTM1, 0);
-        for (int i = 0; i < 16; i++) {
-            // Blue
-            mbia043_shift_data(_blue, 10);
-            // Green
-            mbia043_shift_data(_green, 10);
-            // Red
-            mbia043_shift_data(_red, 10);
-            //_delay(10);
-            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-            //_delay(10);
-        }
-        pwmEnableChannel(&PWMD_GPTM1, 0, width);
-        //_delay(10);
-        gpio_reset();
-        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-        GPIOB->DIRCR |= (2 << 2);
-        GPIOB->RR |= (2 << 2);
-        pwmDisableChannel(&PWMD_GPTM1, 0);
-        for (int i = 0; i < 16; i++) {
-            // Blue
-            mbia043_shift_data(_blue, 10);
-            // Green
-            mbia043_shift_data(_green, 10);
-            // Red
-            mbia043_shift_data(_red, 10);
-            //_delay(10);
-            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-            //_delay(10);
-        }
-        pwmEnableChannel(&PWMD_GPTM1, 0, width);
-        //_delay(10);
-        gpio_reset();
-        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-        GPIOB->DIRCR |= (4 << 2);
-        GPIOB->RR |= (4 << 2);
-        pwmDisableChannel(&PWMD_GPTM1, 0);
-        for (int i = 0; i < 16; i++) {
-            // Blue
-            mbia043_shift_data(_blue, 10);
-            // Green
-            mbia043_shift_data(_green, 10);
-            // Red
-            mbia043_shift_data(_red, 10);
-            //_delay(10);
-            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-            //_delay(10);
-        }
-        pwmEnableChannel(&PWMD_GPTM1, 0, width);
-        //_delay(10);
-        gpio_reset();
-        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-        GPIOB->DIRCR |= (8 << 2);
-        GPIOB->RR |= (8 << 2);
-        pwmDisableChannel(&PWMD_GPTM1, 0);
-        for (int i = 0; i < 16; i++) {
-            // Blue
-            mbia043_shift_data(_blue, 10);
-            // Green
-            mbia043_shift_data(_green, 10);
-            // Red
-            mbia043_shift_data(_red, 10);
-            //_delay(10);
-            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-            //_delay(10);
-        }
-        pwmEnableChannel(&PWMD_GPTM1, 0, width);
-        //_delay(10);
-        gpio_reset();
-        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-        GPIOC->DIRCR |= (1 << 5);
-        GPIOC->RR |= (1 << 5);
-        pwmDisableChannel(&PWMD_GPTM1, 0);
-        for (int i = 0; i < 16; i++) {
-            // Blue
-            mbia043_shift_data(_blue, 10);
-            // Green
-            mbia043_shift_data(_green, 10);
-            // Red
-            mbia043_shift_data(_red, 10);
-            //_delay(10);
-            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-            //_delay(10);
-        }
-        pwmEnableChannel(&PWMD_GPTM1, 0, width);
-        //_delay(10);
-        gpio_reset();
-        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-        GPIOC->DIRCR |= (2 << 5);
-        GPIOC->RR |= (2 << 5);
-        pwmDisableChannel(&PWMD_GPTM1, 0);
-        for (int i = 0; i < 16; i++) {
-            // Blue
-            mbia043_shift_data(_blue, 10);
-            // Green
-            mbia043_shift_data(_green, 10);
-            // Red
-            mbia043_shift_data(_red, 10);
-            //_delay(10);
-            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-            //_delay(10);
-        }
-        pwmEnableChannel(&PWMD_GPTM1, 0, width);
-        //_delay(10);
-        gpio_reset();
-        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-        GPIOC->DIRCR |= (4 << 5);
-        GPIOC->RR |= (4 << 5);
-        pwmDisableChannel(&PWMD_GPTM1, 0);
-        for (int i = 0; i < 16; i++) {
-            // Blue
-            mbia043_shift_data(_blue, 10);
-            // Green
-            mbia043_shift_data(_green, 10);
-            // Red
-            mbia043_shift_data(_red, 10);
-            //_delay(10);
-            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-            //_delay(10);
-        }
-        pwmEnableChannel(&PWMD_GPTM1, 0, width);
-        //_delay(10);
-        gpio_reset();
-        mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-        GPIOC->DIRCR |= (8 << 5);
-        GPIOC->RR |= (8 << 5);
-        pwmDisableChannel(&PWMD_GPTM1, 0);
-        for (int i = 0; i < 16; i++) {
-            // Blue
-            mbia043_shift_data(_blue, 10);
-            // Green
-            mbia043_shift_data(_green, 10);
-            // Red
-            mbia043_shift_data(_red, 10);
-            //_delay(10);
-            mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-            //_delay(10);
-        }
-        pwmEnableChannel(&PWMD_GPTM1, 0, width);
-        //_delay(10);
-    }
-    mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-    while (true) {
-        __NOP();
-    }
-
-    mbia043_shift_data(0, 10);
-    mbia043_shift_data(0, 10);
-    mbia043_shift_data(0, 10);
-    counter = mbia043_shift_register_length();
-    printf("%u\n", counter);
-    mbia043_shift_data(0, 10);
-    mbia043_shift_data(0, 10);
-    mbia043_shift_data(0, 10);
-    counter = mbia043_shift_register_length();
-    printf("%u\n", counter);
-    mbia043_shift_data(0, 10);
-    mbia043_shift_data(0, 10);
-    mbia043_shift_data(0, 10);
-    counter = mbia043_shift_register_length();
-    printf("%u\n", counter);
-
-    //number = 0x7ff;
-    //while (counter-- > 0) {
-    //    uint16_t out = mbia043_shift_recv(number, 10);
-    //    printf("%d: out: %u\n", counter, out);
-    //    number = number >> 1;
-    //}
-#endif
+#ifdef MBIA043_DEBUG
     printf("%s END\n", __func__);
-
+#endif
     return;
 }
 
-void mbia043_send_instruction(uint32_t instr) {
-    if (mbia043_initialized) {
-        palClearLine(MBIA_LE_PIN);
-        //_delay(10);
+// Send 'instr' number of DCLK pulses while LE is asserted high.
+void inline _mbia043_send_instruction(int instr) {
+    writePinLow(MBIA043_LE_PIN);
+    __NOP();
+    __NOP();
+    writePinHigh(MBIA043_LE_PIN);
+    while (instr-- > 0) {
         __NOP();
         __NOP();
-        // assert MBIA_LE high
-        palSetLine(MBIA_LE_PIN);
-        //_delay(10);
+        writePinLow(MBIA043_DCLK_PIN);
         __NOP();
         __NOP();
-        // instruction number of DCLK rising edges while MBIA_LE is asserted
-        while (instr--) {
-            __NOP();
-            __NOP();
-            palClearLine(MBIA_DCLK_PIN);
-            //_delay(10);
-            __NOP();
-            __NOP();
-            palSetLine(MBIA_DCLK_PIN);
-            //_delay(10);
-        }
+        writePinHigh(MBIA043_DCLK_PIN);
+    }
+    writePinLow(MBIA043_LE_PIN);
+    return;
+}
+
+// Send 'instr' number of DCLK pulses while LE is asserted high.
+void mbia043_send_instruction(int instr) {
+//#ifdef MBIA043_DEBUG
+//    printf("%s(%d)\n", __func__, instr);
+//#endif
+    _mbia043_send_instruction(instr);
+    return;
+}
+
+// Transmit data to shift-register with shift_amount number of DCLK pulses.
+//
+// Note: Transmission begins with MSB at data[15].
+void inline _mbia043_shift_data(uint16_t data, int shift_amount) {
+    while (shift_amount-- > 0) {
         __NOP();
         __NOP();
-        // deassert MBIA_LE
-        palClearLine(MBIA_LE_PIN);
+        writePinLow(MBIA043_DCLK_PIN);
+        // set SDI to data[15]
+        writePin(MBIA043_SDI_PIN, data & 0x8000);
+        __NOP();
+        __NOP();
+        // clock in data
+        writePinHigh(MBIA043_DCLK_PIN);
+        data = (data & 0x7fff) << 1;
     }
     return;
 }
 
-void mbia043_shift_data(uint16_t value, uint16_t shift_amount) {
-    if (mbia043_initialized) {
-        while (shift_amount--) {
-            __NOP();
-            __NOP();
-            // deassert MBIA_DCLK
-            palClearLine(MBIA_DCLK_PIN);
-            // set MBIA_SDI to value_be[15] bit
-            if ((int)(value << 0x10) < 0) {
-                palSetLine(MBIA_SDI_PIN);
-            } else {
-                palClearLine(MBIA_SDI_PIN);
-            }
-            __NOP();
-            __NOP();
-            // shift bit to shift register
-            palSetLine(MBIA_DCLK_PIN);
-            // shift value_be
-            value = (value & 0x7fff) << 1;
-        }
+// Transmit data to shift-register with shift_amount number of DCLK pulses.
+//
+// Note: Transmission begins with MSB at data[15].
+void mbia043_shift_data(uint16_t data, int shift_amount) {
+//#ifdef MBIA043_DEBUG
+//    printf("%s(0x%04x, %d)\n", __func__, data, shift_amount);
+//#endif
+    _mbia043_shift_data(data, shift_amount);
+    return;
+}
+
+// Transmit data to shift-register with shift_amount number of DCLK pulses,
+// and assert LE for the last instr number of DCLK pulses.
+//
+// Note: Assumes instr is less than shift_amount.
+// Note: Transmission begins with MSB at data[15].
+void mbia043_shift_data_instr(uint16_t data, int shift_amount, int instr) {
+#ifdef MBIA043_DEBUG
+    printf("%s(0x%04x, %d, %d)\n", __func__, data, shift_amount, instr);
+#endif
+    if (instr < shift_amount) {
+        writePinLow(MBIA043_LE_PIN);
+        _mbia043_shift_data(data, shift_amount-instr);
+        data = data << (shift_amount-instr);
+        writePinHigh(MBIA043_LE_PIN);
+        _mbia043_shift_data(data, instr);
+        writePinLow(MBIA043_LE_PIN);
     }
     return;
 }
 
-uint16_t mbia043_shift_recv(uint16_t value, uint16_t shift_amount) {
+// Transmit data to shift-register with shift_amount number of DCLK pulses,
+// and read shift_amount bits of data from (last-in-cascade) shift-register.
+//
+// Note: Transmission begins with MSB at data[15].
+uint16_t mbia043_shift_recv(uint16_t data, int shift_amount) {
+#ifdef MBIA043_DEBUG
+    printf("%s(0x%04x, %d)", __func__, data, shift_amount);
+#endif
     uint16_t recv = 0;
-    if (mbia043_initialized) {
-        while (shift_amount--) {
-            __NOP();
-            __NOP();
-            palClearLine(MBIA_DCLK_PIN);
-            printf("%ld\n", palReadLine(MBIA_SDO_PIN));
-            //recv = (recv << 1) | palReadLine(MBIA_SDO_PIN);
-            if (value & 0x200) {
-                palSetLine(MBIA_SDI_PIN);
-            } else {
-                palClearLine(MBIA_SDI_PIN);
-            }
-            __NOP();
-            __NOP();
-            palSetLine(MBIA_DCLK_PIN);
-            value = (value & 0x1ff) << 1;
-        }
+    while (shift_amount-- > 0) {
         __NOP();
         __NOP();
-        //recv = ((recv << 1) | palReadLine(MBIA_SDO_PIN)) & 0xfff;
-        //recv = palReadLine(MBIA_SDO_PIN);
-        printf("%ld\n", palReadLine(MBIA_SDO_PIN));
+        writePinLow(MBIA043_DCLK_PIN);
+        recv = (recv << 1) | readPin(MBIA043_SDO_PIN);
+        // set SDI to data[15]
+        writePin(MBIA043_SDI_PIN, data & 0x8000);
+        __NOP();
+        __NOP();
+        // clock in data
+        writePinHigh(MBIA043_DCLK_PIN);
+        data = (data & 0x7fff) << 1;
     }
+#ifdef MBIA043_DEBUG
+    printf(": %d\n", recv);
+#endif
     return recv;
 }
 
-#ifdef RGB_MATRIX_ENABLE
-
-mbia043_led_t mbia043_rgb_matrix[MATRIX_ROWS][MBIA_NUM_CHANNELS];
-bool mbia043_needs_flush = true;
-// current row number
-uint8_t mbia043_row = 0;
-
-void _mbia043_reset(void) {
-    _mbia043_deactivate_row_pins();
-    GPIOC->SRR |= 1 << 2; // C2/MBIA_SDI
-    GPIOC->ODR &= ~(1 << 2); // C2/MBIA_SDI
-    GPIOC->DIRCR |= 1 << 2; // C2/MBIA_SDI
-    GPIOA->SRR |= 3 << 14; // A14/MBIA_DCLK & A15/MBIA_LE
-    GPIOA->ODR &= ~(3 << 14); // A14/MBIA_DCLK & A15/MBIA_LE
-    GPIOA->DIRCR |= 3 << 14; // A14/MBIA_DCLK & A15/MBIA_LE
-    _delay(10000);
-    mbia043_row = 0;
-    for (int i = 0; i < MATRIX_ROWS; i++) {
-        memset(mbia043_rgb_matrix[i], 0xffff, MATRIX_COLS * sizeof(mbia043_led_t));
-    }
-    _delay(100);
-    mbia043_update_RGB_buffers();
-    mbia043_send_instruction(MBIA043_INSTR_OVERALL_LATCH);
-    GPIOA->SRR |= 1 << 15; // A15/MBIA_LE
-    // start GPTM1 timer if not already
-    if (PWMD_GPTM1.state != PWM_READY) {
-        pwmStart(&PWMD_GPTM1, &GPTM1_config);
-    }
-    // start BFTM1 continous
-    if (GPTD_BFTM1.state == GPT_READY) {
-        // 60,000 ticks
-        gptStartContinuous(&GPTD_BFTM1, 60000UL);
-    }
-    // no pull resistor on MBIA_GCLK
-    GPIOC->PUR &= ~(1 << 0); // C0/MBIA_GCLK
-    GPIOC->PDR &= ~(1 << 0); // C0/MBIA_GCLK
-    // set MBIA_GCLK AFIO to AF4/GT_CH0
-    AFIO->GPCCFGR[0] |= (AFIO_TM << 0);
-
-    return;
-}
-
-void _mbia043_deactivate_row_pins(void) {
-    // input direction
-    GPIOB->DIRCR &= ~(0xf << 2);
-    // enable input
-    GPIOB->INER |= (0xf << 2);
-    // no pull resistor
-    GPIOB->PUR &= ~(0xf << 2);
-    GPIOB->PDR &= ~(0xf << 2);
-    // input direction
-    GPIOC->DIRCR &= ~(0xf << 5);
-    // enable input
-    GPIOC->INER |= (0xf << 5);
-    // no pull resistor
-    GPIOC->PUR &= ~(0xf << 5);
-    GPIOC->PDR &= ~(0xf << 5);
-    return;
-}
-
-void mbia043_update_RGB_buffers(void) {
-    for (int i = 0; i < MBIA_NUM_CHANNELS; i++) {
-        // Blue channel
-        mbia043_shift_data(mbia043_rgb_matrix[mbia043_row][i].blue<<2, 10);
-        // Green channel
-        mbia043_shift_data(mbia043_rgb_matrix[mbia043_row][i].green<<2, 10);
-        // Red channel
-        mbia043_shift_data(mbia043_rgb_matrix[mbia043_row][i].red<<2, 9);
-        // write data in shift registers to buffers
-        mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-    }
-    // move data in buffers to channel comparators
-    // mbia043_send_instruction(MBIA043_INSTR_DATA_LATCH);
-
-    return;
-}
-
-void mbia043_flush(void) {
-    if (!mbia043_needs_flush) {
-        return;
-    }
-
-    mbia043_update_RGB_buffers();
-    mbia043_needs_flush = false;
-    return;
-}
-
-void mbia043_set_color(int index, uint8_t red, uint8_t green, uint8_t blue) {
-    mbia043_needs_flush = true;
-    // encode to 10-bit big endian
-    return;
-}
-
-void mbia043_set_color_all(uint8_t red, uint8_t green, uint8_t blue) {
-    return;
-}
-
-const rgb_matrix_driver_t rgb_matrix_driver = {
-    .init = mbia043_init,
-    .flush = mbia043_flush,
-    .set_color = mbia043_set_color,
-    .set_color_all = mbia043_set_color_all,
-};
-
+// Read configuration data from cascaded MBIA043s.
+// Note: order of array follows order from SDO to SDI pins.
+void mbia043_read_configuration(uint16_t *dst) {
+#ifdef MBIA043_DEBUG
+    printf("%s:\n", __func__);
 #endif
+    mbia043_send_instruction(MBIA043_READ_CONFIGURATION);
+    for (int i = 0; i < MBIA043_NUM_CASCADE; i++) {
+        dst[i] = mbia043_shift_recv(0, MBIA043_SHIFT_REGISTER_WIDTH) & 0x3ff;
+#ifdef MBIA043_DEBUG
+        printf("\tdst[%d]: 0x%04x\n", i, dst[i]);
+#endif
+    }
+    return;
+}
+
+// Write configuration data to each MBIA043.
+// Note: order of array follows order from SDO to SDI pins.
+void mbia043_write_configuration(uint16_t *src) {
+#ifdef MBIA043_DEBUG
+    printf("%s:\n", __func__);
+#endif
+    mbia043_send_instruction(MBIA043_ENABLE_WRITE_CONFIGURATION);
+    int i = 0;
+    for (; i < MBIA043_NUM_CASCADE - 1; i++) {
+        mbia043_shift_data(src[i] << 6, MBIA043_SHIFT_REGISTER_WIDTH);
+#ifdef MBIA043_DEBUG
+        printf("\tsrc[%d]: 0x%04x\n", i, src[i]);
+#endif
+    }
+    if (i < MBIA043_NUM_CASCADE) {
+        mbia043_shift_data_instr(src[i] << 6, MBIA043_SHIFT_REGISTER_WIDTH,
+                MBIA043_WRITE_CONFIGURATION);
+#ifdef MBIA043_DEBUG
+        printf("\tsrc[%d]: 0x%04x\n", i, src[i]);
+#endif
+    }
+    return;
+}
+
+#ifdef MBIA043_DEBUG
+// Writes/read 10-bit data through shift-register(s)
+void mbia043_test_shift_register(void) {
+    printf("%s:\n", __func__);
+    for (uint16_t i = 0; i < 0x400; i++) {
+        uint16_t read = mbia043_shift_recv(i << 6, MBIA043_SHIFT_REGISTER_WIDTH);
+        printf("\t%u: %u (%s)\n", i, read, i == read ? "Okay" : "Fail");
+    }
+    return;
+}
+#endif
+
+// Find length of shift-register by clearing shift-register with 0s, writing
+// with 1s, and checking how many DCLK pulses until a 1 is detected.
+int mbia043_get_shift_register_length(void) {
+#ifdef MBIA043_DEBUG
+    printf("%s", __func__);
+#endif
+    int len = 0;
+    writePinLow(MBIA043_LE_PIN);
+    // clear shift register
+    mbia043_shift_data(0, MBIA043_NUM_CASCADE * MBIA043_SHIFT_REGISTER_WIDTH);
+    // write 1s until 1 appears on SDO
+    int out = readPin(MBIA043_SDO_PIN);
+    while (!out) {
+        len++;
+        _mbia043_shift_data(1U << 15, 1);
+        out = readPin(MBIA043_SDO_PIN);
+    }
+#ifdef MBIA043_DEBUG
+    printf(": %d\n", len);
+#endif
+    return len;
+}
