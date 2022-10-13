@@ -4,6 +4,7 @@
 #include "hal.h"
 #include "gpio.h"
 #include "mbia043.h"
+#include "quantum.h"
 
 #ifdef MBIA043_DEBUG
 #include "print.h"
@@ -37,7 +38,8 @@ static inline void set_color_all(uint16_t red, uint16_t green, uint16_t blue) {
         _mbia043_shift_data(green, 10);
         mbia043_shift_data_instr(red, 10, MBIA043_DATA_LATCH);
     }
-    mbia043_send_instruction(MBIA043_GLOBAL_LATCH);
+    writePinLow(MBIA043_SDI_PIN);
+    writePinLow(MBIA043_DCLK_PIN);
     return;
 }
 
@@ -48,6 +50,8 @@ static uint16_t _blue = 0x0500;
 // BFTM1 callback routine
 static void timer_callback(GPTDriver *gptp) {
     led_gpio_pin_reset();
+    wait_us(10);
+    mbia043_send_instruction(MBIA043_GLOBAL_LATCH);
     setPinOutput(LED_GPIO_PINS[LED_PIN_NUM]);
     writePinLow(LED_GPIO_PINS[LED_PIN_NUM]);
     LED_PIN_NUM = (LED_PIN_NUM + 1) & 0x7;
