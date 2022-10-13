@@ -22,7 +22,7 @@ static uint32_t LED_GPIO_PINS[8] = {
     Q7_Ctrl,
     Q8_Ctrl,
 };
-static int LED_PIN_NUM = 0;
+static unsigned int LED_PIN_NUM = 0;
 
 static void led_gpio_pin_reset(void) {
     for (int i = 0; i < 8; i++) {

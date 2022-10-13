@@ -39,6 +39,5 @@ void bootloader_jump(void) {
 }
 
 void keyboard_post_init_user(void) {
-    wait_ms(5000);
     mbia043_init();
 }
