@@ -10,8 +10,8 @@ MCU_STARTUP = ht32f165x
 BOARD = MASTERKEYS_PROSRGB
 
 # Custom RGB matrix handling
-# RGB_MATRIX_ENABLE = yes
-# RGB_MATRIX_DRIVER = custom
+RGB_MATRIX_ENABLE = yes
+RGB_MATRIX_DRIVER = custom
 
 # Keys
 CUSTOM_MATRIX = lite

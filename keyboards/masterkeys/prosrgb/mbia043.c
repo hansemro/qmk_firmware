@@ -12,7 +12,64 @@
 
 #define RGB_LEVELS 10
 
-static uint32_t LED_GPIO_PINS[8] = {
+#ifndef RGB_MATRIX_ENABLE
+#define DRIVER_LED_TOTAL 87
+typedef struct {
+    uint8_t x;
+    uint8_t y;
+} led_point_t;
+
+typedef struct {
+    uint8_t matrix_co[MATRIX_ROWS][15];
+    led_point_t point[DRIVER_LED_TOTAL];
+    uint8_t flags[DRIVER_LED_TOTAL];
+} led_config_t;
+#endif
+
+int BOUND = 87;
+#ifdef RGB_MATRIX_ENABLE
+#define NO_LED 255
+led_config_t g_led_config = {
+    { // Key Matrix to LED Index
+{ 8,5,1,255,255,255,255,82,28,26,24,22,20,18,16 },
+{ 9,6,2,72,255,255,85,57,41,39,37,35,33,31,29 },
+{ 255,81,3,71,255,255,10,84,42,40,38,36,34,32,30 },
+{ 255,255,255,73,255,255,11,77,56,54,52,50,48,46,44 },
+{ 255,255,255,74,255,255,12,70,255,55,53,51,49,47,45 },
+{ 255,255,13,75,255,255,86,80,78,68,66,64,62,60,58 },
+{ 255,255,14,76,255,255,255,79,255,69,67,65,63,61,59 },
+{ 7,4,0,255,255,255,83,43,27,25,23,21,19,17,15 },
+    }, { // LED Index to Physical Position
+        {  0,   0}, { 26,   0}, { 39,   0}, { 52,   0}, { 65,   0}, { 84,   0}, { 97,   0}, {110,   0}, {123,   0}, {143,   0}, {156,   0}, {169,   0}, {182,   0}, {198,   0}, {211,   0}, {224,   0},
+        {  0,  17}, { 13,  17}, { 26,  17}, { 39,  17}, { 52,  17}, { 65,  17}, { 78,  17}, { 91,  17}, {104,  17}, {117,  17}, {130,  17}, {143,  17}, {156,  17}, {175,  17}, {198,  17}, {211,  17}, {224,  17},
+        {  3,  29}, { 19,  29}, { 32,  29}, { 45,  29}, { 58,  29}, { 71,  29}, { 84,  29}, { 97,  29}, {110,  29}, {123,  29}, {136,  29}, {149,  29}, {162,  29}, {172,  29}, {198,  29}, {211,  29}, {224,  29},
+        {  5,  41}, { 23,  41}, { 36,  41}, { 49,  41}, { 62,  41}, { 75,  41}, { 88,  41}, {101,  41}, {114,  41}, {127,  41}, {140,  41}, {153,  41}, {174,  41},
+        {  8,  52}, { 29,  52}, { 42,  52}, { 55,  52}, { 68,  52}, { 81,  52}, { 94,  52}, {107,  52}, {120,  52}, {133,  52}, {146,  52}, {170,  52}, {211,  52},
+        {  2,  64}, { 18,  64}, { 34,  64}, { 83,  64}, {131,  64}, {148,  64}, {164,  64}, {180,  64}, {198,  64}, {211,  64}, {224,  64},
+    }, { // LED Index to Flag
+        4,    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,  4, 4, 4,
+        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,  4, 4, 4,
+        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,  4, 4, 4,
+        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,    4,
+        4,    4, 4, 4, 4, 4, 4, 4, 4, 4, 4,    4,     4,
+        4, 4, 4,          4,          4, 4, 4, 4,  4, 4, 4,
+    }
+};
+#endif
+
+typedef struct PACKED {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} mbia043_led_t;
+
+#ifdef RGB_MATRIX_ENABLE
+mbia043_led_t mbia043_leds[MATRIX_ROWS * MBIA043_NUM_CHANNELS];
+#else
+mbia043_led_t mbia043_leds[MATRIX_ROWS][MBIA043_NUM_CHANNELS];
+#endif
+
+static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = {
     Q1_Ctrl,
     Q2_Ctrl,
     Q3_Ctrl,
@@ -22,136 +79,76 @@ static uint32_t LED_GPIO_PINS[8] = {
     Q7_Ctrl,
     Q8_Ctrl,
 };
-static unsigned int LED_PIN_NUM = 0;
+static unsigned int LED_ROW_NUM = 0;
 
-static void led_gpio_pin_reset(void) {
-    for (int i = 0; i < 8; i++) {
-        setPinInput(LED_GPIO_PINS[i]);
+static void mbia043_reset_row_pins(void) {
+    for (int i = 0; i < MATRIX_ROWS; i++) {
+        setPinInput(LEDA_GPIO_ROW_PINS[i]);
     }
     return;
 }
 
-static inline void set_color_all(uint16_t red, uint16_t green, uint16_t blue) {
+static inline void mbia043_write_color_row(int row) {
     writePinLow(MBIA043_LE_PIN);
-    for (int i = 0; i < MBIA043_NUM_CHANNELS; i++) {
-        _mbia043_shift_data(blue, 10);
-        _mbia043_shift_data(green, 10);
-        mbia043_shift_data_instr(red, 10, MBIA043_DATA_LATCH);
+#ifdef RGB_MATRIX_ENABLE
+    for (int i = 0; i < MBIA043_NUM_CHANNELS - MATRIX_COLS; i++) {
+        _mbia043_shift_data(0, 10);
+        _mbia043_shift_data(0, 10);
+        mbia043_shift_data_instr(0, 10, MBIA043_DATA_LATCH);
     }
+    for (int i = 0; i < MATRIX_COLS; i++) {
+        _mbia043_shift_data(mbia043_leds[g_led_config.matrix_co[row][i]].b << 8, 10);
+        _mbia043_shift_data(mbia043_leds[g_led_config.matrix_co[row][i]].g << 8, 10);
+        mbia043_shift_data_instr(mbia043_leds[g_led_config.matrix_co[row][i]].r << 8, 10, MBIA043_DATA_LATCH);
+    }
+#else
+    for (int i = 0; i < MBIA043_NUM_CHANNELS; i++) {
+        _mbia043_shift_data(mbia043_leds[row][i].b << 8, 10);
+        _mbia043_shift_data(mbia043_leds[row][i].g << 8, 10);
+        mbia043_shift_data_instr(mbia043_leds[row][i].r << 8, 10, MBIA043_DATA_LATCH);
+    }
+#endif
     writePinLow(MBIA043_SDI_PIN);
     writePinLow(MBIA043_DCLK_PIN);
     return;
 }
 
-static int state = 0;
-static int counter = 0;
-static int c2 = 0;
-static uint8_t _red = 0x00;
-static uint8_t _green = 0x00;
-static uint8_t _blue = 0x00;
+#ifdef RGB_MATRIX_ENABLE
+static void mbia043_set_color(int index, uint8_t r, uint8_t g, uint8_t b) {
+    mbia043_leds[index].r = r;
+    mbia043_leds[index].g = g;
+    mbia043_leds[index].b = b;
+    return;
+}
+
+static void mbia043_set_color_all(uint8_t r, uint8_t g, uint8_t b) {
+    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+        mbia043_leds[i].r = r;
+        mbia043_leds[i].g = g;
+        mbia043_leds[i].b = b;
+    }
+    return;
+}
+
+static void mbia043_flush(void) { return; }
+
+const rgb_matrix_driver_t rgb_matrix_driver = {
+    .init = mbia043_init,
+    .flush = mbia043_flush,
+    .set_color = mbia043_set_color,
+    .set_color_all = mbia043_set_color_all,
+};
+#endif
 
 // BFTM1 callback routine
 static void timer_callback(GPTDriver *gptp) {
-    led_gpio_pin_reset();
+    mbia043_reset_row_pins();
     wait_us(10);
     mbia043_send_instruction(MBIA043_GLOBAL_LATCH);
-    setPinOutput(LED_GPIO_PINS[LED_PIN_NUM]);
-    writePinLow(LED_GPIO_PINS[LED_PIN_NUM]);
-    LED_PIN_NUM = (LED_PIN_NUM + 1) & 0x7;
-    set_color_all(_red << 8, _green << 8, _blue << 8);
-    if (counter >= 0x00000050) {
-        switch (state) {
-            case 0:
-                if (_red < 0xff) {
-                    _red += 0x1;
-                } else {
-                    _red = 0xff;
-                    _green = 0x00;
-                    _blue = 0x00;
-                    state = 1;
-                    printf("s1\n");
-                }
-                break;
-            case 1:
-                if (_red > 0x00) {
-                    _red -= 0x1;
-                } else {
-                    _red = 0;
-                    _green = 0;
-                    _blue = 0;
-                    state = 2;
-                    printf("s2\n");
-                }
-                break;
-            case 2:
-                if (_green < 0xff) {
-                    _green += 0x1;
-                } else {
-                    _red = 0;
-                    _green = 0xff;
-                    _blue = 0;
-                    state = 3;
-                    printf("s3\n");
-                }
-                break;
-            case 3:
-                if (_green > 0x00) {
-                    _green -= 0x1;
-                } else {
-                    _red = 0;
-                    _green = 0;
-                    _blue = 0;
-                    state = 4;
-                    printf("s4\n");
-                }
-                break;
-            case 4:
-                if (_blue < 0x40) {
-                    if (c2 <= 0x1) {
-                        c2++;
-                    } else {
-                        _blue += 0x1;
-                        //printf("b%d\n", _blue);
-                        c2 = 0;
-                    }
-                } else {
-                    _red = 0;
-                    _green = 0;
-                    _blue = 0x40;
-                    state = 5;
-                    printf("s5\n");
-                }
-                break;
-            case 5:
-                if (_blue > 0x00) {
-                    if (c2 <= 0x0) {
-                        c2++;
-                    } else {
-                        _blue -= 0x1;
-                        //printf("b5%d\n", _blue);
-                        c2 = 0;
-                    }
-                } else {
-                    _red = 0;
-                    _green = 0;
-                    _blue = 0;
-                    state = 0;
-                    printf("s0\n");
-                }
-                break;
-            default:
-                _red = 0;
-                _green = 0;
-                _blue = 0;
-                state = 0;
-        }
-        //_red -= 0x1800;
-        //_green -= 0x2000;
-        //_blue -= 0x1000;
-        counter = 0;
-    } else {
-        counter++;
-    }
+    setPinOutput(LEDA_GPIO_ROW_PINS[LED_ROW_NUM]);
+    writePinLow(LEDA_GPIO_ROW_PINS[LED_ROW_NUM]);
+    mbia043_write_color_row(LED_ROW_NUM);
+    LED_ROW_NUM = (LED_ROW_NUM + 1) & 0x7;
     return;
 }
 
@@ -222,6 +219,55 @@ void mbia043_init(void) {
     if (GPTD_BFTM1.state == GPT_READY) {
         gptStartContinuous(&GPTD_BFTM1, 60000UL);
     }
+#ifdef RGB_MATRIX_ENABLE
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < MATRIX_COLS; j++) {
+            mbia043_leds[g_led_config.matrix_co[i][j]].r = 0;
+            mbia043_leds[g_led_config.matrix_co[i][j]].g = 0;
+            mbia043_leds[g_led_config.matrix_co[i][j]].b = 0;
+        }
+    }
+    //for (int i = 0; i < MATRIX_COLS; i++) {
+    //    mbia043_leds[g_led_config.matrix_co[0][i]].r = 0x2f;
+    //    mbia043_leds[g_led_config.matrix_co[1][i]].g = 0x2f;
+    //    mbia043_leds[g_led_config.matrix_co[2][i]].b = 0x0f;
+    //    mbia043_leds[g_led_config.matrix_co[3][i]].r = 0x4f;
+    //    mbia043_leds[g_led_config.matrix_co[4][i]].g = 0x4f;
+    //    mbia043_leds[g_led_config.matrix_co[5][i]].b = 0x2f;
+    //    mbia043_leds[g_led_config.matrix_co[6][i]].r = 0x6f;
+    //    mbia043_leds[g_led_config.matrix_co[6][i]].b = 0x6f;
+    //    mbia043_leds[g_led_config.matrix_co[7][i]].g = 0x6f;
+    //    mbia043_leds[g_led_config.matrix_co[7][i]].b = 0x6f;
+    //}
+#else
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 16; j++) {
+            mbia043_leds[i][j].r = 0;
+            mbia043_leds[i][j].g = 0;
+            mbia043_leds[i][j].b = 0;
+        }
+    }
+    for (int i = 0; i < 16; i++) {
+        mbia043_leds[0][i].r = 0x2f;
+        mbia043_leds[1][i].g = 0x2f;
+        mbia043_leds[2][i].b = 0x0f;
+        mbia043_leds[3][i].r = 0x4f;
+        mbia043_leds[4][i].g = 0x4f;
+        mbia043_leds[5][i].b = 0x2f;
+        mbia043_leds[6][i].r = 0x6f;
+        mbia043_leds[6][i].b = 0x6f;
+        mbia043_leds[7][i].g = 0x6f;
+        mbia043_leds[7][i].b = 0x6f;
+    }
+#endif
+#ifdef RGB_MATRIX_ENABLE
+    for (int i = 0; i < BOUND/*DRIVER_LED_TOTAL;*/; i++) {
+        mbia043_set_color(i, 0xff-(uint8_t)i, 0x5f, (uint8_t)i);
+        wait_us(30000);
+    }
+    wait_us(30000);
+    mbia043_set_color_all(0x3f, 0x00, 0x00);
+#endif
 
 #ifdef MBIA043_DEBUG
     printf("%s END\n", __func__);
