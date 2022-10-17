@@ -17,7 +17,9 @@
 #include "hal.h"
 #include "prosrgb.h"
 
+#ifndef RGB_MATRIX_ENABLE
 #include "mbia043.h"
+#endif
 
 #define FMC_SBVT1 0x40080304
 #define RESET_AP_MAGIC 0x55aafaf0
@@ -38,6 +40,8 @@ void bootloader_jump(void) {
     NVIC_SystemReset();
 }
 
+#ifndef RGB_MATRIX_ENABLE
 void keyboard_post_init_user(void) {
     mbia043_init();
 }
+#endif
