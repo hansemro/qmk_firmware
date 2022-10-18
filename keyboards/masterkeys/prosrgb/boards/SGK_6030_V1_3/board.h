@@ -29,7 +29,7 @@
 
 #define FLASH_SIZE (0x10000 - 0x4000) // 64kB - 16kB
 
-/* MCU -> MBIA_R -> MBIA_G -> MBIA_G -> MCU */
+/* MCU -> MBIA_R -> MBIA_G -> MBIA_B -> MCU */
 #define MBIA043_NUM_CASCADE 3 // one MBIA IC for each color channel
 /* MBIA pins */
 #define MBIA043_GCLK_PIN PAL_LINE(IOPORTC, 0)
