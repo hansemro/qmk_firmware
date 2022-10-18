@@ -1,19 +1,24 @@
 # masterkeys/prosrgb
 
-![masterkeys/prosrgb](imgur.com image replace me!)
-
-*A short description of the keyboard/project*
+A TKL (87-key) keyboard with per-key RGB lighting.
 
 * Keyboard Maintainer: [hansemro](https://github.com/hansemro)
-* Hardware Supported: *The PCBs, controllers supported*
-* Hardware Availability: *Links to where you can find this hardware*
+* Hardware Supported: SGK 6030 v1.3 (with US/ANSI layout)
+* Hardware Availability: Discontinued
 
 Make example for this keyboard (after setting up your build environment):
 
     make masterkeys/prosrgb:default
 
-Flashing example for this keyboard:
+Building pok3rtool for flashing:
 
-    make masterkeys/prosrgb:default:flash
+    git clone -b cooler-master-dev https://github.com/hansemro/pok3rtool.git --recursive
+    cd pok3rtool
+    mkdir -p build
+    cd build
+    cmake ..
+    make
 
-See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_tools) and the [make instructions](https://docs.qmk.fm/#/getting_started_make_guide) for more information. Brand new to QMK? Start with our [Complete Newbs Guide](https://docs.qmk.fm/#/newbs).
+Flashing QMK firmware with pok3rtool:
+
+    ./pok3rtool -t prosrgb flash 1.2.3 masterkeys_prosrgb_debug.bin
