@@ -1,6 +1,6 @@
 {
-    "manufacturer": "Hansem Ro",
-    "keyboard_name": "masterkeys/prosrgb",
+    "manufacturer": "Cooler Master",
+    "keyboard_name": "MasterKeys Pro S RGB",
     "maintainer": "hansemro",
     "bootloader": "custom",
     "diode_direction": "COL2ROW",
@@ -8,7 +8,7 @@
         "bootmagic": true,
         "command": false,
         "console": true,
-        "extrakey": false,
+        "extrakey": true,
         "mousekey": false,
         "nkro": false
     },
@@ -18,7 +18,7 @@
     },
     "usb": {
         "device_version": "1.2.3",
-        "pid": "0x004E",
+        "pid": "0x003E",
         "vid": "0x2516"
     },
     "layouts": {
