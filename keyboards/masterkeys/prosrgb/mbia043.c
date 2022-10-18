@@ -60,9 +60,11 @@ static void mbia043_reset_row_pins(void) {
 }
 
 /* Flush a row's RGB values to MBIA043s starting with output channel 16
- * to buffers. Requires OVERALL_LATCH instruction afterwards to update
+ * to buffers. Requires GLOBAL_LATCH instruction afterwards to update
  * comparators from buffers.
- * */
+ *
+ * Assumes number of channels > number of columns.
+ */
 static inline void mbia043_write_color_row(int row) {
     writePinLow(MBIA043_LE_PIN);
     for (int i = 0; i < MBIA043_NUM_CHANNELS - MATRIX_COLS; i++) {
