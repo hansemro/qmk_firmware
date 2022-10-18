@@ -32,14 +32,14 @@
 /* MCU -> MBIA_R -> MBIA_G -> MBIA_G -> MCU */
 #define MBIA043_NUM_CASCADE 3 // one MBIA IC for each color channel
 /* MBIA pins */
-#define MBIA043_GCLK_PIN       PAL_LINE(IOPORTC, 0)
-#define MBIA043_DCLK_PIN       PAL_LINE(IOPORTA, 14)
-#define MBIA043_SDI_PIN        PAL_LINE(IOPORTC, 2) /* data sent to first MBIA from MCU */
-#define MBIA043_SDO_PIN        PAL_LINE(IOPORTB, 0) /* data sent to CPU from last MBIA */
-#define MBIA043_LE_PIN         PAL_LINE(IOPORTA, 15)
+#define MBIA043_GCLK_PIN PAL_LINE(IOPORTC, 0)
+#define MBIA043_DCLK_PIN PAL_LINE(IOPORTA, 14)
+#define MBIA043_SDI_PIN PAL_LINE(IOPORTC, 2) /* data sent to first MBIA from MCU */
+#define MBIA043_SDO_PIN PAL_LINE(IOPORTB, 0) /* data sent to CPU from last MBIA */
+#define MBIA043_LE_PIN PAL_LINE(IOPORTA, 15)
 /* MBIA 3.3V power enable */
 #define MBIA043_HAS_POWER_PIN
-#define MBIA043_PWRCTRL_PIN    PAL_LINE(IOPORTC, 1)
+#define MBIA043_PWRCTRL_PIN PAL_LINE(IOPORTC, 1)
 
 /* LED (Anode) ROW GPIO Pins*/
 #define Q1_Ctrl PAL_LINE(IOPORTC, 8)

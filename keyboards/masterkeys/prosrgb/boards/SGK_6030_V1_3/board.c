@@ -103,4 +103,4 @@ void __early_init(void) {
     ht32_clock_init();
 }
 
-void boardInit(void) { }
+void boardInit(void) {}
