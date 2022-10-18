@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2013-2016 Fabio UJonathan A. Kollaschtzig, http://fabioutzig.com
  *           (c) 2020 Yaotian Feng (Codetector) <codetector@codetector.cn>
+ *           (c) 2022 Hansem Ro <hansemro@outlook.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
