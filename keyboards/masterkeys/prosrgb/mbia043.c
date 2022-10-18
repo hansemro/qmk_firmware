@@ -8,17 +8,18 @@
 #include "quantum.h"
 
 #ifdef RGB_MATRIX_ENABLE
+// clang-format off
 led_config_t g_led_config = {
     { // KEY Matrix to LED Index
-    //      Col1 Col2 Col3 Col4 Col5 Col6 Col7      Col8    Col9    Col10   Col11   Col12   Col13   Col14   Col15
-/*Row1*/{   16,  18,  20,  22,  24,  26,  28,       30,     32,     NO_LED, NO_LED, NO_LED, 0,      4,      7},
-/*Row2*/{   17,  19,  21,  23,  25,  27,  29,       31,     NO_LED, NO_LED, NO_LED, NO_LED, 1,      5,      8},
-/*Row3*/{   33,  35,  37,  39,  41,  43,  45,       47,     49,     NO_LED, NO_LED, 77,     2,      6,      9},
-/*Row4*/{   34,  36,  38,  40,  42,  44,  46,       48,     10,     NO_LED, NO_LED, 76,     3,      15,     NO_LED},
-/*Row5*/{   50,  52,  54,  56,  58,  60,  62,       82,     11,     NO_LED, NO_LED, 78,     NO_LED, NO_LED, NO_LED},
-/*Row6*/{   51,  53,  55,  57,  59,  61,  NO_LED,   75,     12,     NO_LED, NO_LED, 79,     NO_LED, NO_LED, NO_LED},
-/*Row7*/{   63,  65,  67,  69,  71,  73,  83,       85,     86,     NO_LED, NO_LED, 80,     13,     NO_LED, NO_LED},
-/*Row8*/{   64,  66,  68,  70,  72,  74,  NO_LED,   84,     NO_LED, NO_LED, NO_LED, 81,     14,     NO_LED, NO_LED},
+    /*          Col1 Col2 Col3 Col4 Col5 Col6 Col7      Col8    Col9    Col10   Col11   Col12   Col13   Col14   Col15 */
+    /*Row1*/{   16,  18,  20,  22,  24,  26,  28,       30,     32,     NO_LED, NO_LED, NO_LED, 0,      4,      7},
+    /*Row2*/{   17,  19,  21,  23,  25,  27,  29,       31,     NO_LED, NO_LED, NO_LED, NO_LED, 1,      5,      8},
+    /*Row3*/{   33,  35,  37,  39,  41,  43,  45,       47,     49,     NO_LED, NO_LED, 77,     2,      6,      9},
+    /*Row4*/{   34,  36,  38,  40,  42,  44,  46,       48,     10,     NO_LED, NO_LED, 76,     3,      15,     NO_LED},
+    /*Row5*/{   50,  52,  54,  56,  58,  60,  62,       82,     11,     NO_LED, NO_LED, 78,     NO_LED, NO_LED, NO_LED},
+    /*Row6*/{   51,  53,  55,  57,  59,  61,  NO_LED,   75,     12,     NO_LED, NO_LED, 79,     NO_LED, NO_LED, NO_LED},
+    /*Row7*/{   63,  65,  67,  69,  71,  73,  83,       85,     86,     NO_LED, NO_LED, 80,     13,     NO_LED, NO_LED},
+    /*Row8*/{   64,  66,  68,  70,  72,  74,  NO_LED,   84,     NO_LED, NO_LED, NO_LED, 81,     14,     NO_LED, NO_LED},
     }, { // LED Index to Physical Position
         {  0,   0}, { 26,   0}, { 39,   0}, { 52,   0}, { 65,   0}, { 84,   0}, { 97,   0}, {110,   0}, {123,   0}, {143,   0}, {156,   0}, {169,   0}, {182,   0}, {198,   0}, {211,   0}, {224,   0},
         {  0,  17}, { 13,  17}, { 26,  17}, { 39,  17}, { 52,  17}, { 65,  17}, { 78,  17}, { 91,  17}, {104,  17}, {117,  17}, {130,  17}, {143,  17}, {156,  17}, {175,  17}, {198,  17}, {211,  17}, {224,  17},
@@ -35,6 +36,7 @@ led_config_t g_led_config = {
         1, 1, 1,          4,          1, 1, 1, 1,  4, 4, 4,
     }
 };
+// clang-format on
 
 typedef struct PACKED {
     uint8_t r;
@@ -45,14 +47,7 @@ typedef struct PACKED {
 mbia043_led_t mbia043_leds[MATRIX_ROWS * MBIA043_NUM_CHANNELS];
 
 static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = {
-    Q8_Ctrl,
-    Q1_Ctrl,
-    Q2_Ctrl,
-    Q3_Ctrl,
-    Q4_Ctrl,
-    Q5_Ctrl,
-    Q6_Ctrl,
-    Q7_Ctrl,
+    Q8_Ctrl, Q1_Ctrl, Q2_Ctrl, Q3_Ctrl, Q4_Ctrl, Q5_Ctrl, Q6_Ctrl, Q7_Ctrl,
 };
 static unsigned int LED_ROW_NUM = 0;
 
@@ -101,7 +96,9 @@ static void mbia043_set_color_all(uint8_t r, uint8_t g, uint8_t b) {
     return;
 }
 
-static void mbia043_flush(void) { return; }
+static void mbia043_flush(void) {
+    return;
+}
 
 /* BFTM1 timer routine to update/flush RGB values one row at a time */
 static void timer_callback(GPTDriver *gptp) {
@@ -120,7 +117,7 @@ static void timer_callback(GPTDriver *gptp) {
  */
 static const GPTConfig BFTM1_config = {
     .frequency = HT32_CK_AHB_FREQUENCY,
-    .callback = timer_callback,
+    .callback  = timer_callback,
 };
 
 /* GPTM1 PWM configuration:
@@ -129,14 +126,16 @@ static const GPTConfig BFTM1_config = {
  */
 static const PWMConfig GPTM1_config = {
     .frequency = HT32_CK_AHB_FREQUENCY,
-    .period = (HT32_CK_AHB_FREQUENCY / 3600000) - 1,
-    .callback = NULL,
-    .channels = {
-        [0] = {
-            .mode = PWM_OUTPUT_ACTIVE_LOW,
-            .callback = NULL,
+    .period    = (HT32_CK_AHB_FREQUENCY / 3600000) - 1,
+    .callback  = NULL,
+    .channels =
+        {
+            [0] =
+                {
+                    .mode     = PWM_OUTPUT_ACTIVE_LOW,
+                    .callback = NULL,
+                },
         },
-    },
 };
 
 void mbia043_init(void) {
@@ -150,17 +149,16 @@ void mbia043_init(void) {
     writePinHigh(MBIA043_SDI_PIN);
     setPinInput(MBIA043_SDO_PIN);
 
-#ifdef MBIA043_HAS_POWER_PIN
+#    ifdef MBIA043_HAS_POWER_PIN
     /* Power on MBIA */
     setPinOutput(MBIA043_PWRCTRL_PIN);
     writePinHigh(MBIA043_PWRCTRL_PIN);
-#endif
+#    endif
 
     /* Start/configure PWM (at GCLK pin) */
     pwmStart(&PWMD_GPTM1, &GPTM1_config);
     writePinHigh(MBIA043_GCLK_PIN);
-    palSetLineMode(MBIA043_GCLK_PIN, PAL_MODE_OUTPUT_PUSHPULL |
-            PAL_MODE_HT32_AF(AFIO_TM));
+    palSetLineMode(MBIA043_GCLK_PIN, PAL_MODE_OUTPUT_PUSHPULL | PAL_MODE_HT32_AF(AFIO_TM));
 
     int len = 0;
     /* Wait until shift register becomes ready */
@@ -169,7 +167,7 @@ void mbia043_init(void) {
     }
 
     /* Set configuration */
-    uint16_t mbia043_config[MBIA043_NUM_CASCADE] = { 0xc, 0xc, 0xc };
+    uint16_t mbia043_config[MBIA043_NUM_CASCADE] = {0xc, 0xc, 0xc};
     mbia043_write_configuration(mbia043_config);
 
     /* Start PWM and BFTM1 */
@@ -182,9 +180,9 @@ void mbia043_init(void) {
 }
 
 const rgb_matrix_driver_t rgb_matrix_driver = {
-    .init = mbia043_init,
-    .flush = mbia043_flush,
-    .set_color = mbia043_set_color,
+    .init          = mbia043_init,
+    .flush         = mbia043_flush,
+    .set_color     = mbia043_set_color,
     .set_color_all = mbia043_set_color_all,
 };
 #endif
@@ -241,8 +239,8 @@ void inline mbia043_shift_data(uint16_t data, int shift_amount) {
 void mbia043_shift_data_instr(uint16_t data, int shift_amount, int instr) {
     if (instr < shift_amount) {
         writePinLow(MBIA043_LE_PIN);
-        mbia043_shift_data(data, shift_amount-instr);
-        data = data << (shift_amount-instr);
+        mbia043_shift_data(data, shift_amount - instr);
+        data = data << (shift_amount - instr);
         writePinHigh(MBIA043_LE_PIN);
         mbia043_shift_data(data, instr);
         writePinLow(MBIA043_LE_PIN);
@@ -298,8 +296,7 @@ void mbia043_write_configuration(uint16_t *src) {
         mbia043_shift_data(src[i] << 6, MBIA043_SHIFT_REG_WIDTH);
     }
     if (i < MBIA043_NUM_CASCADE) {
-        mbia043_shift_data_instr(src[i] << 6, MBIA043_SHIFT_REG_WIDTH,
-                MBIA043_WRITE_CONFIGURATION);
+        mbia043_shift_data_instr(src[i] << 6, MBIA043_SHIFT_REG_WIDTH, MBIA043_WRITE_CONFIGURATION);
     }
     return;
 }

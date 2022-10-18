@@ -31,12 +31,13 @@
       K40,        K42,  K43,  K44,  K45,  K46,  K47,  K48,  K49,  K4A,  K4B,        K4D,            K4E,        \
       K50,  K51,  K52,                    K56,                    K59,  K5A,  K5B,  K5C,      K5D,  K5E,  K6E   \
 ) { \
-    { K10,  K12,  K14,  K16,  K18,  K1A,  K1C,  K2E,  K63,  XXX,  XXX,  XXX,  K00,  K04,  K07 },  \
-    { K11,  K13,  K15,  K17,  K19,  K1B,  K1E,  K62,  XXX,  XXX,  XXX,  XXX,  K01,  K05,  K08 },  \
-    { K20,  K22,  K24,  K26,  K28,  K2A,  K2C,  K3E,  K69,  XXX,  XXX,  K51,  K02,  K06,  K09 },  \
-    { K21,  K23,  K25,  K27,  K29,  K2B,  K2D,  K68,  K0A,  XXX,  XXX,  K50,  K03,  K61,  XXX },  \
-    { K30,  K32,  K34,  K36,  K38,  K3A,  K3D,  K5B,  K0B,  XXX,  XXX,  K52,  XXX,  XXX,  XXX },  \
-    { K31,  K33,  K35,  K37,  K39,  K3B,  XXX,  K4E,  K0C,  XXX,  XXX,  K56,  XXX,  XXX,  XXX },  \
-    { K40,  K43,  K45,  K47,  K49,  K4B,  K5C,  K5E,  K6E,  XXX,  XXX,  K59,  K0D,  XXX,  XXX },  \
-    { K42,  K44,  K46,  K48,  K4A,  K4D,  XXX,  K5D,  XXX,  XXX,  XXX,  K5A,  K0E,  XXX,  XXX }   \
+    /*          Col1  Col2  Col3  Col4  Col5  Col6  Col7  Col8  Col9  Col10 Col11 Col12 Col13 Col14 Col15 */ \
+    /*Row1*/ {  K10,  K12,  K14,  K16,  K18,  K1A,  K1C,  K2E,  K63,  XXX,  XXX,  XXX,  K00,  K04,  K07 },  \
+    /*Row2*/ {  K11,  K13,  K15,  K17,  K19,  K1B,  K1E,  K62,  XXX,  XXX,  XXX,  XXX,  K01,  K05,  K08 },  \
+    /*Row3*/ {  K20,  K22,  K24,  K26,  K28,  K2A,  K2C,  K3E,  K69,  XXX,  XXX,  K51,  K02,  K06,  K09 },  \
+    /*Row4*/ {  K21,  K23,  K25,  K27,  K29,  K2B,  K2D,  K68,  K0A,  XXX,  XXX,  K50,  K03,  K61,  XXX },  \
+    /*Row5*/ {  K30,  K32,  K34,  K36,  K38,  K3A,  K3D,  K5B,  K0B,  XXX,  XXX,  K52,  XXX,  XXX,  XXX },  \
+    /*Row6*/ {  K31,  K33,  K35,  K37,  K39,  K3B,  XXX,  K4E,  K0C,  XXX,  XXX,  K56,  XXX,  XXX,  XXX },  \
+    /*Row7*/ {  K40,  K43,  K45,  K47,  K49,  K4B,  K5C,  K5E,  K6E,  XXX,  XXX,  K59,  K0D,  XXX,  XXX },  \
+    /*Row8*/ {  K42,  K44,  K46,  K48,  K4A,  K4D,  XXX,  K5D,  XXX,  XXX,  XXX,  K5A,  K0E,  XXX,  XXX }   \
 }
