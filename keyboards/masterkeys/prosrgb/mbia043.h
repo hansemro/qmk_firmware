@@ -34,8 +34,8 @@
 
 /* Pin used to control power supply to MBIA(s) */
 #ifdef MBIA043_HAS_POWER_PIN
-#    ifndef MBIA043_DCLK_PIN
-#        error "MBIA043_DCLK_PIN is not defined"
+#    ifndef MBIA043_PWRCTRL_PIN
+#        error "MBIA043_PWRCTRL_PIN is not defined"
 #    endif
 #endif
 
