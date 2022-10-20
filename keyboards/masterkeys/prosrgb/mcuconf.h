@@ -7,7 +7,7 @@
 #define HT32F1654_MCUCONF
 
 // CK_HSE = 8 MHz crystal
-// CK_PLL = 144 MHz
+// CK_PLL = CK_HSE * 18 = 144 MHz
 // CK_SYS = CK_PLL
 // CK_AHB = CK_SYS / 2 = 72 MHz
 // CK_USB = CK_PLL / 3 = 48 MHz
