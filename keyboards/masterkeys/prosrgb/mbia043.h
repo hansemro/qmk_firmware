@@ -56,9 +56,7 @@
 /* FUNCTIONS */
 void mbia043_init(void);
 
-void     _mbia043_send_instruction(int instr);
 void     mbia043_send_instruction(int instr);
-void     _mbia043_shift_data(uint16_t data, int shift_amount);
 void     mbia043_shift_data(uint16_t data, int shift_amount);
 void     mbia043_shift_data_instr(uint16_t data, int shift_amount, int instr);
 uint16_t mbia043_shift_recv(uint16_t data, int shift_amount);
