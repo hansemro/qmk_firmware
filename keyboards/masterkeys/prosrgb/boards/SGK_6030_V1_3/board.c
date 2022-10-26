@@ -16,6 +16,7 @@
 */
 
 #include "hal.h"
+#include "gpio.h"
 
 /* ============ Private Defines ===================== */
 
@@ -103,4 +104,28 @@ void __early_init(void) {
     ht32_clock_init();
 }
 
-void boardInit(void) {}
+#ifdef EEPROM_DRIVER
+static const SPIConfig SPI1_config = {
+    .end_cb = NULL,
+    .cr0 = SPI_CR0_SELOEN,
+    .cr1 = 8 | SPI_CR1_FORMAT_MODE0 | SPI_CR1_MODE,
+    .cpr = 1,
+    .fcr = 0,
+};
+
+static void spi_init(void) {
+    setPinOutput(SPI_CS_PIN);
+    palSetLineMode(SPI_SCK_PIN, PAL_MODE_HT32_AF(AFIO_SPI));
+    palSetLineMode(SPI_MOSI_PIN, PAL_MODE_HT32_AF(AFIO_SPI));
+    palSetLineMode(SPI_MISO_PIN, PAL_MODE_HT32_AF(AFIO_SPI));
+    palSetLineMode(SPI_CS_PIN, PAL_MODE_OUTPUT_PUSHPULL | PAL_MODE_HT32_AF(AFIO_GPIO));
+    writePinHigh(SPI_CS_PIN);
+    spiStart(&SPI_DRIVER, &SPI1_config);
+}
+#endif
+
+void boardInit(void) {
+#ifdef EEPROM_DRIVER
+    spi_init();
+#endif
+}
