@@ -12,9 +12,11 @@
 #    define HAL_USE_PWM TRUE
 #endif
 
-//#define HAL_USE_SPI     TRUE
-//#define SPI_USE_WAIT    TRUE
-//#define SPI_SELECT_MODE SPI_SELECT_MODE_PAD
+#ifdef EEPROM_DRIVER
+#    define HAL_USE_SPI TRUE
+#    define SPI_USE_WAIT TRUE
+#    define SPI_SELECT_MODE SPI_SELECT_MODE_PAD
+#endif
 
 #define SERIAL_USB_BUFFERS_SIZE 256
 

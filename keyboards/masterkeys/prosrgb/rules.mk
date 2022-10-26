@@ -17,6 +17,10 @@ RGB_MATRIX_DRIVER = custom
 CUSTOM_MATRIX = lite
 KEY_LOCK_ENABLE = no
 
+# Wear-leveling driver
+EEPROM_DRIVER = wear_leveling
+WEAR_LEVELING_DRIVER = spi_flash
+
 # Other features
 RAW_ENABLE = no
 MIDI_ENABLE = no
