@@ -47,7 +47,7 @@ typedef struct PACKED {
 static mbia043_led_t mbia043_leds[MATRIX_ROWS * MBIA043_NUM_CHANNELS];
 
 static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = {
-    Q8_Ctrl, Q1_Ctrl, Q2_Ctrl, Q3_Ctrl, Q4_Ctrl, Q5_Ctrl, Q6_Ctrl, Q7_Ctrl,
+    Q1_Ctrl, Q2_Ctrl, Q3_Ctrl, Q4_Ctrl, Q5_Ctrl, Q6_Ctrl, Q7_Ctrl, Q8_Ctrl,
 };
 static unsigned int LED_ROW_NUM = 0;
 
@@ -108,8 +108,8 @@ static void timer_callback(GPTDriver *gptp) {
     mbia043_send_instruction(MBIA043_GLOBAL_LATCH);
     setPinOutput(LEDA_GPIO_ROW_PINS[LED_ROW_NUM]);
     writePinLow(LEDA_GPIO_ROW_PINS[LED_ROW_NUM]);
-    mbia043_write_color_row(LED_ROW_NUM);
     LED_ROW_NUM = (LED_ROW_NUM + 1) & 0x7;
+    mbia043_write_color_row(LED_ROW_NUM);
     return;
 }
 
