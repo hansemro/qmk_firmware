@@ -37,3 +37,8 @@
 
 #define HT32_USB_USE_USB0 TRUE
 #define HT32_USB_USB0_IRQ_PRIORITY 5
+
+#ifdef RGB_MATRIX_ENABLE
+#    define HT32_PWM_USE_GPTM1 TRUE
+#    define HT32_GPT_USE_BFTM1 TRUE
+#endif
