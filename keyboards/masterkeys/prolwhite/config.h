@@ -6,7 +6,6 @@
 
 #include "pin_defs.h"
 
-#define DEBUG_MATRIX_SCAN_RATE
 
 #define DRIVER_LED_TOTAL 108
 
