@@ -25,7 +25,6 @@
 
 #ifdef LED_MATRIX_ENABLE
 #    define LED_MATRIX_KEYPRESSES          // reacts to keypresses
-#    define LED_MATRIX_KEYRELEASES         // reacts to keyreleases (instead of keypresses)
 #    define LED_MATRIX_FRAMEBUFFER_EFFECTS // enable framebuffer effects
 #    define ENABLE_LED_MATRIX_ALPHAS_MODS
 #    define ENABLE_LED_MATRIX_BREATHING
