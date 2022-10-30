@@ -20,12 +20,6 @@
 #define FMC_SBVT1 0x40080304
 #define RESET_AP_MAGIC 0x55aafaf0
 #define RESET_IAP_MAGIC 0x55aafaf5
-#define WATCH_DOG_CR_ADDR 0x40068000
-#define WATCH_DOG_RELOAD_VALUE 0x5fa00001
-
-void reload_watchdog(void) {
-    *(uint32_t *)(WATCH_DOG_CR_ADDR) = WATCH_DOG_RELOAD_VALUE;
-}
 
 void bootloader_jump(void) {
     wait_us(10000);                // 10 ms
