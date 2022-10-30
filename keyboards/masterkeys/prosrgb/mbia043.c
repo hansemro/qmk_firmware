@@ -46,9 +46,7 @@ typedef struct PACKED {
 
 static mbia043_led_t mbia043_leds[MATRIX_ROWS * MBIA043_NUM_CHANNELS];
 
-static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = {
-    Q1_Ctrl, Q2_Ctrl, Q3_Ctrl, Q4_Ctrl, Q5_Ctrl, Q6_Ctrl, Q7_Ctrl, Q8_Ctrl,
-};
+static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
 static unsigned int LED_ROW_NUM = 0;
 
 /* Disable row pins by setting to tristate */
