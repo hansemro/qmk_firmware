@@ -6,6 +6,7 @@
 
 #include "pin_defs.h"
 
+//#define FORCE_NKRO
 
 #define DRIVER_LED_TOTAL 108
 
