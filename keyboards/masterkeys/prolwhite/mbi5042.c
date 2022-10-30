@@ -179,16 +179,6 @@ void mbi5042_init(void) {
         gptStartContinuous(&GPTD_BFTM1, 30000UL);
     }
 
-#    if 0
-    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
-        mbi5042_set_color(i, 20+i, 0, 0);
-        printf("%d\n", i);
-        for (int j = 0; j < 1; j++) {
-            reload_watchdog();
-            wait_ms(100);
-        }
-    }
-#    endif
     return;
 }
 
