@@ -8,10 +8,11 @@
 #include "quantum.h"
 #include "print.h"
 
-#ifdef RGB_MATRIX_ENABLE
-#define NLD NO_LED
+#ifdef LED_MATRIX_ENABLE
+#    define NLD NO_LED
 
 // LED Matrix to LED Index
+// clang-format off
 uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS] = {
     /*          Col1 Col2 Col3 Col4 Col5 Col6 Col7 Col8 Col9 Col10 Col11 Col12 Col13 Col14 Col15 Col16*/
     /*Row1*/{   0,   1,   2,   3,   4,   5,   6,   7,   8,   9,    10,   11,   12,   NLD,  13,   14},
@@ -23,6 +24,7 @@ uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS] = {
     /*Row7*/{   NLD, NLD, NLD, NLD, NLD, 16,  17,  18,  19,  37,   38,   39,   40,   58,   59,   60},
     /*Row8*/{   NLD, NLD, NLD, NLD, NLD, 75,  76,  77,  61,  91,   92,   93,   94,   106,  107,  NLD},
 };
+// clang-format on
 
 // clang-format off
 led_config_t g_led_config = {
@@ -54,13 +56,7 @@ led_config_t g_led_config = {
 };
 // clang-format on
 
-typedef struct PACKED {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} mbi_led_t;
-
-static mbi_led_t mbi5042_leds[MATRIX_ROWS * MBI5042_NUM_CHANNELS];
+static uint8_t mbi5042_leds[MATRIX_ROWS * MBI5042_NUM_CHANNELS];
 
 static uint32_t LED_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
 
@@ -74,34 +70,30 @@ static void mbi5042_reset_row_pins(void) {
     return;
 }
 
-/* Flush a row's RGB values to MBI5042s starting with output channel 16
+/* Flush a row's grayscale values to MBI5042 starting with output channel 16
  * to buffers. Requires GLOBAL_LATCH instruction afterwards to update
  * comparators from buffers.
  *
  * Assumes number of channels > number of columns.
  */
-static inline void mbi5042_write_color_row(int row) {
+static inline void mbi5042_write_grayscale_row(int row) {
     writePinLow(MBI5042_LE_PIN);
     for (int i = MATRIX_COLS - 1; i >= 0; i--) {
-        mbi5042_shift_data_instr(mbi5042_leds[led_matrix_co[row][i]].r << 8, MBI5042_SHIFT_REG_WIDTH, MBI5042_DATA_LATCH);
+        mbi5042_shift_data_instr(mbi5042_leds[led_matrix_co[row][i]] << 8, MBI5042_SHIFT_REG_WIDTH, MBI5042_DATA_LATCH);
     }
     writePinLow(MBI5042_SDI_PIN);
     writePinLow(MBI5042_DCLK_PIN);
     return;
 }
 
-static void mbi5042_set_color(int index, uint8_t r, uint8_t g, uint8_t b) {
-    mbi5042_leds[index].r = r;
-    mbi5042_leds[index].g = g;
-    mbi5042_leds[index].b = b;
+static void mbi5042_set_value(int index, uint8_t value) {
+    mbi5042_leds[index] = value;
     return;
 }
 
-static void mbi5042_set_color_all(uint8_t r, uint8_t g, uint8_t b) {
+static void mbi5042_set_value_all(uint8_t value) {
     for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
-        mbi5042_leds[i].r = r;
-        mbi5042_leds[i].g = g;
-        mbi5042_leds[i].b = b;
+        mbi5042_leds[i] = value;
     }
     return;
 }
@@ -110,14 +102,14 @@ static void mbi5042_flush(void) {
     return;
 }
 
-/* BFTM1 timer routine to update/flush RGB values one row at a time */
+/* BFTM1 timer routine to update/flush grayscale values one row at a time */
 static void timer_callback(GPTDriver *gptp) {
     mbi5042_reset_row_pins();
     mbi5042_send_instruction(MBI5042_GLOBAL_LATCH);
     setPinOutput(LED_GPIO_ROW_PINS[LED_ROW_NUM]);
     writePinHigh(LED_GPIO_ROW_PINS[LED_ROW_NUM]);
     LED_ROW_NUM = (LED_ROW_NUM + 1) & 0x7;
-    mbi5042_write_color_row(LED_ROW_NUM);
+    mbi5042_write_grayscale_row(LED_ROW_NUM);
     return;
 }
 
@@ -187,7 +179,7 @@ void mbi5042_init(void) {
         gptStartContinuous(&GPTD_BFTM1, 30000UL);
     }
 
-#if 0
+#    if 0
     for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
         mbi5042_set_color(i, 20+i, 0, 0);
         printf("%d\n", i);
@@ -196,15 +188,15 @@ void mbi5042_init(void) {
             wait_ms(100);
         }
     }
-#endif
+#    endif
     return;
 }
 
-const rgb_matrix_driver_t rgb_matrix_driver = {
-    .init           = mbi5042_init,
-    .flush          = mbi5042_flush,
-    .set_color      = mbi5042_set_color,
-    .set_color_all  = mbi5042_set_color_all,
+const led_matrix_driver_t led_matrix_driver = {
+    .init          = mbi5042_init,
+    .flush         = mbi5042_flush,
+    .set_value     = mbi5042_set_value,
+    .set_value_all = mbi5042_set_value_all,
 };
 
 #endif
