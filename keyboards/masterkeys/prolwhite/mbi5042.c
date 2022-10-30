@@ -10,9 +10,9 @@
 
 #ifdef RGB_MATRIX_ENABLE
 #define NLD NO_LED
-// clang-format off
-led_config_t g_led_config = {
-    { // KEY Matrix to LED Index
+
+// LED Matrix to LED Index
+uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS] = {
     /*          Col1 Col2 Col3 Col4 Col5 Col6 Col7 Col8 Col9 Col10 Col11 Col12 Col13 Col14 Col15 Col16*/
     /*Row1*/{   0,   1,   2,   3,   4,   5,   6,   7,   8,   9,    10,   11,   12,   NLD,  13,   14},
     /*Row2*/{   20,  21,  22,  23,  24,  25,  26,  28,  29,  30,   31,   32,   NLD,  89,   34,   35},
@@ -22,6 +22,20 @@ led_config_t g_led_config = {
     /*Row6*/{   95,  96,  97,  NLD, 98,  NLD, 83,  85,  NLD, NLD,  99,   100,  NLD,  105,  104,  57},
     /*Row7*/{   NLD, NLD, NLD, NLD, NLD, 16,  17,  18,  19,  37,   38,   39,   40,   58,   59,   60},
     /*Row8*/{   NLD, NLD, NLD, NLD, NLD, 75,  76,  77,  61,  91,   92,   93,   94,   106,  107,  NLD},
+};
+
+// clang-format off
+led_config_t g_led_config = {
+    { // KEY Matrix to LED Index
+    /*          Col1 Col2 Col3 Col4 Col5 Col6 Col7 Col8 Col9 Col10 Col11 Col12 Col13 Col14 Col15 Col16*/
+    /*Row1*/{   15,  42,  43,  44,  45,  48,  49,  50,  51,  14,   90,   57,   58,   59,   60,   NLD},
+    /*Row2*/{   35,  41,  62,  3,   46,  47,  53,  7,   52,  78,   33,   NLD,  75,   76,   77,   NLD},
+    /*Row3*/{   36,  63,  64,  65,  66,  69,  70,  71,  72,  89,   54,   96,   91,   92,   93,   NLD},
+    /*Row4*/{   34,  0,   NLD, 4,   67,  68,  6,   NLD, 73,  97,   11,   98,   NLD,  106,  107,  NLD},
+    /*Row5*/{   102, 79,  80,  81,  82,  85,  86,  87,  NLD, NLD,  74,   56,   37,   38,   39,   NLD},
+    /*Row6*/{   105, NLD, NLD, NLD, 83,  84,  NLD, 101, 88,  99,   12,   104,  16,   17,   18,   NLD},
+    /*Row7*/{   95,  20,  1,   2,   25,  26,  32,  8,   31,  100,  9,    55,   NLD,  61,   40,   NLD},
+    /*Row8*/{   5,   21,  22,  23,  24,  27,  28,  29,  30,  13,   10,   103,  NLD,  94,   19,   NLD},
     }, { // LED Index to Physical Position
         {  0,   0}, { 21,   0}, { 31,   0}, { 42,   0}, { 52,   0}, { 68,   0}, { 78,   0}, { 89,   0}, { 99,   0}, {115,   0}, {125,   0}, {135,   0}, {146,   0}, {159,   0}, {169,   0}, {180,   0}, {193,   0}, {203,   0}, {214,   0}, {224,   0},
         {  0,  17}, { 10,  17}, { 21,  17}, { 31,  17}, { 42,  17}, { 52,  17}, { 63,  17}, { 73,  17}, { 83,  17}, { 94,  17}, {104,  17}, {115,  17}, {125,  17}, {141,  17}, {159,  17}, {169,  17}, {180,  17}, {193,  17}, {203,  17}, {214,  17}, {224,  17},
@@ -69,7 +83,7 @@ static void mbi5042_reset_row_pins(void) {
 static inline void mbi5042_write_color_row(int row) {
     writePinLow(MBI5042_LE_PIN);
     for (int i = MATRIX_COLS - 1; i >= 0; i--) {
-        mbi5042_shift_data_instr(mbi5042_leds[g_led_config.matrix_co[row][i]].r << 8, MBI5042_SHIFT_REG_WIDTH, MBI5042_DATA_LATCH);
+        mbi5042_shift_data_instr(mbi5042_leds[led_matrix_co[row][i]].r << 8, MBI5042_SHIFT_REG_WIDTH, MBI5042_DATA_LATCH);
     }
     writePinLow(MBI5042_SDI_PIN);
     writePinLow(MBI5042_DCLK_PIN);
