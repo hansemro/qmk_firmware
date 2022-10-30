@@ -6,19 +6,21 @@
 
 #include "pin_defs.h"
 
+//#define FORCE_NKRO
+
 /* MCU -> MBIA_R -> MBIA_G -> MBIA_B -> MCU */
 #define MBIA043_NUM_CASCADE 3 // one MBIA IC for each color channel
 /* MBIA pins */
 #define MBIA043_GCLK_PIN C0
 #define MBIA043_DCLK_PIN A14
 #define MBIA043_SDI_PIN C2 /* data sent to first MBIA from MCU */
-#define MBIA043_SDO_PIN B0 /* data sent to CPU from last MBIA */
+#define MBIA043_SDO_PIN B0 /* data sent to MCU from last MBIA */
 #define MBIA043_LE_PIN A15
 /* MBIA 3.3V power enable */
 #define MBIA043_HAS_POWER_PIN
 #define MBIA043_PWRCTRL_PIN C1
 
-/* LED (Anode) ROW GPIO Pins*/
+/* LED (Anode) ROW GPIO Pins */
 #define LED_ROW_PINS \
     { C8, C7, B5, B4, B3, B2, C6, C5 }
 
