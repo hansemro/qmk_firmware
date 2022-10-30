@@ -103,7 +103,7 @@ void __early_init(void) {
     ht32_clock_init();
 }
 
-void boardInit(void) { }
+void boardInit(void) {}
 
 const uint8_t bootloader_magic[] __attribute__((section(".magic.bootloader"))) = {
     0x00, 0x00, 0x04, 0x04, 0x01, 0x00, 0x00, 0x34, 0x04, 0x00, 0x02, 0x00,

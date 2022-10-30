@@ -30,8 +30,8 @@
 #define HT32_PLL_USE_HSE FALSE
 #define HT32_PLL_FBDIV 6 // 8 MHz -> 48 MHz
 #define HT32_PLL_OTDIV 0
-#define HT32_AHB_PRESCALER 1   // 48 MHz -> 48 MHz
-#define HT32_USB_PRESCALER 1   // 48 MHz -> 48 MHz
+#define HT32_AHB_PRESCALER 1 // 48 MHz -> 48 MHz
+#define HT32_USB_PRESCALER 1 // 48 MHz -> 48 MHz
 // SysTick uses processor clock at 48MHz
 #define HT32_ST_USE_HCLK TRUE
 
