@@ -68,7 +68,7 @@ Mass erase with [openocd fork with HT32 support](https://github.com/hansemro/ope
 Flash [stock USB IAP bootloader](https://github.com/hansemro/pok3r_re_firmware/raw/cmprosrgb/disassemble/cmprosrgb/builtin/cmprosrgb_builtin.bin):
 
 ```
-> flash write_image ./cmpprosrgb_builtin.bin 0; reset
+> flash write_image ./cmprosrgb_builtin.bin 0; reset
 ```
 
 Keyboard should now be detected in DFU/IAP bootloader mode by pok3rtool:
