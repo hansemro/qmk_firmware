@@ -13,7 +13,7 @@
 
 // LED Matrix to LED Index
 // clang-format off
-uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS] = {
+static uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS] = {
     /*          Col1 Col2 Col3 Col4 Col5 Col6 Col7 Col8 Col9 Col10 Col11 Col12 Col13 Col14 Col15 Col16*/
     /*Row1*/{   0,   1,   2,   3,   4,   5,   6,   7,   8,   9,    10,   11,   12,   NLD,  13,   14},
     /*Row2*/{   20,  21,  22,  23,  24,  25,  26,  28,  29,  30,   31,   32,   NLD,  89,   34,   35},
