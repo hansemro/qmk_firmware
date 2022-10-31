@@ -1,24 +1,95 @@
-# masterkeys/prosrgb
+# Cooler Master MasterKeys Pro S RGB
 
-A TKL (87-key) keyboard with per-key RGB lighting.
+A TKL keyboard with per-key RGB lighting.
 
 * Keyboard Maintainer: [hansemro](https://github.com/hansemro)
-* Hardware Supported: SGK 6030 v1.3 (with US/ANSI layout)
-* Hardware Availability: Discontinued
+* Hardware Supported: SGK-6030 v1.3 (with US/ANSI layout)
+* Hardware Availability: [Discontinued](https://www.coolermaster.com/catalog/peripheral/keyboards/masterkeys-pro-s/)
+* Schematic:
+    * [PDF](https://github.com/hansemro/re-masterkeys/blob/Pro_S_RGB/kicad/pros_rgb/pros_rgb_schematic.pdf)
+    * [KiCad](https://github.com/hansemro/re-masterkeys/tree/Pro_S_RGB/kicad/pros_rgb)
+
+Hardware details:
+* Holtek HT32F1654 (Cortex-M3)
+    * 63 kB embedded flash
+    * 16 kB SRAM
+    * LQFP64
+    * UART ISP bootrom accessed by shorting SEL2 header on reset
+    * USB IAP bootloader (~10 kB) @ 0x0 of embedded flash
+    * SWD header (CN2) on PCB
+* 3x Macroblock MBIA043GP LED drivers
+* GigaDevice 25Q40CT 4 Mb SPI flash
+
+## Warning: Flashing to locked MCU will brick your keyboard
+
+From factory, the HT32 processor comes with flash protection and debug security enabled. These protections need to be disabled (via SWD debugger) to boot QMK without running into hardfaults and leaving the keyboard unresponsive.
+
+* See here for more information on [unlocking HT32 MCU](https://github.com/pok3r-custom/pok3r_re_firmware/wiki/HT32-Unlocking).
+* See here for [unlocking with Raspberry Pi 4](https://github.com/mateuszradomski/re-masterkeys/issues/1#issuecomment-1143137173).
+
+## How to compile
 
 Make example for this keyboard (after setting up your build environment):
 
-    make masterkeys/prosrgb:default
+```bash
+make masterkeys/prosrgb:default
+```
+## Installing (on unlocked keyboard)
 
-Building pok3rtool for flashing:
+### Building pok3rtool
 
-    git clone -b cooler-master-dev https://github.com/hansemro/pok3rtool.git --recursive
-    cd pok3rtool
-    mkdir -p build
-    cd build
-    cmake ..
-    make
+`pok3rtool` interfaces with the keyboard while running stock bootloader or stock application firmware. Rebooting to bootloader mode will be necessary for upgrading QMK over USB or returning to stock firmware.
 
-Flashing QMK firmware with pok3rtool:
+```bash
+git clone -b cooler-master-dev https://github.com/hansemro/pok3rtool.git --recursive
+cd pok3rtool
+mkdir build
+cd build
+cmake ..
+make
+```
 
-    ./pok3rtool -t prosrgb flash 1.2.3 masterkeys_prosrgb_debug.bin
+### Flashing the firmware
+
+Flash QMK firmware with pok3rtool (use appropriate path to firmware binary):
+
+```bash
+pok3rtool -t prosrgb flash 1.2.3 masterkeys_prosrgb_default.bin
+```
+
+## Unlocking/Unbricking with SWD debugger and OpenOCD
+
+Mass erase with [openocd fork with HT32 support](https://github.com/hansemro/openocd-ht32/tree/ht32f165x-dev):
+
+```
+> halt; ht32f165x mass_erase 0; reset halt
+```
+
+Flash [stock USB IAP bootloader](https://github.com/hansemro/pok3r_re_firmware/raw/cmprosrgb/disassemble/cmprosrgb/builtin/cmprosrgb_builtin.bin):
+
+```
+> flash write_image ./cmpprosrgb_builtin.bin 0; reset
+```
+
+Keyboard should now be detected in DFU/IAP bootloader mode by pok3rtool:
+
+```bash
+$ pok3rtool list
+List Devices...
+MasterKeys Pro S RGB (bootloader): 1.2.3
+```
+
+## Rebooting to DFU/IAP bootloader (with default keymap)
+
+While running QMK, press FN+Esc (mapped to `QK_BOOT`) to reboot to bootloader.
+
+## Rebooting to FW from DFU/IAP bootloader
+
+Use pok3rtool to reboot keyboard back to application (AP) firmware:
+
+```
+$ pok3rtool -t prosrgb reboot
+Opened MasterKeys Pro S RGB (bootloader)
+Reset to Firmware
+true
+```
