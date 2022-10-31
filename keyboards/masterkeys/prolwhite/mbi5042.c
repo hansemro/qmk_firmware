@@ -85,7 +85,7 @@ static void timer_callback(GPTDriver *gptp) {
 
 /* BFTM1 timer configuration:
  * - Input frequency = 48 MHz
- * - Compare value = 30,000 ticks
+ * - Compare value = 40,000 ticks
  */
 static const GPTConfig BFTM1_config = {
     .frequency = HT32_CK_AHB_FREQUENCY,
@@ -94,11 +94,11 @@ static const GPTConfig BFTM1_config = {
 
 /* GPTM1 PWM configuration:
  * - Input frequency = 48 MHz
- * - Output frequency = 1.8 MHz
+ * - Output frequency = 3.7 MHz
  */
 static const PWMConfig GPTM1_config = {
     .frequency = HT32_CK_AHB_FREQUENCY,
-    .period    = (HT32_CK_AHB_FREQUENCY / 1800000) - 1,
+    .period    = (HT32_CK_AHB_FREQUENCY / 3700000) - 1,
     .callback  = NULL,
     .channels =
         {
@@ -146,7 +146,7 @@ void mbi5042_init(void) {
     pwmEnableChannel(&PWMD_GPTM1, 0, PWM_FRACTION_TO_WIDTH(&PWMD_GPTM1, 2, 1));
     gptStart(&GPTD_BFTM1, &BFTM1_config);
     if (GPTD_BFTM1.state == GPT_READY) {
-        gptStartContinuous(&GPTD_BFTM1, 30000UL);
+        gptStartContinuous(&GPTD_BFTM1, 40000UL);
     }
 
     return;
