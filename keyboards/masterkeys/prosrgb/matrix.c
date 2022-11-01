@@ -46,7 +46,7 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
         port_cache[3] = palReadPort(IOPORTD);
         palSetLine(col_list[col]);
 
-        // get columns from ports
+        // get rows from ports
         for (int row = 0; row < MATRIX_ROWS; ++row) {
             matrix_row_t data = current_matrix[row] & ~(1 << col);
 

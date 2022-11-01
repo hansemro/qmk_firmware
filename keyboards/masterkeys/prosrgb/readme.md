@@ -79,9 +79,14 @@ List Devices...
 MasterKeys Pro S RGB (bootloader): 1.2.3
 ```
 
-## Rebooting to DFU/IAP bootloader (with default keymap)
+## Rebooting to DFU/IAP bootloader
 
-While running QMK, press FN+Esc (mapped to `QK_BOOT`) to reboot to bootloader.
+Enter the bootloader in 4 ways:
+
+* **Bootmagic reset**: Hold down the `Grave` key and plug in the keyboard
+* **Keycode in layout**: Press the key mapped to `QK_BOOT` if it is available
+* **Jump to bootloader via Magic command**: With Command enabled, press `LShift+RShift+B` or `LShift+RShift+Esc`
+* **Wipe and reflash bootloader with OpenOCD**: See [here](#Unlocking/Unbricking-with-SWD-debugger-and-OpenOCD)
 
 ## Rebooting to FW from DFU/IAP bootloader
 

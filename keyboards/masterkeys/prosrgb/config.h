@@ -79,8 +79,9 @@
 #    define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 #endif
 
-// Bootmagic key on Esc
-#define BOOTMAGIC_LITE_COLUMN 12
+// Bootmagic key on Grave (`)
+// Note: Bootmagic key does not get detected when column is non-zero...
+#define BOOTMAGIC_LITE_COLUMN 0
 #define BOOTMAGIC_LITE_ROW 0
 
 #ifdef EEPROM_DRIVER
