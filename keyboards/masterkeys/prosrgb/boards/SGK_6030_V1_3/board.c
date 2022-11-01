@@ -107,10 +107,10 @@ void __early_init(void) {
 #ifdef EEPROM_DRIVER
 static const SPIConfig SPI1_config = {
     .end_cb = NULL,
-    .cr0 = SPI_CR0_SELOEN,
-    .cr1 = 8 | SPI_CR1_FORMAT_MODE0 | SPI_CR1_MODE,
-    .cpr = 1,
-    .fcr = 0,
+    .cr0    = SPI_CR0_SELOEN,
+    .cr1    = 8 | SPI_CR1_FORMAT_MODE0 | SPI_CR1_MODE,
+    .cpr    = 1,
+    .fcr    = 0,
 };
 
 static void spi_init(void) {
