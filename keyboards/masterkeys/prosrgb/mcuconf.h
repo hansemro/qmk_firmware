@@ -36,5 +36,5 @@
 #    define HT32_PWM_USE_GPTM1 TRUE
 
 // GPT
-#    define HT32_GPT_USE_BFTM1 TRUE
+#    define HT32_GPT_USE_BFTM0 TRUE
 #endif
