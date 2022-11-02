@@ -70,7 +70,7 @@ static void mbia043_flush(void) {
     return;
 }
 
-/* BFTM1 timer routine to update/flush RGB values one row at a time */
+/* BFTM0 timer routine to update/flush RGB values one row at a time */
 static void timer_callback(GPTDriver *gptp) {
     mbia043_reset_row_pins();
     mbia043_send_instruction(MBIA043_GLOBAL_LATCH);
@@ -81,11 +81,11 @@ static void timer_callback(GPTDriver *gptp) {
     return;
 }
 
-/* BFTM1 timer configuration:
+/* BFTM0 timer configuration:
  * - Input frequency = 72 MHz
  * - Compare value = 60,000 ticks
  */
-static const GPTConfig BFTM1_config = {
+static const GPTConfig BFTM0_config = {
     .frequency = HT32_CK_AHB_FREQUENCY,
     .callback  = timer_callback,
 };
@@ -140,11 +140,11 @@ void mbia043_init(void) {
     uint16_t mbia043_config[MBIA043_NUM_CASCADE] = {0xc, 0xc, 0xc};
     mbia043_write_configuration(mbia043_config);
 
-    /* Start PWM and BFTM1 */
+    /* Start PWM and BFTM0 */
     pwmEnableChannel(&PWMD_GPTM1, 0, PWM_FRACTION_TO_WIDTH(&PWMD_GPTM1, 2, 1));
-    gptStart(&GPTD_BFTM1, &BFTM1_config);
-    if (GPTD_BFTM1.state == GPT_READY) {
-        gptStartContinuous(&GPTD_BFTM1, 60000UL);
+    gptStart(&GPTD_BFTM0, &BFTM0_config);
+    if (GPTD_BFTM0.state == GPT_READY) {
+        gptStartContinuous(&GPTD_BFTM0, 60000UL);
     }
     return;
 }
