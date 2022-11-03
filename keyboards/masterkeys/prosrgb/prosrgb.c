@@ -15,7 +15,7 @@
  */
 
 #include "hal.h"
-#include "prosrgb.h"
+#include "wait.h"
 
 #define FMC_SBVT1 0x40080304
 #define RESET_AP_MAGIC 0x55aafaf0
