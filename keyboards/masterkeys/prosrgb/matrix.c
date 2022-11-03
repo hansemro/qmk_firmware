@@ -17,13 +17,10 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <string.h>
 #include <hal.h>
-#include "timer.h"
-#include "wait.h"
-#include "print.h"
 #include "matrix.h"
-#include "prosrgb.h"
+#include "wait.h"
+#include "gpio.h"
 
 pin_t row_list[MATRIX_ROWS] = MATRIX_ROW_PINS;
 pin_t col_list[MATRIX_COLS] = MATRIX_COL_PINS;
