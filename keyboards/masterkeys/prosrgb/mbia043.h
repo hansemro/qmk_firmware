@@ -54,7 +54,10 @@
 #define MBIA043_ENABLE_WRITE_CONFIGURATION 18
 
 /* FUNCTIONS */
+#ifdef RGB_MATRIX_ENABLE
 void mbia043_init(void);
+void mbia043_set_mask(int index, uint8_t value);
+#endif
 
 void     mbia043_send_instruction(int instr);
 void     mbia043_shift_data(uint16_t data, int shift_amount);
