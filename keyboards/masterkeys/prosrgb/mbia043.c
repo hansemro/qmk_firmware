@@ -12,6 +12,7 @@ typedef struct PACKED {
     uint8_t r;
     uint8_t g;
     uint8_t b;
+    uint8_t mask;
 } mbia043_led_t;
 
 static mbia043_led_t mbia043_leds[MATRIX_ROWS * MBIA043_NUM_CHANNELS];
@@ -41,12 +42,19 @@ static inline void mbia043_write_color_row(int row) {
         mbia043_shift_data_instr(0, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
     }
     for (int i = MATRIX_COLS - 1; i >= 0; i--) {
-        mbia043_shift_data(mbia043_leds[g_led_config.matrix_co[row][i]].b << 8, MBIA043_SHIFT_REG_WIDTH);
-        mbia043_shift_data(mbia043_leds[g_led_config.matrix_co[row][i]].g << 8, MBIA043_SHIFT_REG_WIDTH);
-        mbia043_shift_data_instr(mbia043_leds[g_led_config.matrix_co[row][i]].r << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
+        uint8_t index = g_led_config.matrix_co[row][i];
+        uint8_t mask = mbia043_leds[index].mask;
+        mbia043_shift_data((mbia043_leds[index].b & mask) << 8, MBIA043_SHIFT_REG_WIDTH);
+        mbia043_shift_data((mbia043_leds[index].g & mask) << 8, MBIA043_SHIFT_REG_WIDTH);
+        mbia043_shift_data_instr((mbia043_leds[index].r & mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
     }
     writePinLow(MBIA043_SDI_PIN);
     writePinLow(MBIA043_DCLK_PIN);
+    return;
+}
+
+void mbia043_set_mask(int index, uint8_t value) {
+    mbia043_leds[index].mask = value;
     return;
 }
 
@@ -139,6 +147,10 @@ void mbia043_init(void) {
     /* Set configuration */
     uint16_t mbia043_config[MBIA043_NUM_CASCADE] = {0xc, 0xc, 0xc};
     mbia043_write_configuration(mbia043_config);
+
+    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+        mbia043_leds[i].mask = 0xff;
+    }
 
     /* Start PWM and BFTM0 */
     pwmEnableChannel(&PWMD_GPTM1, 0, PWM_FRACTION_TO_WIDTH(&PWMD_GPTM1, 2, 1));
