@@ -16,6 +16,8 @@
 
 #include QMK_KEYBOARD_H
 
+#include "mbia043.h"
+
 enum prosrgb_layers {
     BASE,
     FN1,
@@ -74,3 +76,10 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 };
 // clang-format on
+
+#ifdef RGB_MATRIX_ENABLE
+void rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    mbia043_set_mask(50, host_keyboard_led_state().caps_lock ? 0xff : 0);
+    mbia043_set_mask(14, host_keyboard_led_state().scroll_lock ? 0xff : 0);
+}
+#endif
