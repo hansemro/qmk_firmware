@@ -43,8 +43,6 @@ static void mbi5042_reset_row_pins(void) {
 /* Flush a row's grayscale values to MBI5042 starting with output channel 16
  * to buffers. Requires GLOBAL_LATCH instruction afterwards to update
  * comparators from buffers.
- *
- * Assumes number of channels > number of columns.
  */
 static inline void mbi5042_write_grayscale_row(int row) {
     writePinLow(MBI5042_LE_PIN);
@@ -111,7 +109,7 @@ static const PWMConfig GPTM1_config = {
 };
 
 void mbi5042_init(void) {
-    /* Configure MBIA pins */
+    /* Configure MBI pins */
     setPinOutput(MBI5042_DCLK_PIN);
     setPinOutput(MBI5042_GCLK_PIN);
     setPinOutput(MBI5042_LE_PIN);
@@ -122,7 +120,7 @@ void mbi5042_init(void) {
     setPinInput(MBI5042_SDO_PIN);
 
 #    ifdef MBI5042_HAS_POWER_PIN
-    /* Power on MBIA */
+    /* Power on MBI */
     setPinOutput(MBI5042_PWRCTRL_PIN);
     writePinLow(MBI5042_PWRCTRL_PIN);
 #    endif
