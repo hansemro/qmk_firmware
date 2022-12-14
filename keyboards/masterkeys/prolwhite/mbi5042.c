@@ -26,7 +26,12 @@ static uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-static uint8_t mbi5042_leds[MATRIX_ROWS * MBI5042_NUM_CHANNELS];
+typedef struct PACKED {
+    uint8_t value;
+    uint8_t mask;
+} mbi5042_led_t;
+
+static mbi5042_led_t mbi5042_leds[MATRIX_ROWS * MBI5042_NUM_CHANNELS];
 
 static uint32_t LED_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
 
@@ -47,7 +52,9 @@ static void mbi5042_reset_row_pins(void) {
 static inline void mbi5042_write_grayscale_row(int row) {
     writePinLow(MBI5042_LE_PIN);
     for (int i = MATRIX_COLS - 1; i >= 0; i--) {
-        mbi5042_shift_data_instr(mbi5042_leds[led_matrix_co[row][i]] << 8, MBI5042_SHIFT_REG_WIDTH, MBI5042_DATA_LATCH);
+        uint8_t index = led_matrix_co[row][i];
+        uint8_t mask = mbi5042_leds[index].mask;
+        mbi5042_shift_data_instr((mbi5042_leds[index].value & mask) << 8, MBI5042_SHIFT_REG_WIDTH, MBI5042_DATA_LATCH);
     }
     writePinLow(MBI5042_SDI_PIN);
     writePinLow(MBI5042_DCLK_PIN);
@@ -55,14 +62,19 @@ static inline void mbi5042_write_grayscale_row(int row) {
 }
 
 static void mbi5042_set_value(int index, uint8_t value) {
-    mbi5042_leds[index] = value;
+    mbi5042_leds[index].value = value;
     return;
 }
 
 static void mbi5042_set_value_all(uint8_t value) {
     for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
-        mbi5042_leds[i] = value;
+        mbi5042_leds[i].value = value;
     }
+    return;
+}
+
+void mbi5042_set_mask(int index, uint8_t value) {
+    mbi5042_leds[index].mask = value;
     return;
 }
 
@@ -139,6 +151,10 @@ void mbi5042_init(void) {
     /* Set configuration */
     uint16_t mbi5042_config[MBI5042_NUM_CASCADE] = {0x12c};
     mbi5042_write_configuration(mbi5042_config);
+
+    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+        mbi5042_leds[i].mask = 0xff;
+    }
 
     /* Start PWM and BFTM1 */
     pwmEnableChannel(&PWMD_GPTM1, 0, PWM_FRACTION_TO_WIDTH(&PWMD_GPTM1, 2, 1));

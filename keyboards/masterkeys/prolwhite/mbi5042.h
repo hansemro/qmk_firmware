@@ -54,7 +54,10 @@
 #define MBI5042_ENABLE_WRITE_CONFIGURATION 15
 
 /* FUNCTIONS */
+#ifdef LED_MATRIX_ENABLE
 void mbi5042_init(void);
+void mbi5042_set_mask(int index, uint8_t value);
+#endif
 
 void     mbi5042_send_instruction(int instr);
 void     mbi5042_shift_data(uint16_t data, int shift_amount);
