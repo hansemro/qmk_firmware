@@ -26,12 +26,6 @@ From factory, the HT32 processor comes with flash protection and debug security 
 
 ## How to compile
 
-Patch Chibios to align vector table to 512 bytes:
-
-```bash
-sed -r "s/(.vectors : ALIGN)\(1024\)/\1(512)/" lib/chibios/os/common/startup/ARMCMx/compilers/GCC/ld/rules_code.ld
-```
-
 Make example for this keyboard (after setting up your build environment):
 
 ```bash
