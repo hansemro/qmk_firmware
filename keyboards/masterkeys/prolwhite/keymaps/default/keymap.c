@@ -3,6 +3,8 @@
  */
 #include QMK_KEYBOARD_H
 
+#include "mbi5042.h"
+
 enum prolwhite_layers {
     BASE,
     FN1,
@@ -46,3 +48,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 // clang-format on
+
+#ifdef LED_MATRIX_ENABLE
+void led_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    mbi5042_set_mask(62, host_keyboard_led_state().caps_lock ? 0xff : 0);
+    mbi5042_set_mask(14, host_keyboard_led_state().scroll_lock ? 0xff : 0);
+    mbi5042_set_mask(37, host_keyboard_led_state().num_lock ? 0xff : 0);
+}
+#endif
