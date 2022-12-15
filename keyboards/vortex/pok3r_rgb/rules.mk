@@ -3,7 +3,8 @@
 SRC = \
 	ht32.c \
 	util.c \
-	eeprom_gd25.c
+	eeprom_gd25.c \
+	mbia043.c
 
 # MCU
 MCU = cortex-m3
@@ -38,8 +39,8 @@ NKRO_ENABLE = yes
 DIP_SWITCH_ENABLE = yes
 
 # RGB Backlight (uses 2 Macroblock MBIA043 LED driver ICs)
-#RGB_MATRIX_ENABLE = yes
-#RGB_MATRIX_DRIVER = custom
+RGB_MATRIX_ENABLE = yes
+RGB_MATRIX_DRIVER = custom
 
 EEPROM_DRIVER = custom
 

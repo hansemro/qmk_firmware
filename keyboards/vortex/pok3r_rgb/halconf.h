@@ -18,7 +18,11 @@
 
 #define HAL_USE_PAL     TRUE
 #define HAL_USE_USB     TRUE
-#define HAL_USE_GPT     TRUE
+
+#ifdef RGB_MATRIX_ENABLE
+#    define HAL_USE_GPT TRUE
+#    define HAL_USE_PWM TRUE
+#endif
 
 #define HAL_USE_SPI     TRUE
 #define SPI_USE_WAIT    TRUE

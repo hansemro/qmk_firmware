@@ -24,13 +24,6 @@ void __early_init(void) {
 //    ht32_clock_init();
 }
 
-// GPT Initialization
-
-static const GPTConfig bftm0_config = {
-    .frequency = 1000000,
-    .callback = NULL,
-};
-
 static const SPIConfig spi1_config = {
     .end_cb = NULL,
     .cr0 = SPI_CR0_SELOEN,
@@ -49,16 +42,6 @@ void boardInit(void) {
     palSetLineMode(B8, PAL_MODE_ALTERNATE(AFIO_SPI));
     palSetLineMode(B9, PAL_MODE_ALTERNATE(AFIO_SPI));
     palSetLineMode(B10, PAL_MODE_ALTERNATE(AFIO_GPIO) | PAL_MODE_OUTPUT_PUSHPULL);
-
-    // GCLK
-//    palSetLineMode(C0, PAL_MODE_ALTERNATE(AFIO_TM));
-    // RGB Matrix power = C1
-    // SDI = C2
-    // DCLK = A14
-    // LE = A15
-    // SDO = B0
-
-    gptStart(&GPTD_BFTM0, &bftm0_config);
 
     spiStart(&SPI_DRIVER, &spi1_config);
     palSetLine(EXTERNAL_EEPROM_SPI_SLAVE_SELECT_PIN);
