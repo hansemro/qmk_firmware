@@ -114,8 +114,8 @@ static inline void mbia043_write_color_col(int col) {
     mbia043_shift_data_instr(0, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
     // start from B_ROW10 & B_ROW5...
     for (int i = MATRIX_ROWS - 1; i >= MATRIX_ROWS / 2; i--) {
-        uint8_t B_index = g_led_config.matrix_co[i][col];
-        uint8_t A_index = g_led_config.matrix_co[i-5][col];
+        uint8_t B_index = led_matrix_co[i][col];
+        uint8_t A_index = led_matrix_co[i-5][col];
         uint8_t B_mask = mbia043_leds[B_index].mask;
         uint8_t A_mask = mbia043_leds[A_index].mask;
 
