@@ -122,19 +122,19 @@ static inline void mbia043_write_color_col(int col) {
         // Blue
         // Row i of 2nd MBIA IC
         mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-        // Row i-5 of 2nd MBIA IC
+        // Row i-5 of 1st MBIA IC
         mbia043_shift_data_instr((mbia043_leds[A_index].b & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
 
         // Green
         // Row i of 2nd MBIA IC
         mbia043_shift_data((mbia043_leds[B_index].g & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-        // Row i-5 of 2nd MBIA IC
+        // Row i-5 of 1st MBIA IC
         mbia043_shift_data_instr((mbia043_leds[A_index].g & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
 
         // Red
         // Row i of 2nd MBIA IC
         mbia043_shift_data((mbia043_leds[B_index].r & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-        // Row i-5 of 2nd MBIA IC
+        // Row i-5 of 1st MBIA IC
         mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
     }
     palClearLine(MBIA043_SDI_PIN);
