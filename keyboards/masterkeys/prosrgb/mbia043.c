@@ -66,7 +66,7 @@ static void mbia043_set_color(int index, uint8_t r, uint8_t g, uint8_t b) {
 }
 
 static void mbia043_set_color_all(uint8_t r, uint8_t g, uint8_t b) {
-    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+    for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
         mbia043_leds[i].r = r;
         mbia043_leds[i].g = g;
         mbia043_leds[i].b = b;
@@ -148,7 +148,7 @@ void mbia043_init(void) {
     uint16_t mbia043_config[MBIA043_NUM_CASCADE] = {0xc, 0xc, 0xc};
     mbia043_write_configuration(mbia043_config);
 
-    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+    for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
         mbia043_leds[i].mask = 0xff;
     }
 
