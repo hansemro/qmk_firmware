@@ -25,6 +25,7 @@ Hardware details:
 From the factory, the HT32 processor comes with flash protection and debug security enabled. These protections need to be disabled to boot QMK without lockups and leaving the keyboard unresponsive.
 
 * See here for more information on [unlocking HT32 MCU](https://github.com/pok3r-custom/pok3r_re_firmware/wiki/HT32-Unlocking).
+* See section below for [unlocking/unbricking](#UnlockingUnbricking)
 * See here for [unlocking with Raspberry Pi 4](https://github.com/mateuszradomski/re-masterkeys/issues/1#issuecomment-1143137173).
 
 ## How to compile
@@ -66,6 +67,7 @@ Of the two methods available to unlock the processor, the ISP method is recommen
 ### w/ ISP/Pin-Shorting Method (Recommended)
 
 * As of December 2022, Holtek ISP protocol support has not yet been merged to upstream `pok3rtool` repo.
+    * `git clone https://github.com/hansemro/pok3rtool -b holtek-isp-libusb-dev`
 
 Short the SEL2 pins on the back of the PCB together then plug in the USB cable. Leave the pins shorted until IAP bootloader is flashed.
 
