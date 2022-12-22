@@ -119,7 +119,7 @@ MasterKeys Pro S RGB (bootloader): CLEARED
 
 Enter the bootloader in 4 ways:
 
-* **Bootmagic reset**: Hold down the `Grave` key and plug in the keyboard
+* **Bootmagic reset**: Hold down the `Esc` key and plug in the keyboard
 * **Keycode in layout**: Press the key mapped to `QK_BOOT` if it is available
 * **Jump to bootloader via Magic command**: With Command enabled, press `LShift+RShift+B` or `LShift+RShift+Esc`
 * **Wipe and reflash bootloader**: See [here](#UnlockingUnbricking)
