@@ -6,6 +6,10 @@
 
 #include "pin_defs.h"
 
+// Bootmagic key on Esc
+#define BOOTMAGIC_LITE_COLUMN 12
+#define BOOTMAGIC_LITE_ROW 0
+
 //#define FORCE_NKRO
 
 /* MCU -> MBIA_R -> MBIA_G -> MBIA_B -> MCU */
@@ -78,11 +82,6 @@
 #    define ENABLE_RGB_MATRIX_SOLID_SPLASH
 #    define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 #endif
-
-// Bootmagic key on Grave (`)
-// Note: Bootmagic key does not get detected when column is non-zero...
-#define BOOTMAGIC_LITE_COLUMN 0
-#define BOOTMAGIC_LITE_ROW 0
 
 #ifdef EEPROM_DRIVER
 // SPI Flash
