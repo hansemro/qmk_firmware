@@ -11,5 +11,4 @@ MCU_STARTUP = ht32f165x
 #EEPROM_DRIVER = wear_leveling
 #WEAR_LEVELING_DRIVER = spi_flash
 
-SRC += matrix.c
 SRC += mbia043.c
