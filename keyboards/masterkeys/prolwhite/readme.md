@@ -12,16 +12,18 @@ Hardware details:
     * 127 kB embedded flash
     * 16 kB SRAM
     * LQFP64
+    * USB/UART ISP bootrom accessed by shorting BOOT pin to ground on reset
     * USB IAP bootloader (~10 kB) @ 0x0 of embedded flash
     * SWD header (CN1) on PCB
 * Macroblock MBI5042GP LED driver
 * Macronix 25L4006E 4 Mb SPI flash
 
-## Warning: Flashing to locked MCU will brick your keyboard
+## Warning: Flashing QMK to locked HT32 will brick your keyboard
 
-From factory, the HT32 processor comes with flash protection and debug security enabled. These protections need to be disabled (via SWD debugger) to boot QMK without running into hardfaults and leaving the keyboard unresponsive.
+From the factory, the HT32 processor comes with flash protection and debug security enabled. These protections need to be disabled to boot QMK without lockups and leaving the keyboard unresponsive.
 
 * See here for more information on [unlocking HT32 MCU](https://github.com/pok3r-custom/pok3r_re_firmware/wiki/HT32-Unlocking).
+* See section below for [unlocking/unbricking](#UnlockingUnbricking)
 * See here for [unlocking with Raspberry Pi 4](https://github.com/mateuszradomski/re-masterkeys/issues/1#issuecomment-1143137173).
 
 ## How to compile
@@ -55,7 +57,42 @@ Flash QMK firmware with pok3rtool (use appropriate path to firmware binary):
 pok3rtool -t prolwhite flash V1.08.01 masterkeys_prolwhite_default.bin
 ```
 
-## Unlocking/Unbricking with SWD debugger and OpenOCD
+## Unlocking/Unbricking
+
+The process of unlocking the HT32 processor involves a flash mass erase procedure followed by restoring the stock IAP bootloader.
+
+Of the two methods available to unlock the processor, the ISP method is recommended as it does not require a JTAG debugger.
+
+### w/ ISP/Pin-Shorting Method (Recommended)
+
+* As of December 2022, Holtek ISP protocol support has not yet been merged to upstream `pok3rtool` repo.
+    * `git clone https://github.com/hansemro/pok3rtool -b holtek-isp-libusb-dev`
+
+Short the BOOT pin to ground on the back of the PCB then plug in the USB cable. Leave the pin shorted until IAP bootloader is flashed.
+
+If successful, the keyboard should be detected by `pok3rtool` as `Holtek ISP USB`:
+
+```
+$ pok3rtool list
+List Devices...
+Holtek ISP USB: 101
+```
+
+Flash [stock USB IAP bootloader](https://github.com/hansemro/pok3r_re_firmware/raw/cmprolwhite/disassemble/cmprolwhite/builtin/cmprolwhite_builtin.bin):
+
+```
+$ pok3rtool -t isp flash 0 ./cmprolwhite_builtin.bin
+```
+
+Keyboard should now be detected in IAP bootloader mode by pok3rtool:
+
+```bash
+$ pok3rtool list
+List Devices...
+MasterKeys Pro L White (bootloader): CLEARED
+```
+
+### w/ SWD Debugger and OpenOCD
 
 Mass erase with [openocd fork with HT32 support](https://github.com/hansemro/openocd-ht32/tree/ht32f165x-dev):
 
@@ -69,19 +106,24 @@ Flash [stock USB IAP bootloader](https://github.com/hansemro/pok3r_re_firmware/r
 > flash write_image ./cmprolwhite_builtin.bin 0; reset
 ```
 
-Keyboard should now be detected in DFU/IAP bootloader mode by pok3rtool:
+Keyboard should now be detected in IAP bootloader mode by pok3rtool:
 
 ```bash
 $ pok3rtool list
 List Devices...
-MasterKeys Pro L White (bootloader): V1.09.00
+MasterKeys Pro L White (bootloader): CLEARED
 ```
 
-## Rebooting to DFU/IAP bootloader (with default keymap)
+## Entering IAP bootloader
 
-While running QMK, press FN+Esc (mapped to `QK_BOOT`) to reboot to bootloader.
+Enter the bootloader in 4 ways:
 
-## Rebooting to FW from DFU/IAP bootloader
+* **Bootmagic reset**: Hold down the `Esc` key and plug in the keyboard
+* **Keycode in layout**: Press the key mapped to `QK_BOOT` if it is available
+* **Jump to bootloader via Magic command**: With Command enabled, press `LShift+RShift+B` or `LShift+RShift+Esc`
+* **Wipe and reflash bootloader**: See [here](#UnlockingUnbricking)
+
+## Rebooting to FW from IAP bootloader
 
 Use pok3rtool to reboot keyboard back to application (AP) firmware:
 
