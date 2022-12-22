@@ -6,7 +6,9 @@
 
 #include "pin_defs.h"
 
-//#define FORCE_NKRO
+/* Bootmagic key on Esc */
+#define BOOTMAGIC_LITE_COLUMN 1
+#define BOOTMAGIC_LITE_ROW 3
 
 //#define FORCE_NKRO
 
