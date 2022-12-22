@@ -13,7 +13,7 @@
         "pid": "0x0045",
         "vid": "0x2516"
     },
-    "diode_direction": "COL2ROW",
+    "diode_direction": "ROW2COL",
     "features": {
         "bootmagic": true,
         "command": false,

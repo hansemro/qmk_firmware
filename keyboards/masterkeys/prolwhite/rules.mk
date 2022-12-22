@@ -9,8 +9,4 @@ MCU_STARTUP = ht32f523xx
 
 OPT_DEFS = -DCORTEX_VTOR_INIT=0x3200 -DCRT0_VTOR_INIT
 
-# Keys
-CUSTOM_MATRIX = lite
-
-SRC += matrix.c
 SRC += mbi5042.c
