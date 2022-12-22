@@ -13,7 +13,7 @@
         "pid": "0x003E",
         "vid": "0x2516"
     },
-    "diode_direction": "COL2ROW",
+    "diode_direction": "ROW2COL",
     "features": {
         "bootmagic": true,
         "command": true,
@@ -24,8 +24,6 @@
         "rgb_matrix": true
     },
     "matrix_pins": {
-        "custom": true,
-        "custom_lite": true,
         "cols": ["C4", "B6", "D0", "B11", "A11", "A0", "A1", "A2", "A3", "A4", "C10", "C12", "C3", "A10", "B1"],
         "rows": ["C9", "A5", "A6", "A7", "C11", "C13", "C14", "C15"]
     },
