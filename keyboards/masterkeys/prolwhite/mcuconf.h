@@ -35,6 +35,8 @@
 // SysTick uses processor clock at 48MHz
 #define HT32_ST_USE_HCLK TRUE
 
+#define HT32_WDG_USE_WDT TRUE
+
 #define HT32_USB_USE_USB0 TRUE
 #define HT32_USB_USB0_IRQ_PRIORITY 5
 

@@ -10,6 +10,12 @@ enum prolwhite_layers {
     FN1,
 };
 
+enum prolwhite_keycodes {
+    CM_TEST = SAFE_RANGE,
+    CM_START,
+    CM_STOP,
+};
+
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
@@ -44,10 +50,47 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,    KC_MPRV,  KC_MNXT, KC_VOLD,     _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,                                    _______, _______, _______,
         _______,          _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,             _______,               _______, _______, _______, _______,
-        _______, _______, _______,                            _______,                            _______, _______, _______, _______,    _______, _______,  _______,     _______,          _______
+        _______, _______, _______,                            _______,                            _______, _______, _______, _______,    CM_TEST, CM_START,  CM_STOP,     _______,         _______
     )
 };
 // clang-format on
+
+#include "print.h"
+#include "hal.h"
+
+static const WDGConfig WDT_config = {
+    .mr0 = WDT_MR0_WDTSHLT_MODE2 | 0xfff,
+    .mr1 = (6 << 12) | 0xfff,
+    .dbwdt = 0,
+};
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case CM_TEST:
+            if (record->event.pressed) {
+                printf("WDT_MR0: 0x%lx\n", *(uint32_t *)0x40068004);
+                printf("WDT_MR1: 0x%lx\n", *(uint32_t *)0x40068008);
+                printf("WDT_PR:  0x%lx\n", *(uint32_t *)0x40068010);
+                printf("WDT_CSR: 0x%lx\n", *(uint32_t *)0x40068018);
+                printf("CFSR: 0x%lx\n", *(uint32_t *)0xE000ED28);
+            }
+            return false;
+        case CM_START:
+            if (record->event.pressed) {
+                printf("Starting WDT\n");
+                wdgStart(&WDGD1, &WDT_config);
+            }
+            return false;
+        case CM_STOP:
+            if (record->event.pressed) {
+                printf("Stopping WDT\n");
+                wdgStop(&WDGD1);
+            }
+            return false;
+        default:
+            return true;
+    }
+}
 
 #ifdef LED_MATRIX_ENABLE
 void led_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
