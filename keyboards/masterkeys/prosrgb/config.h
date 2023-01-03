@@ -10,6 +10,8 @@
 #define BOOTMAGIC_LITE_COLUMN 12
 #define BOOTMAGIC_LITE_ROW 0
 
+#define MATRIX_IO_DELAY 0
+
 //#define FORCE_NKRO
 
 /* MCU -> MBIA_R -> MBIA_G -> MBIA_B -> MCU */
