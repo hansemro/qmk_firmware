@@ -11,14 +11,14 @@ A TKL keyboard with per-key RGB lighting.
 
 Hardware details:
 * Holtek HT32F1654 (Cortex-M3)
-    * 63 kB embedded flash
-    * 16 kB SRAM
+    * 63 kiB embedded flash
+    * 16 kiB SRAM
     * LQFP64
     * USB/UART ISP bootrom accessed by shorting SEL2 header pins on reset
-    * USB IAP bootloader (~10 kB) @ 0x0 of embedded flash
+    * USB IAP bootloader (~11 kiB) @ 0x0 of embedded flash
     * SWD header (CN2) on PCB
 * 3x Macroblock MBIA043GP LED drivers
-* GigaDevice 25Q40CT 4 Mb SPI flash
+* GigaDevice 25Q40CT 4 Mibit SPI flash
 
 ## Warning: Flashing QMK to locked HT32 will brick your keyboard
 
@@ -64,10 +64,10 @@ The process of unlocking the HT32 processor involves a flash mass erase procedur
 
 Of the two methods available to unlock the processor, the ISP method is recommended as it does not require a JTAG debugger.
 
-### w/ ISP/Pin-Shorting Method (Recommended)
+### with ISP/Pin-Shorting Method (Recommended)
 
-* As of December 2022, Holtek ISP protocol support has not yet been merged to upstream `pok3rtool` repo.
-    * `git clone https://github.com/hansemro/pok3rtool -b holtek-isp-libusb-dev`
+* As of January 2023, Holtek ISP protocol support has not yet been merged to upstream `pok3rtool` repo.
+    * `git clone https://github.com/hansemro/pok3rtool -b holtek-isp-libusb-dev pok3rtool-isp`
 
 Short the SEL2 pins on the back of the PCB together then plug in the USB cable. Leave the pins shorted until IAP bootloader is flashed.
 
@@ -93,7 +93,7 @@ List Devices...
 MasterKeys Pro S RGB (bootloader): CLEARED
 ```
 
-### w/ SWD Debugger and OpenOCD
+### with SWD Debugger and OpenOCD
 
 Mass erase with [openocd fork with HT32 support](https://github.com/hansemro/openocd-ht32/tree/ht32f165x-dev):
 
