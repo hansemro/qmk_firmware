@@ -145,7 +145,7 @@ void mbia043_init(void) {
     }
 
     /* Set configuration */
-    uint16_t mbia043_config[MBIA043_NUM_CASCADE] = {0xc, 0xc, 0xc};
+    uint16_t mbia043_config[MBIA043_NUM_CASCADE] = MBIA043_CONFIGURATION;
     mbia043_write_configuration(mbia043_config);
 
     for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
