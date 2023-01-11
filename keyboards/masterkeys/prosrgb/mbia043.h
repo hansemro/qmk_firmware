@@ -68,7 +68,6 @@ uint16_t mbia043_shift_recv(uint16_t data, int shift_amount);
  * By default, it is configured to 0b0000000010.
  * On several boards, it is reconfigured to 0b0000001100.
  */
-void mbia043_read_configuration(uint16_t *dst);
 void mbia043_write_configuration(uint16_t *src);
 
 /* Returns a length of MBIA043_NUM_CASCADE * MBIA043_SHIFT_REG_WIDTH when

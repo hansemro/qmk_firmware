@@ -255,18 +255,6 @@ uint16_t mbia043_shift_recv(uint16_t data, int shift_amount) {
     return recv;
 }
 
-/* Read configuration data from cascaded MBIA043s.
- *
- * Note: order of array follows order from SDO to SDI pins.
- */
-void mbia043_read_configuration(uint16_t *dst) {
-    mbia043_send_instruction(MBIA043_READ_CONFIGURATION);
-    for (int i = 0; i < MBIA043_NUM_CASCADE; i++) {
-        dst[i] = mbia043_shift_recv(0, MBIA043_SHIFT_REG_WIDTH) & 0x3ff;
-    }
-    return;
-}
-
 /* Write configuration data to each MBIA043.
  *
  * Note: order of array follows order from SDO to SDI pins.
