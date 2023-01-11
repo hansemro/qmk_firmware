@@ -34,7 +34,7 @@ static void mbia043_reset_row_pins(void) {
  *
  * Assumes number of channels > number of columns.
  */
-static inline void mbia043_write_color_row(int row) {
+static void mbia043_write_color_row(int row) {
     writePinLow(MBIA043_LE_PIN);
     for (int i = 0; i < MBIA043_NUM_CHANNELS - MATRIX_COLS; i++) {
         mbia043_shift_data(0, MBIA043_SHIFT_REG_WIDTH);
@@ -170,7 +170,7 @@ const rgb_matrix_driver_t rgb_matrix_driver = {
 #endif
 
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
-void inline mbia043_send_instruction(int instr) {
+void mbia043_send_instruction(int instr) {
     writePinLow(MBIA043_LE_PIN);
     __NOP();
     __NOP();
@@ -194,7 +194,7 @@ void inline mbia043_send_instruction(int instr) {
  *
  * Note: Transmission begins with MSB at data[15].
  */
-void inline mbia043_shift_data(uint16_t data, int shift_amount) {
+void mbia043_shift_data(uint16_t data, int shift_amount) {
     while (shift_amount-- > 0) {
         __NOP();
         __NOP();
