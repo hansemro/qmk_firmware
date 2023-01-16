@@ -6,7 +6,7 @@
 
 #include "pin_defs.h"
 
-// Bootmagic key on
+// Bootmagic key on Esc
 #define BOOTMAGIC_LITE_COLUMN 0
 #define BOOTMAGIC_LITE_ROW 0
 
