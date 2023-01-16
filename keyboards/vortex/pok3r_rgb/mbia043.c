@@ -54,11 +54,6 @@ static void mbia043_reset_col_pins(void) {
     return;
 }
 
-// TODO: remove defines once each channel is fully validated
-#define ENABLE_RED
-#define ENABLE_GREEN
-#define ENABLE_BLUE
-
 /* Flush a column's RGB values to MBIA043s starting with output channel 16 to
  * buffers. Requires GLOBAL_LATCH instruction afterwards to update comparators
  * from buffers.
@@ -92,85 +87,49 @@ static inline void mbia043_write_color_col(int col) {
         // MBIA B unused
         mbia043_shift_data(0, MBIA043_SHIFT_REG_WIDTH);
         // MBIA A Green 6-i
-#ifdef ENABLE_GREEN
         uint8_t index = led_matrix_co[6-i][col];
         uint8_t mask = mbia043_leds[index].mask;
         mbia043_shift_data_instr((mbia043_leds[index].g & mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#else
-        mbia043_shift_data_instr(0, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#endif
     }
     for (int i = 0; i < 2; i++) {
         // MBIA B Blue 8-i
-#ifdef ENABLE_BLUE
         uint8_t B_index = led_matrix_co[8-i][col];
         uint8_t B_mask = mbia043_leds[B_index].mask;
         mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-#else
-        mbia043_shift_data(0, MBIA043_SHIFT_REG_WIDTH);
-#endif
         // MBIA A Green 1-i
-#ifdef ENABLE_GREEN
         uint8_t A_index = led_matrix_co[1-i][col];
         uint8_t A_mask = mbia043_leds[A_index].mask;
         mbia043_shift_data_instr((mbia043_leds[A_index].g & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#else
-        mbia043_shift_data_instr(0, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#endif
     }
     {
         // MBIA B Blue 6
-#ifdef ENABLE_BLUE
         uint8_t B_index = led_matrix_co[6][col];
         uint8_t B_mask = mbia043_leds[B_index].mask;
         mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-#else
-        mbia043_shift_data(0, MBIA043_SHIFT_REG_WIDTH);
-#endif
         // MBIA A Red 8
-#ifdef ENABLE_RED
         uint8_t A_index = led_matrix_co[8][col];
         uint8_t A_mask = mbia043_leds[A_index].mask;
         mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#else
-        mbia043_shift_data_instr(0, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#endif
     }
     for (int i = 0; i < 6; i++) {
         // MBIA B Blue 5-i
-#ifdef ENABLE_BLUE
         uint8_t B_index = led_matrix_co[5-i][col];
         uint8_t B_mask = mbia043_leds[B_index].mask;
         mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-#else
-        mbia043_shift_data(0, MBIA043_SHIFT_REG_WIDTH);
-#endif
         // MBIA A Red 7-i
-#ifdef ENABLE_RED
         uint8_t A_index = led_matrix_co[7-i][col];
         uint8_t A_mask = mbia043_leds[A_index].mask;
         mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#else
-        mbia043_shift_data_instr(0, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#endif
     }
     for (int i = 0; i < 2; i++) {
         // MBIA B Green 8-i
-#ifdef ENABLE_GREEN
         uint8_t B_index = led_matrix_co[8-i][col];
         uint8_t B_mask = mbia043_leds[B_index].mask;
         mbia043_shift_data((mbia043_leds[B_index].g & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-#else
-        mbia043_shift_data(0, MBIA043_SHIFT_REG_WIDTH);
-#endif
         // MBIA A Red 1-i
-#ifdef ENABLE_RED
         uint8_t A_index = led_matrix_co[1-i][col];
         uint8_t A_mask = mbia043_leds[A_index].mask;
         mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#else
-        mbia043_shift_data_instr(0, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-#endif
     }
     writePinLow(MBIA043_SDI_PIN);
     writePinLow(MBIA043_DCLK_PIN);
@@ -240,13 +199,7 @@ static const PWMConfig GPTM1_config = {
         },
 };
 
-#include "print.h"
-
 void mbia043_init(void) {
-    // Debug delay so that prints appear in qmk console
-    wait_ms(2000);
-    printf("%s START\n", __func__);
-
     /* Configure MBIA pins */
     setPinOutput(MBIA043_DCLK_PIN);
     setPinOutput(MBIA043_GCLK_PIN);
@@ -262,11 +215,9 @@ void mbia043_init(void) {
     palSetLineMode(MBIA043_SDO_PIN, PAL_MODE_INPUT | PAL_MODE_ALTERNATE(AFIO_GPIO));
 
 #    ifdef MBIA043_HAS_POWER_PIN
-    printf("%s Powering on...\n", __func__);
     /* Power on MBIA */
     setPinOutput(MBIA043_PWRCTRL_PIN);
     writePinLow(MBIA043_PWRCTRL_PIN);
-    printf("%s Powered on\n", __func__);
 #    endif
 
     /* Start/configure PWM (at GCLK pin) */
@@ -275,20 +226,13 @@ void mbia043_init(void) {
 
     int len = 0;
     /* Wait until shift register becomes ready */
-    printf("%s Waiting for shift register...\n", __func__);
     while (len != MBIA043_NUM_CASCADE * MBIA043_SHIFT_REG_WIDTH) {
         len = mbia043_get_shift_register_length();
-        printf("%s len: %d\n", __func__, len);
     }
 
     /* Set configuration */
     uint16_t mbia043_config[MBIA043_NUM_CASCADE] = MBIA043_CONFIGURATION;
-    printf("%s Writing configuration...\n", __func__);
     mbia043_write_configuration(mbia043_config);
-    printf("%s Writing configuration done\n", __func__);
-
-    mbia043_read_configuration(mbia043_config);
-    printf("%s Read configuration: %x, %x\n", __func__, mbia043_config[0], mbia043_config[1]);
 
     for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
         mbia043_leds[i].mask = 0xff;
