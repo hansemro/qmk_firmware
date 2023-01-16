@@ -277,8 +277,8 @@ void mbia043_init(void) {
     /* Wait until shift register becomes ready */
     printf("%s Waiting for shift register...\n", __func__);
     while (len != MBIA043_NUM_CASCADE * MBIA043_SHIFT_REG_WIDTH) {
-        printf("%s len: %d\n", __func__, len);
         len = mbia043_get_shift_register_length();
+        printf("%s len: %d\n", __func__, len);
     }
 
     /* Set configuration */
