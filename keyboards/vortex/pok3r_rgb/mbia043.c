@@ -247,10 +247,14 @@ void mbia043_init(void) {
     setPinOutput(MBIA043_GCLK_PIN);
     setPinOutput(MBIA043_LE_PIN);
     setPinOutput(MBIA043_SDI_PIN);
+    palSetLineMode(MBIA043_DCLK_PIN, PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_ALTERNATE(AFIO_GPIO));
+    palSetLineMode(MBIA043_LE_PIN, PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_ALTERNATE(AFIO_GPIO));
+    palSetLineMode(MBIA043_SDI_PIN, PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_ALTERNATE(AFIO_GPIO));
     writePinHigh(MBIA043_DCLK_PIN);
     writePinHigh(MBIA043_LE_PIN);
     writePinHigh(MBIA043_SDI_PIN);
     setPinInput(MBIA043_SDO_PIN);
+    palSetLineMode(MBIA043_SDO_PIN, PAL_MODE_INPUT | PAL_MODE_ALTERNATE(AFIO_GPIO));
 
 #    ifdef MBIA043_HAS_POWER_PIN
     printf("%s Powering on...\n", __func__);
@@ -264,7 +268,6 @@ void mbia043_init(void) {
     pwmStart(&PWMD_GPTM1, &GPTM1_config);
     palSetLineMode(MBIA043_GCLK_PIN, PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_ALTERNATE(AFIO_TM));
 
-#if 0
     int len = 0;
     /* Wait until shift register becomes ready */
     printf("%s Waiting for shift register...\n", __func__);
@@ -272,13 +275,6 @@ void mbia043_init(void) {
         printf("%s len: %d\n", __func__, len);
         len = mbia043_get_shift_register_length();
     }
-#else
-    // Replaces above due to issues with second MBIA not functioning.
-    // I did confirm that both MBIA ICs are receiving 5V and are chained
-    // together, but I am unable submit data to the 2nd (U8) MBIA's shift
-    // register from the 1st (U11) MBIA.
-    wait_ms(2000);
-#endif
 
     /* Set configuration */
     uint16_t mbia043_config[MBIA043_NUM_CASCADE] = MBIA043_CONFIGURATION;
