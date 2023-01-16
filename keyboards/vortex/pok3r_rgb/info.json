@@ -157,13 +157,13 @@
                 { "label": "/", "matrix": [7, 5], "x": 11.25, "y": 3 },
                 { "label": "RShift", "matrix": [7, 6], "x": 12.25, "y": 3, "w": 2.75 },
 
-                { "label": "FN/LCtrl", "matrix": [4, 0], "x": 0, "y": 4, "w": 1.25 },
+                { "label": "Ctrl", "matrix": [4, 0], "x": 0, "y": 4, "w": 1.25 },
                 { "label": "LGUI", "matrix": [4, 1], "x": 1.25, "y": 4, "w": 1.25 },
                 { "label": "LAlt", "matrix": [4, 2], "x": 2.5, "y": 4, "w": 1.25 },
                 { "label": "Space", "matrix": [7, 2], "x": 3.75, "y": 4, "w": 6.25 },
                 { "label": "RAlt", "matrix": [8, 3], "x": 10, "y": 4, "w": 1.25 },
-                { "label": "Menu", "matrix": [8, 4], "x": 11.25, "y": 4, "w": 1.25 },
-                { "label": "RGUI", "matrix": [8, 5], "x": 12.5, "y": 4, "w": 1.25 },
+                { "label": "FN", "matrix": [8, 4], "x": 11.25, "y": 4, "w": 1.25 },
+                { "label": "Menu", "matrix": [8, 5], "x": 12.5, "y": 4, "w": 1.25 },
                 { "label": "RCtrl", "matrix": [8, 7], "x": 13.75, "y": 4, "w": 1.25 }
             ]
         }
