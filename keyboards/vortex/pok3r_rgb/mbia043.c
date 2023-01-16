@@ -301,17 +301,6 @@ void mbia043_init(void) {
         gptStartContinuous(&GPTD_BFTM0, 60000UL);
     }
 
-    // TODO: remove test
-    // This test is used to check the led matrix by lighting each LED in order of
-    // physical position (left-to-right, top-to-bottom).
-    for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-        mbia043_set_color(i, 20+i, 20+i, 20+i);
-        printf("%d\n", i);
-        for (int j = 0; j < 1; j++) {
-            wait_ms(1000);
-        }
-    }
-
     return;
 }
 
