@@ -10,6 +10,11 @@
 #ifdef RGB_MATRIX_ENABLE
 #define NLD NO_LED
 
+// Row6,Col2 : Caps Lock
+// Row8,Col2 : Left Space
+// Row8,Col3 : Space
+// Row9,Col3 : Right Space
+
 // clang-format off
 // LED Matrix to LED Index
 uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS] = {
@@ -17,12 +22,12 @@ uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS] = {
     /*Row1*/ {  0,   1,   2,   3,   4,   5,   6,   7    },
     /*Row2*/ {  14,  15,  16,  17,  18,  19,  20,  21   },
     /*Row3*/ {  28,  29,  30,  31,  32,  33,  34,  35   },
-    /*Row4*/ {  41,  43,  44,  45,  46,  47,  48,  49   },
-    /*Row5*/ {  55,  56,  57,  8,   9,   10,  11,  13   },
+    /*Row4*/ {  41,  42,  43,  44,  45,  46,  47,  48   },
+    /*Row5*/ {  53,  54,  55,  8,   9,   10,  11,  13   },
     /*Row6*/ {  42,  NLD, 12,  22,  23,  24,  25,  27   },
     /*Row7*/ {  NLD, NLD, 26,  36,  37,  38,  39,  40   },
-    /*Row8*/ {  NLD, NLD, 58,  50,  51,  52,  53,  54   },
-    /*Row9*/ {  NLD, NLD, NLD, NLD, 59,  60,  NLD, 61   },
+    /*Row8*/ {  NLD, NLD, 56,  49,  50,  51,  52,  NLD  },
+    /*Row9*/ {  NLD, NLD, NLD, 57,  58,  59,  NLD, 60   },
     /*Row10*/{  NLD, NLD, NLD, NLD, NLD, NLD, NLD, NLD  }, /* unused row */
 };
 // clang-format on
