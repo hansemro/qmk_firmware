@@ -10,8 +10,8 @@
     },
     "usb": {
         "device_version": "1.0.0",
-        "pid": "0x04D9",
-        "vid": "0x0167"
+        "vid": "0x04D9",
+        "pid": "0x0167"
     },
     "diode_direction": "COL2ROW",
     "features": {
