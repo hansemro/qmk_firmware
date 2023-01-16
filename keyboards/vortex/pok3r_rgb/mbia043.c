@@ -24,10 +24,10 @@ uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS] = {
     /*Row3*/ {  28,  29,  30,  31,  32,  33,  34,  35   },
     /*Row4*/ {  41,  42,  43,  44,  45,  46,  47,  48   },
     /*Row5*/ {  53,  54,  55,  8,   9,   10,  11,  13   },
-    /*Row6*/ {  42,  61,  12,  22,  23,  24,  25,  27   },
+    /*Row6*/ {  42,  63,  12,  22,  23,  24,  25,  27   },
     /*Row7*/ {  NLD, NLD, 26,  36,  37,  38,  39,  40   },
-    /*Row8*/ {  NLD, NLD, 56,  49,  50,  51,  52,  NLD  },
-    /*Row9*/ {  NLD, NLD, NLD, 57,  58,  59,  NLD, 60   },
+    /*Row8*/ {  NLD, 56,  57,  49,  50,  51,  52,  NLD  },
+    /*Row9*/ {  NLD, NLD, 58,  59,  60,  61,  NLD, 62   },
     /*Row10*/{  NLD, NLD, NLD, NLD, NLD, NLD, NLD, NLD  }, /* unused row */
 };
 // clang-format on

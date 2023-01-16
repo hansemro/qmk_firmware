@@ -15,8 +15,8 @@
 //#define FORCE_NKRO
 
 #ifdef RGB_MATRIX_ENABLE
-// 61 LEDs for each key + Dedicated Caps Lock LED
-#    define RGB_MATRIX_LED_COUNT (61 + 1)
+// 61 LEDs for each key + Dedicated Caps Lock LED + 2 Additional Spacebar LEDs
+#    define RGB_MATRIX_LED_COUNT (61 + 1 + 2)
 #    define RGB_MATRIX_KEYPRESSES
 #    define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #    define RGB_DISABLE_WHEN_USB_SUSPENDED
