@@ -29,7 +29,7 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,
         _______, _______, KC_UP,   _______, _______, _______, _______, KC_PGUP, KC_UP,   KC_PGDN, KC_PSCR, KC_SCRL, KC_PAUS, _______,
         _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______, KC_HOME, KC_LEFT, KC_DOWN, KC_RIGHT,KC_INS,  _______,          _______,
-        _______,          KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLD, KC_VOLU, KC_END,  KC_MUTE, BL_DEC,  BL_TOGG, BL_INC,           _______,
+        _______,          KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLD, KC_VOLU, KC_END,  KC_MUTE, RGB_HUI, RGB_MOD, RGB_VAI,           _______,
         _______, _______, _______,                            _______,                            _______, MO(2),   _______, _______
     ),
     [2] = LAYOUT_60_ansi(
