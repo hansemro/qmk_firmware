@@ -96,7 +96,9 @@
             { "flags": 4, "matrix": [8, 3], "x": 163, "y": 64 },
             { "flags": 4, "matrix": [8, 4], "x": 184, "y": 64 },
             { "flags": 4, "matrix": [8, 5], "x": 204, "y": 64 },
-            { "flags": 4, "matrix": [8, 7], "x": 224, "y": 64 }
+            { "flags": 4, "matrix": [8, 7], "x": 224, "y": 64 },
+
+            { "flags": 8, "matrix": [2, 0], "x": 12, "y": 36 }
         ]
     },
     "layouts": {
