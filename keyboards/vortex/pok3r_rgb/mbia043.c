@@ -8,7 +8,7 @@
 #include "quantum.h"
 
 #ifdef RGB_MATRIX_ENABLE
-#define NLD NO_LED
+#    define NLD NO_LED
 
 // Row6,Col2 : Caps Lock
 // Row8,Col2 : Left Space
@@ -43,8 +43,8 @@ typedef struct PACKED {
 
 static mbia043_led_t mbia043_leds[RGB_MATRIX_LED_COUNT];
 
-static uint32_t LEDA_GPIO_COL_PINS[MATRIX_COLS] = LED_COL_PINS;
-static unsigned int LED_COL_NUM = 0;
+static uint32_t     LEDA_GPIO_COL_PINS[MATRIX_COLS] = LED_COL_PINS;
+static unsigned int LED_COL_NUM                     = 0;
 
 /* Disable column pins by setting to tristate */
 static void mbia043_reset_col_pins(void) {
@@ -87,48 +87,48 @@ static inline void mbia043_write_color_col(int col) {
         // MBIA B unused
         mbia043_shift_data(0, MBIA043_SHIFT_REG_WIDTH);
         // MBIA A Green 6-i
-        uint8_t index = led_matrix_co[6-i][col];
-        uint8_t mask = mbia043_leds[index].mask;
+        uint8_t index = led_matrix_co[6 - i][col];
+        uint8_t mask  = mbia043_leds[index].mask;
         mbia043_shift_data_instr((mbia043_leds[index].g & mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
     }
     for (int i = 0; i < 2; i++) {
         // MBIA B Blue 8-i
-        uint8_t B_index = led_matrix_co[8-i][col];
-        uint8_t B_mask = mbia043_leds[B_index].mask;
+        uint8_t B_index = led_matrix_co[8 - i][col];
+        uint8_t B_mask  = mbia043_leds[B_index].mask;
         mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
         // MBIA A Green 1-i
-        uint8_t A_index = led_matrix_co[1-i][col];
-        uint8_t A_mask = mbia043_leds[A_index].mask;
+        uint8_t A_index = led_matrix_co[1 - i][col];
+        uint8_t A_mask  = mbia043_leds[A_index].mask;
         mbia043_shift_data_instr((mbia043_leds[A_index].g & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
     }
     {
         // MBIA B Blue 6
         uint8_t B_index = led_matrix_co[6][col];
-        uint8_t B_mask = mbia043_leds[B_index].mask;
+        uint8_t B_mask  = mbia043_leds[B_index].mask;
         mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
         // MBIA A Red 8
         uint8_t A_index = led_matrix_co[8][col];
-        uint8_t A_mask = mbia043_leds[A_index].mask;
+        uint8_t A_mask  = mbia043_leds[A_index].mask;
         mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
     }
     for (int i = 0; i < 6; i++) {
         // MBIA B Blue 5-i
-        uint8_t B_index = led_matrix_co[5-i][col];
-        uint8_t B_mask = mbia043_leds[B_index].mask;
+        uint8_t B_index = led_matrix_co[5 - i][col];
+        uint8_t B_mask  = mbia043_leds[B_index].mask;
         mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
         // MBIA A Red 7-i
-        uint8_t A_index = led_matrix_co[7-i][col];
-        uint8_t A_mask = mbia043_leds[A_index].mask;
+        uint8_t A_index = led_matrix_co[7 - i][col];
+        uint8_t A_mask  = mbia043_leds[A_index].mask;
         mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
     }
     for (int i = 0; i < 2; i++) {
         // MBIA B Green 8-i
-        uint8_t B_index = led_matrix_co[8-i][col];
-        uint8_t B_mask = mbia043_leds[B_index].mask;
+        uint8_t B_index = led_matrix_co[8 - i][col];
+        uint8_t B_mask  = mbia043_leds[B_index].mask;
         mbia043_shift_data((mbia043_leds[B_index].g & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
         // MBIA A Red 1-i
-        uint8_t A_index = led_matrix_co[1-i][col];
-        uint8_t A_mask = mbia043_leds[A_index].mask;
+        uint8_t A_index = led_matrix_co[1 - i][col];
+        uint8_t A_mask  = mbia043_leds[A_index].mask;
         mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
     }
     writePinLow(MBIA043_SDI_PIN);
