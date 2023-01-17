@@ -17,6 +17,7 @@
 
 #include QMK_KEYBOARD_H
 
+// clang-format off
 const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_60_ansi(
         KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC,
@@ -29,17 +30,18 @@ const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,
         _______, _______, KC_UP,   _______, _______, _______, _______, KC_PGUP, KC_UP,   KC_PGDN, KC_PSCR, KC_SCRL, KC_PAUS, _______,
         _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______, KC_HOME, KC_LEFT, KC_DOWN, KC_RIGHT,KC_INS,  _______,          _______,
-        _______,          KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLD, KC_VOLU, KC_END,  KC_MUTE, RGB_HUI, RGB_MOD, RGB_VAI,           _______,
+        _______,          KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLD, KC_VOLU, KC_END,  KC_MUTE, RGB_HUI, RGB_MOD, RGB_VAI,          _______,
         _______, _______, _______,                            _______,                            _______, MO(2),   _______, _______
     ),
     [2] = LAYOUT_60_ansi(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
         _______,          _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
         _______, _______, _______,                            _______,                            _______, _______, _______, _______
     ),
 };
+// clang-format on
 
 #ifdef RGB_MATRIX_ENABLE
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
