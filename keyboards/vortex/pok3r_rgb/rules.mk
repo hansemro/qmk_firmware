@@ -11,4 +11,6 @@ MCU_STARTUP = ht32f165x
 #EEPROM_DRIVER = wear_leveling
 #WEAR_LEVELING_DRIVER = spi_flash
 
+DIP_SWITCH_ENABLE = yes
+
 SRC += mbia043.c
