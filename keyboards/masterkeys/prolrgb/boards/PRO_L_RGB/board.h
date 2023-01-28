@@ -29,6 +29,24 @@
 
 #define FLASH_SIZE (0x10000 - 0x4000) // 64kB - 16kB
 
+/* MBI5042 */
+#define MBI5042_NUM_CASCADE 3
+#define MBI5042_LE_PIN A15
+#define MBI5042_SDI_PIN C2
+#define MBI5042_SDO_PIN B0
+#define MBI5042_DCLK_PIN A14
+#define MBI5042_GCLK_PIN C0
+#define MBI5042_HAS_POWER_PIN
+/* Enable 3.3V rail to MBI5042 when pin goes low */
+#define MBI5042_PWRCTRL_PIN C1
+
+/* LED ROW GPIO Pins */
+#define LED_ROW_PINS \
+    { C8, C7, B5, B4, B3, B2, C6, C5 }
+
+#define MBI5042_CONFIGURATION \
+    { 0x2b0, 0x2b0, 0x2b0 }
+
 #if !defined(_FROM_ASM_)
 #    ifdef __cplusplus
 extern "C" {
