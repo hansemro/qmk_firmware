@@ -28,7 +28,7 @@ From the factory, the HT32 processor comes with flash protection and debug secur
 Make example for this keyboard (after setting up your build environment):
 
 ```bash
-make masterkeys/prolrgb:default
+make masterkeys/prolrgb:<keymap>
 ```
 
 ## Installing (on unlocked keyboard)
@@ -51,7 +51,7 @@ make
 Flash QMK firmware with pok3rtool (use appropriate path to firmware binary):
 
 ```bash
-pok3rtool -t prolrgb flash V1.08.01 masterkeys_prolrgb_default.bin
+pok3rtool -t prolrgb flash 1.2.3 masterkeys_prolrgb_<keymap>.bin
 ```
 
 ## Unlocking/Unbricking
@@ -108,7 +108,7 @@ Keyboard should now be detected in IAP bootloader mode by pok3rtool:
 ```bash
 $ pok3rtool list
 List Devices...
-MasterKeys Pro L RGB (bootloader): CLEARED
+MasterKeys Pro L RGB (bootloader): ERROR
 ```
 
 ## Entering IAP bootloader
