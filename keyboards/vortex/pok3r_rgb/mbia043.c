@@ -46,10 +46,10 @@ static mbia043_led_t mbia043_leds[RGB_MATRIX_LED_COUNT];
 static uint32_t     LEDA_GPIO_COL_PINS[MATRIX_COLS] = LED_COL_PINS;
 static unsigned int LED_COL_NUM                     = 0;
 
-/* Disable column pins by setting to tristate */
+/* Disable column pins by setting to Hi-Z */
 static void mbia043_reset_col_pins(void) {
     for (int i = 0; i < MATRIX_COLS; i++) {
-        setPinInput(LEDA_GPIO_COL_PINS[i]);
+        writePinHigh(LEDA_GPIO_COL_PINS[i]);
     }
     return;
 }
@@ -165,7 +165,6 @@ static void mbia043_flush(void) {
 static void timer_callback(GPTDriver *gptp) {
     mbia043_reset_col_pins();
     mbia043_send_instruction(MBIA043_GLOBAL_LATCH);
-    setPinOutput(LEDA_GPIO_COL_PINS[LED_COL_NUM]);
     writePinLow(LEDA_GPIO_COL_PINS[LED_COL_NUM]);
     LED_COL_NUM = (LED_COL_NUM + 1) & 0x7;
     mbia043_write_color_col(LED_COL_NUM);
@@ -213,6 +212,12 @@ void mbia043_init(void) {
     writePinHigh(MBIA043_SDI_PIN);
     setPinInput(MBIA043_SDO_PIN);
     palSetLineMode(MBIA043_SDO_PIN, PAL_MODE_INPUT | PAL_MODE_ALTERNATE(AFIO_GPIO));
+
+    for (int i = 0; i < MATRIX_COLS; i++) {
+        setPinOutput(LEDA_GPIO_COL_PINS[i]);
+        palSetLineMode(LEDA_GPIO_COL_PINS[i], PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_ALTERNATE(AFIO_GPIO));
+        writePinHigh(LEDA_GPIO_COL_PINS[i]);
+    }
 
 #    ifdef MBIA043_HAS_POWER_PIN
     /* Power on MBIA */
