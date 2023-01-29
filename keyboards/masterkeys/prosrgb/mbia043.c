@@ -20,10 +20,10 @@ static mbia043_led_t mbia043_leds[MATRIX_ROWS * MBIA043_NUM_CHANNELS];
 static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
 static unsigned int LED_ROW_NUM = 0;
 
-/* Disable row pins by setting to tristate */
+/* Disable row pins by setting to Hi-Z */
 static void mbia043_reset_row_pins(void) {
     for (int i = 0; i < MATRIX_ROWS; i++) {
-        setPinInput(LEDA_GPIO_ROW_PINS[i]);
+        writePinHigh(LEDA_GPIO_ROW_PINS[i]);
     }
     return;
 }
@@ -82,7 +82,6 @@ static void mbia043_flush(void) {
 static void timer_callback(GPTDriver *gptp) {
     mbia043_reset_row_pins();
     mbia043_send_instruction(MBIA043_GLOBAL_LATCH);
-    setPinOutput(LEDA_GPIO_ROW_PINS[LED_ROW_NUM]);
     writePinLow(LEDA_GPIO_ROW_PINS[LED_ROW_NUM]);
     LED_ROW_NUM = (LED_ROW_NUM + 1) & 0x7;
     mbia043_write_color_row(LED_ROW_NUM);
@@ -126,6 +125,12 @@ void mbia043_init(void) {
     writePinHigh(MBIA043_LE_PIN);
     writePinHigh(MBIA043_SDI_PIN);
     setPinInput(MBIA043_SDO_PIN);
+
+    for (int i = 0; i < MATRIX_ROWS; i++) {
+        setPinOutput(LEDA_GPIO_ROW_PINS[i]);
+        palSetLineMode(LEDA_GPIO_ROW_PINS[i], PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO));
+        writePinHigh(LEDA_GPIO_ROW_PINS[i]);
+    }
 
 #    ifdef MBIA043_HAS_POWER_PIN
     /* Power on MBIA */
