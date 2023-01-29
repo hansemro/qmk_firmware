@@ -41,7 +41,7 @@ static unsigned int LED_ROW_NUM = 0;
 /* Disable row pins */
 static void mbi5042_reset_row_pins(void) {
     for (int i = 0; i < MATRIX_ROWS; i++) {
-        setPinInput(LED_GPIO_ROW_PINS[i]);
+        writePinHigh(LED_GPIO_ROW_PINS[i]);
     }
     return;
 }
@@ -93,7 +93,6 @@ static void mbi5042_flush(void) {
 static void timer_callback(GPTDriver *gptp) {
     mbi5042_reset_row_pins();
     mbi5042_send_instruction(MBI5042_GLOBAL_LATCH);
-    setPinOutput(LED_GPIO_ROW_PINS[LED_ROW_NUM]);
     writePinLow(LED_GPIO_ROW_PINS[LED_ROW_NUM]);
     LED_ROW_NUM = (LED_ROW_NUM + 1) & 0x7;
     mbi5042_write_color_row(LED_ROW_NUM);
@@ -137,6 +136,12 @@ void mbi5042_init(void) {
     writePinHigh(MBI5042_LE_PIN);
     writePinHigh(MBI5042_SDI_PIN);
     setPinInput(MBI5042_SDO_PIN);
+
+    for (int i = 0; i < MATRIX_ROWS; i++) {
+        setPinOutput(LED_GPIO_ROW_PINS[i]);
+        palSetLineMode(LED_GPIO_ROW_PINS[i], PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO));
+        writePinHigh(LED_GPIO_ROW_PINS[i]);
+    }
 
 #    ifdef MBI5042_HAS_POWER_PIN
     /* Power on MBI */
