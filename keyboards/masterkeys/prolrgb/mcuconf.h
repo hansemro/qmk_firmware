@@ -32,3 +32,9 @@
 // GPT
 #    define HT32_GPT_USE_BFTM1 TRUE
 #endif
+
+#ifdef EEPROM_DRIVER
+// SPI
+#    define HT32_SPI_USE_SPI1 TRUE
+#    define HT32_SPI1_IRQ_PRIORITY 9
+#endif
