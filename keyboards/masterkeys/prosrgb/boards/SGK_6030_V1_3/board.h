@@ -39,7 +39,7 @@
 #define MBIA043_LE_PIN A15
 /* MBIA 3.3V power enable */
 #define MBIA043_HAS_POWER_PIN
-/* 3.3V supply to MBIA ICs is enabled when C1 is high */
+/* 3.3V supply to MBIA ICs is enabled when C1 is low */
 #define MBIA043_PWRCTRL_PIN C1
 
 /* LED ROW GPIO Pins */

@@ -135,7 +135,8 @@ void mbia043_init(void) {
 #    ifdef MBIA043_HAS_POWER_PIN
     /* Power on MBIA */
     setPinOutput(MBIA043_PWRCTRL_PIN);
-    writePinHigh(MBIA043_PWRCTRL_PIN);
+    palSetLineMode(MBIA043_PWRCTRL_PIN, PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO));
+    writePinLow(MBIA043_PWRCTRL_PIN);
 #    endif
 
     /* Start/configure PWM (at GCLK pin) */
