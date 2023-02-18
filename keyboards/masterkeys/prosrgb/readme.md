@@ -66,26 +66,30 @@ Of the two methods available to unlock the processor, the ISP method is recommen
 
 ### with ISP/Pin-Shorting Method (Recommended)
 
-* As of January 2023, Holtek ISP protocol support has not yet been merged to upstream `pok3rtool` repo.
-    * `git clone https://github.com/hansemro/pok3rtool -b holtek-isp-libusb-dev pok3rtool-isp`
+#### Building ht32-dfu-tool
+
+```bash
+git clone https://github.com/hansemro/ht32-dfu-tool.git
+cd ht32-dfu-tool
+cargo build -r
+```
 
 Short the SEL2 pins on the back of the PCB together then plug in the USB cable. Leave the pins shorted until IAP bootloader is flashed.
 
-If successful, the keyboard should be detected by `pok3rtool` as `Holtek ISP USB`:
+If successful, the keyboard should be detected by `ht32-dfu-tool`:
 
-```
-$ pok3rtool list
-List Devices...
-Holtek ISP USB: 100
+```bash
+$ ht32-dfu-tool list
+Device 0: [04d9:8010] Model=HT32F1654 Bus=3 Port=4 Addr=66
 ```
 
 Flash [stock USB IAP bootloader](https://github.com/hansemro/pok3r_re_firmware/raw/cmprosrgb/disassemble/cmprosrgb/builtin/cmprosrgb_builtin.bin):
 
-```
-$ pok3rtool -t isp flash 0 ./cmprosrgb_builtin.bin
+```bash
+ht32-dfu-tool -wmvr write 0 ./cmprosrgb_builtin.bin
 ```
 
-Keyboard should now be detected in IAP bootloader mode by pok3rtool:
+Keyboard should now be detected in IAP bootloader mode by `pok3rtool`:
 
 ```bash
 $ pok3rtool list
@@ -107,7 +111,7 @@ Flash [stock USB IAP bootloader](https://github.com/hansemro/pok3r_re_firmware/r
 > flash write_image ./cmprosrgb_builtin.bin 0; reset
 ```
 
-Keyboard should now be detected in IAP bootloader mode by pok3rtool:
+Keyboard should now be detected in IAP bootloader mode by `pok3rtool`:
 
 ```bash
 $ pok3rtool list
