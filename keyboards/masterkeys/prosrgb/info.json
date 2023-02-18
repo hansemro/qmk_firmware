@@ -13,6 +13,9 @@
         "pid": "0x003E",
         "vid": "0x2516"
     },
+    "bootmagic": {
+        "matrix": [0, 12]
+    },
     "diode_direction": "ROW2COL",
     "features": {
         "bootmagic": true,
