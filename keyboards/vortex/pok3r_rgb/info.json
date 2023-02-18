@@ -13,6 +13,9 @@
         "vid": "0x04D9",
         "pid": "0x0167"
     },
+    "bootmagic": {
+        "matrix": [0, 0]
+    },
     "diode_direction": "COL2ROW",
     "features": {
         "bootmagic": true,
