@@ -79,14 +79,14 @@ Short the SEL2 pins on the back of the PCB together then plug in the USB cable. 
 If successful, the keyboard should be detected by `ht32-dfu-tool`:
 
 ```bash
-$ ht32-dfu-tool list
+$ ./target/release/ht32-dfu-tool list
 Device 0: [04d9:8010] Model=HT32F1654 Bus=3 Port=4 Addr=66
 ```
 
 Flash [stock USB IAP bootloader](https://github.com/hansemro/pok3r_re_firmware/raw/cmprosrgb/disassemble/cmprosrgb/builtin/cmprosrgb_builtin.bin):
 
 ```bash
-ht32-dfu-tool -wmvr write 0 ./cmprosrgb_builtin.bin
+./target/release/ht32-dfu-tool -wmvr write 0 ./cmprosrgb_builtin.bin
 ```
 
 Keyboard should now be detected in IAP bootloader mode by `pok3rtool`:
