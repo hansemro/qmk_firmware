@@ -43,6 +43,78 @@ typedef struct PACKED {
 
 static mbia043_led_t mbia043_leds[RGB_MATRIX_LED_COUNT];
 
+#define MBIA043_RED_CH 0
+#define MBIA043_GREEN_CH 1
+#define MBIA043_BLUE_CH 2
+#define MBIA043_UNUSED_CH 3
+
+typedef struct PACKED {
+    uint8_t color_ch;
+    uint8_t color_index;
+} mbia043_channel_t;
+
+/*
+ * Channel Setup:
+ *          _______
+ *    SDI->|       |->SDO1_2
+ * R_ROW0<-|       |->G_ROW6
+ * R_ROW1<-|       |->G_ROW5
+ * R_ROW2<-|       |->G_ROW4
+ * R_ROW3<-|MBIA043|->G_ROW3
+ * R_ROW4<-|   A   |->G_ROW2
+ * R_ROW5<-|       |->G_ROW1
+ * R_ROW6<-|       |->G_ROW0
+ * R_ROW7<-|_______|->R_ROW8
+ *          _______
+ * SDO1_2->|       |->SDO
+ * G_ROW7<-|       |->unused
+ * G_ROW8<-|       |->unused
+ * B_ROW0<-|       |->unused
+ * B_ROW1<-|MBIA043|->unused
+ * B_ROW2<-|   B   |->unused
+ * B_ROW3<-|       |->B_ROW8
+ * B_ROW4<-|       |->B_ROW7
+ * B_ROW5<-|_______|->B_ROW6
+ */
+static const mbia043_channel_t mbia043_channels[MBIA043_NUM_CASCADE][MBIA043_NUM_CHANNELS] = {
+    {
+        {MBIA043_RED_CH, 0},
+        {MBIA043_RED_CH, 1},
+        {MBIA043_RED_CH, 2},
+        {MBIA043_RED_CH, 3},
+        {MBIA043_RED_CH, 4},
+        {MBIA043_RED_CH, 5},
+        {MBIA043_RED_CH, 6},
+        {MBIA043_RED_CH, 7},
+        {MBIA043_RED_CH, 8},
+        {MBIA043_GREEN_CH, 0},
+        {MBIA043_GREEN_CH, 1},
+        {MBIA043_GREEN_CH, 2},
+        {MBIA043_GREEN_CH, 3},
+        {MBIA043_GREEN_CH, 4},
+        {MBIA043_GREEN_CH, 5},
+        {MBIA043_GREEN_CH, 6},
+    },
+    {
+        {MBIA043_GREEN_CH, 7},
+        {MBIA043_GREEN_CH, 8},
+        {MBIA043_BLUE_CH, 0},
+        {MBIA043_BLUE_CH, 1},
+        {MBIA043_BLUE_CH, 2},
+        {MBIA043_BLUE_CH, 3},
+        {MBIA043_BLUE_CH, 4},
+        {MBIA043_BLUE_CH, 5},
+        {MBIA043_BLUE_CH, 6},
+        {MBIA043_BLUE_CH, 7},
+        {MBIA043_BLUE_CH, 8},
+        {MBIA043_UNUSED_CH, 0},
+        {MBIA043_UNUSED_CH, 0},
+        {MBIA043_UNUSED_CH, 0},
+        {MBIA043_UNUSED_CH, 0},
+        {MBIA043_UNUSED_CH, 0},
+    },
+};
+
 static uint32_t     LEDA_GPIO_COL_PINS[MATRIX_COLS] = LED_COL_PINS;
 static unsigned int LED_COL_NUM                     = 0;
 
@@ -57,79 +129,52 @@ static void mbia043_reset_col_pins(void) {
 /* Flush a column's RGB values to MBIA043s starting with output channel 16 to
  * buffers. Requires GLOBAL_LATCH instruction afterwards to update comparators
  * from buffers.
- *
- * Row configuration:
- *          _______
- *    SDI->|       |->SDO1_2
- * R_ROW1<-|       |->G_ROW7
- * R_ROW2<-|       |->G_ROW6
- * R_ROW3<-|       |->G_ROW5
- * R_ROW4<-|MBIA043|->G_ROW4
- * R_ROW5<-|   A   |->G_ROW3
- * R_ROW6<-|       |->G_ROW2
- * R_ROW7<-|       |->G_ROW1
- * R_ROW8<-|_______|->R_ROW9
- *          _______
- * SDO1_2->|       |->SDO
- * G_ROW8<-|       |->unused
- * G_ROW9<-|       |->unused
- * B_ROW1<-|       |->unused
- * B_ROW2<-|MBIA043|->unused
- * B_ROW3<-|   B   |->unused
- * B_ROW4<-|       |->B_ROW9
- * B_ROW5<-|       |->B_ROW8
- * B_ROW6<-|_______|->B_ROW7
- *
  */
 static inline void mbia043_write_color_col(int col) {
     writePinLow(MBIA043_LE_PIN);
-    for (int i = 0; i < 5; i++) {
-        // MBIA B unused
-        mbia043_shift_data(0, MBIA043_SHIFT_REG_WIDTH);
-        // MBIA A Green 6-i
-        uint8_t index = led_matrix_co[6 - i][col];
-        uint8_t mask  = mbia043_leds[index].mask;
-        mbia043_shift_data_instr((mbia043_leds[index].g & mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-    }
-    for (int i = 0; i < 2; i++) {
-        // MBIA B Blue 8-i
-        uint8_t B_index = led_matrix_co[8 - i][col];
-        uint8_t B_mask  = mbia043_leds[B_index].mask;
-        mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-        // MBIA A Green 1-i
-        uint8_t A_index = led_matrix_co[1 - i][col];
-        uint8_t A_mask  = mbia043_leds[A_index].mask;
-        mbia043_shift_data_instr((mbia043_leds[A_index].g & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-    }
-    {
-        // MBIA B Blue 6
-        uint8_t B_index = led_matrix_co[6][col];
-        uint8_t B_mask  = mbia043_leds[B_index].mask;
-        mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-        // MBIA A Red 8
-        uint8_t A_index = led_matrix_co[8][col];
-        uint8_t A_mask  = mbia043_leds[A_index].mask;
-        mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-    }
-    for (int i = 0; i < 6; i++) {
-        // MBIA B Blue 5-i
-        uint8_t B_index = led_matrix_co[5 - i][col];
-        uint8_t B_mask  = mbia043_leds[B_index].mask;
-        mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-        // MBIA A Red 7-i
-        uint8_t A_index = led_matrix_co[7 - i][col];
-        uint8_t A_mask  = mbia043_leds[A_index].mask;
-        mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
-    }
-    for (int i = 0; i < 2; i++) {
-        // MBIA B Green 8-i
-        uint8_t B_index = led_matrix_co[8 - i][col];
-        uint8_t B_mask  = mbia043_leds[B_index].mask;
-        mbia043_shift_data((mbia043_leds[B_index].g & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
-        // MBIA A Red 1-i
-        uint8_t A_index = led_matrix_co[1 - i][col];
-        uint8_t A_mask  = mbia043_leds[A_index].mask;
-        mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
+    uint8_t color_ch;
+    uint8_t row;
+    uint8_t B_index;
+    uint8_t B_mask;
+    uint8_t A_index;
+    uint8_t A_mask;
+    for (int i = MBIA043_NUM_CHANNELS - 1; i >= 0; i--) {
+        // MBIA B
+        color_ch = mbia043_channels[1][i].color_ch;
+        row = mbia043_channels[1][i].color_index;
+        B_index = led_matrix_co[row][col];
+        B_mask  = mbia043_leds[B_index].mask;
+        switch (color_ch) {
+            case MBIA043_RED_CH:
+                mbia043_shift_data((mbia043_leds[B_index].r & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
+                break;
+            case MBIA043_GREEN_CH:
+                mbia043_shift_data((mbia043_leds[B_index].g & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
+                break;
+            case MBIA043_BLUE_CH:
+                mbia043_shift_data((mbia043_leds[B_index].b & B_mask) << 8, MBIA043_SHIFT_REG_WIDTH);
+                break;
+            default:
+                mbia043_shift_data(0, MBIA043_SHIFT_REG_WIDTH);
+        }
+        // MBIA A
+        color_ch = mbia043_channels[0][i].color_ch;
+        row = mbia043_channels[0][i].color_index;
+        A_index = led_matrix_co[row][col];
+        A_mask  = mbia043_leds[A_index].mask;
+        switch (color_ch) {
+            case MBIA043_RED_CH:
+                mbia043_shift_data_instr((mbia043_leds[A_index].r & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
+                break;
+            case MBIA043_GREEN_CH:
+                mbia043_shift_data_instr((mbia043_leds[A_index].g & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
+                break;
+            case MBIA043_BLUE_CH:
+                mbia043_shift_data_instr((mbia043_leds[A_index].b & A_mask) << 8, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
+                break;
+            default:
+                mbia043_shift_data_instr(0, MBIA043_SHIFT_REG_WIDTH, MBIA043_DATA_LATCH);
+        }
     }
     writePinLow(MBIA043_SDI_PIN);
     writePinLow(MBIA043_DCLK_PIN);
