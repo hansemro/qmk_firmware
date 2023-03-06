@@ -109,8 +109,14 @@ bool led_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         mbi5042_set_value(94, 0);
     }
     if (host_keyboard_led_state().num_lock) {
+        if (layer_state_is(BASE)) {
+            layer_move(NUM);
+        }
         mbi5042_set_value(92, 0xff);
     } else {
+        if (layer_state_is(NUM)) {
+            layer_move(BASE);
+        }
         mbi5042_set_value(92, 0);
     }
     return false;
