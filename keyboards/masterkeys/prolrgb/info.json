@@ -13,11 +13,14 @@
         "pid": "0x103B",
         "vid": "0x2516"
     },
+    "bootmagic": {
+        "matrix": [3, 1]
+    },
     "diode_direction": "ROW2COL",
     "features": {
         "bootmagic": true,
         "command": true,
-        "console": false,
+        "console": true,
         "extrakey": true,
         "mousekey": false,
         "nkro": true,
