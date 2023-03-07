@@ -13,6 +13,9 @@
         "pid": "0x004F",
         "vid": "0x2516"
     },
+    "bootmagic": {
+        "matrix": [0, 0]
+    },
     "diode_direction": "ROW2COL",
     "features": {
         "bootmagic": true,

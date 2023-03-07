@@ -7,8 +7,7 @@
 #include "pin_defs.h"
 
 // Bootmagic key on Esc
-#define BOOTMAGIC_LITE_COLUMN 0
-#define BOOTMAGIC_LITE_ROW 0
+// see info.json
 
 //#define FORCE_NKRO
 
