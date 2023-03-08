@@ -9,6 +9,8 @@
 // Bootmagic key on Esc
 // see info.json
 
+#define MATRIX_IO_DELAY 0
+
 //#define FORCE_NKRO
 
 #ifdef RGB_MATRIX_ENABLE
