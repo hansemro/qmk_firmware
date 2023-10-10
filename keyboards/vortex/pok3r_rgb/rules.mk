@@ -8,8 +8,8 @@ MCU_LDSCRIPT = HT32F1654_POK3RRGB
 MCU_STARTUP = ht32f165x
 
 # Wear-leveling driver
-#EEPROM_DRIVER = wear_leveling
-#WEAR_LEVELING_DRIVER = spi_flash
+EEPROM_DRIVER = wear_leveling
+WEAR_LEVELING_DRIVER = spi_flash
 
 DIP_SWITCH_ENABLE = yes
 
