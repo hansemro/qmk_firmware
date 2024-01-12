@@ -312,12 +312,21 @@ void inline mbia043_send_instruction(int instr) {
     __NOP();
     __NOP();
     __NOP();
+    __NOP();
+    __NOP();
+    __NOP();
     writePinHigh(MBIA043_LE_PIN);
     while (instr-- > 0) {
         __NOP();
         __NOP();
         __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
         writePinLow(MBIA043_DCLK_PIN);
+        __NOP();
+        __NOP();
+        __NOP();
         __NOP();
         __NOP();
         __NOP();
@@ -336,9 +345,15 @@ void inline mbia043_shift_data(uint16_t data, int shift_amount) {
         __NOP();
         __NOP();
         __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
         writePinLow(MBIA043_DCLK_PIN);
         // set SDI to data[15]
         writePin(MBIA043_SDI_PIN, data & 0x8000);
+        __NOP();
+        __NOP();
+        __NOP();
         __NOP();
         __NOP();
         __NOP();
@@ -378,10 +393,16 @@ uint16_t mbia043_shift_recv(uint16_t data, int shift_amount) {
         __NOP();
         __NOP();
         __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
         writePinLow(MBIA043_DCLK_PIN);
         recv = (recv << 1) | readPin(MBIA043_SDO_PIN);
         // set SDI to data[15]
         writePin(MBIA043_SDI_PIN, data & 0x8000);
+        __NOP();
+        __NOP();
+        __NOP();
         __NOP();
         __NOP();
         __NOP();
