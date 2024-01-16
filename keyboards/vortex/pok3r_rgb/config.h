@@ -11,8 +11,6 @@
 
 #define MATRIX_IO_DELAY 0
 
-#define DIP_SWITCH_MATRIX_GRID { {9, 0}, {9, 1}, {9, 2}, {9, 3} }
-
 //#define FORCE_NKRO
 
 #ifdef EEPROM_DRIVER

@@ -11,6 +11,14 @@
         "firmware_format": "bin"
     },
     "diode_direction": "COL2ROW",
+    "dip_switch": {
+        "matrix_grid": [
+            [9, 0],
+            [9, 1],
+            [9, 2],
+            [9, 3]
+        ]
+    },
     "eeprom": {
         "driver": "wear_leveling",
         "wear_leveling": {
