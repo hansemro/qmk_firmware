@@ -10,8 +10,8 @@
     "diode_direction": "COL2ROW",
     "features": {
         "bootmagic": true,
-        "command": false,
-        "console": true,
+        "command": true,
+        "console": false,
         "extrakey": true,
         "led_matrix": true,
         "mousekey": false,
