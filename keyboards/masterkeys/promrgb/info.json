@@ -17,6 +17,13 @@
         "matrix": [0, 0]
     },
     "diode_direction": "ROW2COL",
+    "eeprom": {
+        "driver": "wear_leveling",
+        "wear_leveling": {
+            "backing_size": 2048,
+            "driver": "spi_flash"
+        }
+    },
     "features": {
         "bootmagic": true,
         "command": true,

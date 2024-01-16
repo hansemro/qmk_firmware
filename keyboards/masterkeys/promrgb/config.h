@@ -28,8 +28,4 @@
 #    define SPI_MOSI_PIN B8
 #    define SPI_MISO_PIN B9
 #    define SPI_CS_PIN B10
-
-// Wear-leveling driver configuration
-#    define WEAR_LEVELING_LOGICAL_SIZE 1024
-#    define WEAR_LEVELING_BACKING_SIZE (WEAR_LEVELING_LOGICAL_SIZE * 2)
 #endif
