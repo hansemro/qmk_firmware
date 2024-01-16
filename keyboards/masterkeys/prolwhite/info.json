@@ -28,6 +28,28 @@
         "rows": ["C4", "A5", "A6", "A7", "C8", "B10", "B11", "B12"]
     },
     "led_matrix": {
+        "animations": {
+            "alphas_mods": true,
+            "band": true,
+            "band_pinwheel": true,
+            "band_spiral": true,
+            "breathing": true,
+            "cycle_left_right": true,
+            "cycle_out_in": true,
+            "cycle_up_down": true,
+            "dual_beacon": true,
+            "multisplash": true,
+            "solid_reactive_cross": true,
+            "solid_reactive_multicross": true,
+            "solid_reactive_multinexus": true,
+            "solid_reactive_multiwide": true,
+            "solid_reactive_nexus": true,
+            "solid_reactive_simple": true,
+            "solid_reactive_wide": true,
+            "splash": true,
+            "wave_left_right": true,
+            "wave_up_down": true
+        },
         "driver": "custom",
         "layout": [
                 { "flags": 4, "matrix": [3, 1], "x": 0, "y": 0 },
@@ -143,7 +165,8 @@
                 { "flags": 4, "matrix": [5, 0], "x": 180, "y": 64 },
                 { "flags": 4, "matrix": [3, 13], "x": 198, "y": 64 },
                 { "flags": 4, "matrix": [3, 14], "x": 214, "y": 64 }
-        ]
+        ],
+        "sleep": true
     },
     "layouts": {
         "LAYOUT": {
