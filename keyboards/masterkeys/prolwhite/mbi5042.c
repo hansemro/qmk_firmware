@@ -67,7 +67,7 @@ static void mbi5042_set_value(int index, uint8_t value) {
 }
 
 static void mbi5042_set_value_all(uint8_t value) {
-    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+    for (int i = 0; i < LED_MATRIX_LED_COUNT; i++) {
         mbi5042_leds[i].value = value;
     }
     return;
@@ -152,7 +152,7 @@ void mbi5042_init(void) {
     uint16_t mbi5042_config[MBI5042_NUM_CASCADE] = {0x12c};
     mbi5042_write_configuration(mbi5042_config);
 
-    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+    for (int i = 0; i < LED_MATRIX_LED_COUNT; i++) {
         mbi5042_leds[i].mask = 0xff;
     }
 
