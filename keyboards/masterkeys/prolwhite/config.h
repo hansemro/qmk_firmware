@@ -8,23 +8,8 @@
 
 //#define FORCE_NKRO
 
-//#define FORCE_NKRO
-
-/* MBI5042 */
-#define MBI5042_NUM_CASCADE 1
-#define MBI5042_LE_PIN A15
-#define MBI5042_SDI_PIN C12
-#define MBI5042_SDO_PIN B0
-#define MBI5042_DCLK_PIN A14
-#define MBI5042_GCLK_PIN C10
-#define MBI5042_HAS_POWER_PIN
-/* Enable 3.3V rail to MBI5042 when pin goes low */
-#define MBI5042_PWRCTRL_PIN C11
-
 #ifdef LED_MATRIX_ENABLE
 #    define DRIVER_LED_TOTAL 108
-#    define LED_ROW_PINS \
-        { C15, C14, B5, B4, B3, B2, D3, D2 }
 #    define LED_MATRIX_KEYPRESSES          // reacts to keypresses
 #    define LED_MATRIX_FRAMEBUFFER_EFFECTS // enable framebuffer effects
 #    define ENABLE_LED_MATRIX_ALPHAS_MODS
