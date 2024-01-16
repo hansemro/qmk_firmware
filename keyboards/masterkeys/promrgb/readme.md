@@ -61,7 +61,7 @@ Of the two methods available to unlock the processor, the ISP method is recommen
 
 ### with ISP/Pin-Shorting Method (Recommended)
 
-#### Building ht32-dfu-tool
+#### Building and Using ht32-dfu-tool
 
 ```bash
 git clone https://github.com/hansemro/ht32-dfu-tool.git
@@ -81,7 +81,7 @@ Device 0: [04d9:8010] Model=HT32F1654 Bus=3 Port=4 Addr=66
 Flash [stock USB IAP bootloader](https://github.com/hansemro/pok3r_re_firmware/raw/cmpromrgb/disassemble/cmpromrgb/builtin/cmpromrgb_builtin.bin):
 
 ```bash
-./target/release/ht32-dfu-tool -wmvr write 0 ./cmpromrgb_builtin.bin
+./target/release/ht32-dfu-tool -w -r write -m -v 0 ./cmpromrgb_builtin.bin
 ```
 
 Keyboard should now be detected in IAP bootloader mode by `pok3rtool`:
