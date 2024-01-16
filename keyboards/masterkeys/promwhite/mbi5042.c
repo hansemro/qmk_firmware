@@ -31,7 +31,9 @@ typedef struct PACKED {
     uint8_t mask;
 } mbi5042_led_t;
 
-static mbi5042_led_t mbi5042_leds[MATRIX_ROWS * MBI5042_NUM_CHANNELS];
+// mbi5042_leds[0]: back buffer
+// mbi5042_leds[1]: front buffer
+static mbi5042_led_t mbi5042_leds[2][MATRIX_ROWS * MBI5042_NUM_CHANNELS];
 
 static uint32_t LED_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
 
@@ -53,8 +55,8 @@ static inline void mbi5042_write_grayscale_row(int row) {
     writePinLow(MBI5042_LE_PIN);
     for (int i = MATRIX_COLS - 1; i >= 0; i--) {
         uint8_t index = led_matrix_co[row][i];
-        uint8_t mask = mbi5042_leds[index].mask;
-        mbi5042_shift_data_instr((mbi5042_leds[index].value & mask) << 8, MBI5042_SHIFT_REG_WIDTH, MBI5042_DATA_LATCH);
+        uint8_t mask = mbi5042_leds[1][index].mask;
+        mbi5042_shift_data_instr((mbi5042_leds[1][index].value & mask) << 8, MBI5042_SHIFT_REG_WIDTH, MBI5042_DATA_LATCH);
     }
     writePinLow(MBI5042_SDI_PIN);
     writePinLow(MBI5042_DCLK_PIN);
@@ -62,23 +64,24 @@ static inline void mbi5042_write_grayscale_row(int row) {
 }
 
 void mbi5042_set_value(int index, uint8_t value) {
-    mbi5042_leds[index].value = value;
+    mbi5042_leds[0][index].value = value;
     return;
 }
 
 void mbi5042_set_value_all(uint8_t value) {
     for (int i = 0; i < LED_MATRIX_LED_COUNT; i++) {
-        mbi5042_leds[i].value = value;
+        mbi5042_leds[0][i].value = value;
     }
     return;
 }
 
 void mbi5042_set_mask(int index, uint8_t value) {
-    mbi5042_leds[index].mask = value;
+    mbi5042_leds[0][index].mask = value;
     return;
 }
 
 static void mbi5042_flush(void) {
+    memcpy(&mbi5042_leds[1], &mbi5042_leds[0], MATRIX_ROWS * MBI5042_NUM_CHANNELS * sizeof(mbi5042_led_t));
     return;
 }
 
@@ -153,7 +156,8 @@ void mbi5042_init(void) {
     mbi5042_write_configuration(mbi5042_config);
 
     for (int i = 0; i < LED_MATRIX_LED_COUNT; i++) {
-        mbi5042_leds[i].mask = 0xff;
+        mbi5042_leds[0][i].mask = 0xff;
+        mbi5042_leds[1][i].mask = 0xff;
     }
 
     /* Start PWM and BFTM1 */
