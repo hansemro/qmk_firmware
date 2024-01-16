@@ -18,9 +18,9 @@
 #include "hal.h"
 #include "prolwhite.h"
 
-#define RAM_MAGIC_LOCATION 0x20003ffc
-#define RESET_FW_MAGIC 0x55aafaf0
-#define RESET_BL_MAGIC 0x55aafaf5
+#define SRAM_BOOT_MODE 0x20003ffc
+#define RESET_AP_MAGIC 0x55aafaf0
+#define RESET_IAP_MAGIC 0x55aafaf5
 #define WATCH_DOG_CR_ADDR 0x40068000
 #define WATCH_DOG_RELOAD_VALUE 0x5fa00001
 
@@ -32,7 +32,7 @@ void bootloader_jump(void) {
     wait_us(10000);                // 10 ms
     chSysDisable();                // mask all interrupts
     usbDisconnectBus(&USB_DRIVER); // disconnect usb
-    *((uint32_t *)RAM_MAGIC_LOCATION) = RESET_BL_MAGIC;
+    *((volatile uint32_t *)SRAM_BOOT_MODE) = RESET_IAP_MAGIC;
     wait_us(50000); // 50 ms
     NVIC_SystemReset();
 }
