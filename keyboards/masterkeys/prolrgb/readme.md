@@ -60,28 +60,32 @@ The process of unlocking the HT32 processor involves a flash mass erase procedur
 
 Of the two methods available to unlock the processor, the ISP method is recommended as it does not require a JTAG debugger.
 
-### w/ ISP/Pin-Shorting Method (Recommended)
+### with ISP/Pin-Shorting Method (Recommended)
 
-* As of December 2022, Holtek ISP protocol support has not yet been merged to upstream `pok3rtool` repo.
-    * `git clone https://github.com/hansemro/pok3rtool -b holtek-isp-libusb-dev`
+#### Building ht32-dfu-tool
 
-Short the BOOT pin to ground on the back of the PCB then plug in the USB cable. Leave the pin shorted until IAP bootloader is flashed.
-
-If successful, the keyboard should be detected by `pok3rtool` as `Holtek ISP USB`:
-
+```bash
+git clone https://github.com/hansemro/ht32-dfu-tool.git
+cd ht32-dfu-tool
+cargo build -r
 ```
-$ pok3rtool list
-List Devices...
-Holtek ISP USB: 100
+
+Short the SEL2 pins on the back of the PCB together then plug in the USB cable. Leave the pins shorted until IAP bootloader is flashed.
+
+If successful, the keyboard should be detected by `ht32-dfu-tool`:
+
+```bash
+$ ./target/release/ht32-dfu-tool list
+Device 0: [04d9:8010] Model=HT32F1654 Bus=3 Port=4 Addr=66
 ```
 
 Flash [stock USB IAP bootloader](https://github.com/hansemro/pok3r_re_firmware/raw/cmprolrgb/disassemble/cmprolrgb/builtin/cmprolrgb_builtin.bin):
 
-```
-$ pok3rtool -t isp flash 0 ./cmprolrgb_builtin.bin
+```bash
+./target/release/ht32-dfu-tool -w -r write -m -v 0 ./cmprolrgb_builtin.bin
 ```
 
-Keyboard should now be detected in IAP bootloader mode by pok3rtool:
+Keyboard should now be detected in IAP bootloader mode by `pok3rtool`:
 
 ```bash
 $ pok3rtool list
