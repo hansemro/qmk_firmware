@@ -31,3 +31,14 @@ void bootloader_jump(void) {
     wait_us(50000); // 50 ms
     NVIC_SystemReset();
 }
+
+#ifdef RGB_MATRIX_ENABLE
+bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    if (host_keyboard_led_state().caps_lock) {
+        RGB_MATRIX_INDICATOR_SET_COLOR(63, 255, 255, 255);
+    } else {
+        RGB_MATRIX_INDICATOR_SET_COLOR(63, 0, 0, 0);
+    }
+    return false;
+}
+#endif
