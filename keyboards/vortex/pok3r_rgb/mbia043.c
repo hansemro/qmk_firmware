@@ -8,7 +8,12 @@
 #include "quantum.h"
 
 #ifdef RGB_MATRIX_ENABLE
+
+#ifdef NLD
+#    error "NLD already defined"
+# else
 #    define NLD NO_LED
+#endif
 
 // Row6,Col2 : Caps Lock
 // Row8,Col2 : Left Space
