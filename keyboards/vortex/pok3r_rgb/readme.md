@@ -16,6 +16,7 @@ Hardware details:
     * SWD header (CN3) on PCB
 * 2x Macroblock MBIA043GP LED drivers
 * GigaDevice 25Q41BT 4 Mibit SPI flash
+* Mini-USB port
 
 ## Warning: Flashing QMK to locked HT32 will brick your keyboard
 
@@ -32,6 +33,7 @@ Make example for this keyboard (after setting up your build environment):
 ```bash
 make vortex/pok3r_rgb:<keymap>
 ```
+
 ## Installing (on unlocked keyboard)
 
 ### Building pok3rtool
