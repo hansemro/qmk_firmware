@@ -16,7 +16,7 @@
  */
 
 #include "hal.h"
-#include "prolwhite.h"
+#include "quantum.h"
 
 #define SRAM_BOOT_MODE 0x20003ffc
 #define RESET_AP_MAGIC 0x55aafaf0

@@ -23,7 +23,6 @@
 #include "wait.h"
 #include "print.h"
 #include "matrix.h"
-#include "prolwhite.h"
 
 pin_t row_list[MATRIX_ROWS] = MATRIX_ROW_PINS;
 pin_t col_list[MATRIX_COLS] = MATRIX_COL_PINS;
