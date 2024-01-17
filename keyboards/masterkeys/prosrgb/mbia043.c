@@ -16,7 +16,9 @@ typedef struct PACKED {
     uint8_t mask;
 } mbia043_led_t;
 
-static mbia043_led_t mbia043_leds[MATRIX_ROWS * MBI_NUM_CHANNELS];
+// mbia043_leds[0]: back buffer
+// mbia043_leds[1]: front buffer
+static mbia043_led_t mbia043_leds[2][MATRIX_ROWS * MBI_NUM_CHANNELS] = { 0 };
 
 static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
 static unsigned int LED_ROW_NUM = 0;
@@ -44,10 +46,10 @@ static void mbia043_write_color_row(int row) {
     }
     for (int i = MATRIX_COLS - 1; i >= 0; i--) {
         uint8_t index = g_led_config.matrix_co[row][i];
-        uint8_t mask = mbia043_leds[index].mask;
-        mbi_shift_data((mbia043_leds[index].b & mask) << 8, MBI_SHIFT_REG_WIDTH);
-        mbi_shift_data((mbia043_leds[index].g & mask) << 8, MBI_SHIFT_REG_WIDTH);
-        mbi_shift_data_instr((mbia043_leds[index].r & mask) << 8, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
+        uint8_t mask = mbia043_leds[1][index].mask;
+        mbi_shift_data((mbia043_leds[1][index].b & mask) << 8, MBI_SHIFT_REG_WIDTH);
+        mbi_shift_data((mbia043_leds[1][index].g & mask) << 8, MBI_SHIFT_REG_WIDTH);
+        mbi_shift_data_instr((mbia043_leds[1][index].r & mask) << 8, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
     }
     writePinLow(MBI_SDI_PIN);
     writePinLow(MBI_DCLK_PIN);
@@ -55,27 +57,28 @@ static void mbia043_write_color_row(int row) {
 }
 
 void mbia043_set_mask(int index, uint8_t value) {
-    mbia043_leds[index].mask = value;
+    mbia043_leds[0][index].mask = value;
     return;
 }
 
 static void mbia043_set_color(int index, uint8_t r, uint8_t g, uint8_t b) {
-    mbia043_leds[index].r = r;
-    mbia043_leds[index].g = g;
-    mbia043_leds[index].b = b;
+    mbia043_leds[0][index].r = r;
+    mbia043_leds[0][index].g = g;
+    mbia043_leds[0][index].b = b;
     return;
 }
 
 static void mbia043_set_color_all(uint8_t r, uint8_t g, uint8_t b) {
     for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-        mbia043_leds[i].r = r;
-        mbia043_leds[i].g = g;
-        mbia043_leds[i].b = b;
+        mbia043_leds[0][i].r = r;
+        mbia043_leds[0][i].g = g;
+        mbia043_leds[0][i].b = b;
     }
     return;
 }
 
 static void mbia043_flush(void) {
+    memcpy(&mbia043_leds[1], &mbia043_leds[0], MATRIX_ROWS * MBI_NUM_CHANNELS * sizeof(mbia043_led_t));
     return;
 }
 
@@ -153,7 +156,8 @@ void mbia043_init(void) {
     mbi_write_configuration(MBIA043_CONFIGURATION);
 
     for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-        mbia043_leds[i].mask = 0xff;
+        mbia043_leds[0][i].mask = 0xff;
+        mbia043_leds[1][i].mask = 0xff;
     }
 
     /* Start PWM and BFTM0 */
