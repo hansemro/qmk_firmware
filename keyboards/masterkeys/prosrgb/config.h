@@ -6,12 +6,7 @@
 
 #include "pin_defs.h"
 
-// Bootmagic key on Esc
-// See info.json
-
 #define MATRIX_IO_DELAY 0
-
-// #define FORCE_NKRO
 
 #ifdef EEPROM_DRIVER
 // SPI Flash
