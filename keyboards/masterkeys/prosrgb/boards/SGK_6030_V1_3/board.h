@@ -1,6 +1,6 @@
 /*
     ChibiOS - Copyright (C) 2020 Codetector <codetector@codetector.cn>
-              Copyright (c) 2022 Hansem Ro <hansemro@outlook.com>
+              Copyright (c) 2024 Hansem Ro <hansemro@outlook.com>
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
