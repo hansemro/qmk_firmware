@@ -144,7 +144,7 @@ static const PWMConfig GPTM1_config = {
         },
 };
 
-void mbia043_init(void) {
+static void mbia043_init(void) {
     /* Configure MBIA pins */
     setPinOutput(MBI_DCLK_PIN);
     setPinOutput(MBI_GCLK_PIN);
