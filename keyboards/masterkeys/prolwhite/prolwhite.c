@@ -17,6 +17,7 @@
 
 #include "hal.h"
 #include "quantum.h"
+#include "mbi5042.h"
 
 #define SRAM_BOOT_MODE 0x20003ffc
 #define RESET_AP_MAGIC 0x55aafaf0
@@ -41,3 +42,12 @@ void matrix_scan_kb() {
     reload_watchdog();
     matrix_scan_user();
 }
+
+#ifdef LED_MATRIX_ENABLE
+bool led_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    mbi5042_set_mask(62, host_keyboard_led_state().caps_lock ? 0xff : 0);
+    mbi5042_set_mask(14, host_keyboard_led_state().scroll_lock ? 0xff : 0);
+    mbi5042_set_mask(37, host_keyboard_led_state().num_lock ? 0xff : 0);
+    return false;
+}
+#endif
