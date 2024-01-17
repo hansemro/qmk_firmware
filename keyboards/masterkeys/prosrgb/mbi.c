@@ -7,8 +7,7 @@
 #include "mbi.h"
 #include "quantum.h"
 
-static inline void mbi_nop_delay(void)
-{
+static inline void mbi_nop_delay(void) {
     __NOP();
     __NOP();
     __NOP();

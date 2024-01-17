@@ -42,10 +42,10 @@ typedef struct PACKED {
 
 // mbia043_leds[0]: back buffer
 // mbia043_leds[1]: front buffer
-static mbia043_led_t mbia043_leds[2][MATRIX_ROWS * MBI_NUM_CHANNELS] = { 0 };
+static mbia043_led_t mbia043_leds[2][MATRIX_ROWS * MBI_NUM_CHANNELS] = {0};
 
-static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
-static unsigned int LED_ROW_IDX = 0;
+static uint32_t     LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
+static unsigned int LED_ROW_IDX                     = 0;
 
 /* Disable row pins by setting to Hi-Z */
 static void mbia043_reset_row_pins(void) {
@@ -70,7 +70,7 @@ static void mbia043_write_color_row(int row) {
     }
     for (int i = MATRIX_COLS - 1; i >= 0; i--) {
         uint8_t index = g_led_config.matrix_co[row][i];
-        uint8_t mask = mbia043_leds[1][index].mask;
+        uint8_t mask  = mbia043_leds[1][index].mask;
         mbi_shift_data((mbia043_leds[1][index].b & mask) << 8, MBI_SHIFT_REG_WIDTH);
         mbi_shift_data((mbia043_leds[1][index].g & mask) << 8, MBI_SHIFT_REG_WIDTH);
         mbi_shift_data_instr((mbia043_leds[1][index].r & mask) << 8, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
