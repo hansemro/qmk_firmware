@@ -11,15 +11,15 @@
 
 #define MATRIX_IO_DELAY 0
 
-//#define FORCE_NKRO
+// #define FORCE_NKRO
 
 #ifdef EEPROM_DRIVER
 // SPI Flash
 #    define EXTERNAL_FLASH_SPI_SLAVE_SELECT_PIN B10
 #    define EXTERNAL_FLASH_CLOCK_DIVISOR 16
-#    define EXTERNAL_FLASH_SIZE (512 * 1024) /* 512 KiB */
-#    define EXTERNAL_FLASH_PAGE_SIZE 256 /* 256 B */
-#    define EXTERNAL_FLASH_SECTOR_SIZE 4096 /* 4 KiB */
+#    define EXTERNAL_FLASH_SIZE (512 * 1024)      /* 512 KiB */
+#    define EXTERNAL_FLASH_PAGE_SIZE 256          /* 256 B */
+#    define EXTERNAL_FLASH_SECTOR_SIZE 4096       /* 4 KiB */
 #    define EXTERNAL_FLASH_BLOCK_SIZE (64 * 1024) /* 64 KiB */
 
 // SPI Configuration
