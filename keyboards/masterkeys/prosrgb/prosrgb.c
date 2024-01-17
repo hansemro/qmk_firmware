@@ -17,7 +17,6 @@
 #include "quantum.h"
 #include "hal.h"
 #include "wait.h"
-#include "mbi.h"
 
 #define SRAM_BOOT_MODE 0x40080304
 #define RESET_AP_MAGIC 0x55aafaf0
@@ -33,6 +32,8 @@ void bootloader_jump(void) {
 }
 
 #ifdef RGB_MATRIX_ENABLE
+#include "mbi.h"
+
 typedef struct PACKED {
     uint8_t r;
     uint8_t g;
