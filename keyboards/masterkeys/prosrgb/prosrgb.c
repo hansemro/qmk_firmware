@@ -108,7 +108,7 @@ static void mbia043_flush(void) {
 }
 
 /* BFTM0 timer routine to update/flush RGB values one row at a time */
-static void timer_callback(GPTDriver *gptp) {
+static void mbia043_isr(GPTDriver *gptp) {
     mbia043_reset_row_pins();
     mbi_send_instruction(MBI_GLOBAL_LATCH);
     writePinLow(LEDA_GPIO_ROW_PINS[LED_ROW_IDX]);
@@ -123,7 +123,7 @@ static void timer_callback(GPTDriver *gptp) {
  */
 static const GPTConfig BFTM0_config = {
     .frequency = HT32_CK_AHB_FREQUENCY,
-    .callback  = timer_callback,
+    .callback  = mbia043_isr,
 };
 
 /* GPTM1 PWM configuration:
