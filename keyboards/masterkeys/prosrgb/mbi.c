@@ -7,21 +7,22 @@
 #include "mbi.h"
 #include "quantum.h"
 
+static inline void mbi_nop_delay(void)
+{
+    __NOP();
+    __NOP();
+    __NOP();
+}
+
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
 void mbi_send_instruction(int instr) {
     writePinLow(MBI_LE_PIN);
-    __NOP();
-    __NOP();
-    __NOP();
+    mbi_nop_delay();
     writePinHigh(MBI_LE_PIN);
     while (instr-- > 0) {
-        __NOP();
-        __NOP();
-        __NOP();
+        mbi_nop_delay();
         writePinLow(MBI_DCLK_PIN);
-        __NOP();
-        __NOP();
-        __NOP();
+        mbi_nop_delay();
         writePinHigh(MBI_DCLK_PIN);
     }
     writePinLow(MBI_LE_PIN);
@@ -34,15 +35,11 @@ void mbi_send_instruction(int instr) {
  */
 void mbi_shift_data(uint16_t data, int shift_amount) {
     while (shift_amount-- > 0) {
-        __NOP();
-        __NOP();
-        __NOP();
+        mbi_nop_delay();
         writePinLow(MBI_DCLK_PIN);
         // set SDI to data[15]
         writePin(MBI_SDI_PIN, data & 0x8000);
-        __NOP();
-        __NOP();
-        __NOP();
+        mbi_nop_delay();
         // clock in data
         writePinHigh(MBI_DCLK_PIN);
         data = (data & 0x7fff) << 1;
@@ -76,16 +73,12 @@ void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr) {
 uint16_t mbi_shift_recv(uint16_t data, int shift_amount) {
     uint16_t recv = 0;
     while (shift_amount-- > 0) {
-        __NOP();
-        __NOP();
-        __NOP();
+        mbi_nop_delay();
         writePinLow(MBI_DCLK_PIN);
         recv = (recv << 1) | readPin(MBI_SDO_PIN);
         // set SDI to data[15]
         writePin(MBI_SDI_PIN, data & 0x8000);
-        __NOP();
-        __NOP();
-        __NOP();
+        mbi_nop_delay();
         // clock in data
         writePinHigh(MBI_DCLK_PIN);
         data = (data & 0x7fff) << 1;
