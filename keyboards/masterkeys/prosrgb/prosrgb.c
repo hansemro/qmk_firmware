@@ -38,7 +38,6 @@ typedef struct PACKED {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-    uint8_t mask;
 } mbia043_led_t;
 
 // mbia043_leds[0]: back buffer
@@ -71,18 +70,12 @@ static void mbia043_write_color_row(int row) {
     }
     for (int i = MATRIX_COLS - 1; i >= 0; i--) {
         uint8_t index = g_led_config.matrix_co[row][i];
-        uint8_t mask  = mbia043_leds[1][index].mask;
-        mbi_shift_data((mbia043_leds[1][index].b & mask) << 8, MBI_SHIFT_REG_WIDTH);
-        mbi_shift_data((mbia043_leds[1][index].g & mask) << 8, MBI_SHIFT_REG_WIDTH);
-        mbi_shift_data_instr((mbia043_leds[1][index].r & mask) << 8, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
+        mbi_shift_data((mbia043_leds[1][index].b) << 8, MBI_SHIFT_REG_WIDTH);
+        mbi_shift_data((mbia043_leds[1][index].g) << 8, MBI_SHIFT_REG_WIDTH);
+        mbi_shift_data_instr((mbia043_leds[1][index].r) << 8, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
     }
     writePinLow(MBI_SDI_PIN);
     writePinLow(MBI_DCLK_PIN);
-    return;
-}
-
-void mbia043_set_mask(int index, uint8_t value) {
-    mbia043_leds[0][index].mask = value;
     return;
 }
 
@@ -180,11 +173,6 @@ static void mbia043_init(void) {
     /* Set configuration */
     mbi_write_configuration(MBIA043_CONFIGURATION);
 
-    for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-        mbia043_leds[0][i].mask = 0xff;
-        mbia043_leds[1][i].mask = 0xff;
-    }
-
     /* Start PWM and BFTM0 */
     pwmEnableChannel(&PWMD_GPTM1, 0, PWM_FRACTION_TO_WIDTH(&PWMD_GPTM1, 2, 1));
     gptStart(&GPTD_BFTM0, &BFTM0_config);
@@ -201,11 +189,12 @@ const rgb_matrix_driver_t rgb_matrix_driver = {
     .set_color_all = mbia043_set_color_all,
 };
 
+// Toggle RGB on Caps and Scroll Lock status
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    // enable/disable RGB on Caps Lock status
-    mbia043_set_mask(50, host_keyboard_led_state().caps_lock ? 0xff : 0);
-    // enable/disable RGB on Scroll Lock status
-    mbia043_set_mask(14, host_keyboard_led_state().scroll_lock ? 0xff : 0);
+    if (!host_keyboard_led_state().caps_lock)
+        mbia043_set_color(50, 0, 0, 0);
+    if (!host_keyboard_led_state().scroll_lock)
+        mbia043_set_color(14, 0, 0, 0);
     return false;
 }
 #endif
