@@ -32,7 +32,7 @@ void bootloader_jump(void) {
 }
 
 #ifdef RGB_MATRIX_ENABLE
-#include "mbi.h"
+#    include "mbi.h"
 
 typedef struct PACKED {
     uint8_t r;
@@ -44,8 +44,8 @@ typedef struct PACKED {
 // mbia043_leds[1]: front buffer
 static mbia043_led_t mbia043_leds[2][MATRIX_ROWS * MBI_NUM_CHANNELS] = {0};
 
-static uint32_t     LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
-static unsigned int LED_ROW_IDX                     = 0;
+static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
+static uint8_t  LED_ROW_IDX                     = 0;
 
 /* Disable row pins by setting to Hi-Z */
 static void mbia043_reset_row_pins(void) {
@@ -191,10 +191,8 @@ const rgb_matrix_driver_t rgb_matrix_driver = {
 
 // Toggle RGB on Caps and Scroll Lock status
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    if (!host_keyboard_led_state().caps_lock)
-        mbia043_set_color(50, 0, 0, 0);
-    if (!host_keyboard_led_state().scroll_lock)
-        mbia043_set_color(14, 0, 0, 0);
+    if (!host_keyboard_led_state().caps_lock) mbia043_set_color(50, 0, 0, 0);
+    if (!host_keyboard_led_state().scroll_lock) mbia043_set_color(14, 0, 0, 0);
     return false;
 }
 #endif
