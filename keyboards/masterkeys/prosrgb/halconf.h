@@ -1,6 +1,5 @@
-/* SPDX-License-Identifier: GPL-2.0-or-later
- * Copyright (c) 2024 Hansem Ro <hansemro@outlook.com>
- */
+// Copyright (c) 2024 Hansem Ro <hansemro@outlook.com>
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once
 
