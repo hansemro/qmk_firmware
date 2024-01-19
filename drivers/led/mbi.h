@@ -153,8 +153,8 @@
 
 /* Some keyboards have a pin to enable power to MBI */
 #ifdef MBI_POWER_ENABLE_PIN
-#    if !defined(MBI_POWER_ACTIVE_LOW) && !defined(MBI_POWER_ACTIVE_HIGH)
-#        error "MBI_POWER_ACTIVE_LOW or MBI_POWER_ACTIVE_HIGH must be defined"
+#    if !defined(MBI_POWER_ACTIVE_HL) && (MBI_POWER_ACTIVE_HL != HIGH) && (MBI_POWER_ACTIVE_HL != LOW)
+#        error "MBI_POWER_ACTIVE_HL must be defined to either HIGH or LOW"
 #    endif
 #    ifndef MBI_POWER_OUTPUT_MODE
 #        error "MBI_POWER_OUTPUT_MODE is not defined"

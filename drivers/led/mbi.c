@@ -250,9 +250,9 @@ __attribute__((weak)) void mbi_init_pins(void) {
 #ifdef MBI_POWER_ENABLE_PIN
     palSetLineMode(MBI_POWER_ENABLE_PIN, MBI_POWER_OUTPUT_MODE);
     setPinOutput(MBI_POWER_ENABLE_PIN);
-#    if defined(MBI_POWER_ACTIVE_HIGH)
+#    if (MBI_POWER_ACTIVE_HL == HIGH)
     writePinHigh(MBI_POWER_ENABLE_PIN);
-#    elif defined(MBI_POWER_ACTIVE_LOW)
+#    elif (MBI_POWER_ACTIVE_HL == LOW)
     writePinLow(MBI_POWER_ENABLE_PIN);
 #    endif
 #endif
