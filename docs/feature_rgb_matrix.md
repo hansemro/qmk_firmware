@@ -526,6 +526,195 @@ const aw20216s_led_t PROGMEM g_aw20216s_leds[AW20216S_LED_COUNT] = {
 ```
 
 ---
+### MBI :id=mbi
+
+There is basic support for RGB matrix lighting with the Macroblock MBIA04X/MBI504X LED Driver with proprietary SPI-like control interface. To enable it, add this to your `rules.mk`:
+
+```make
+RGB_MATRIX_ENABLE = yes
+RGB_MATRIX_DRIVER = mbi
+```
+
+You can use 1 or more MBI IC's. You can define the following items in `config.h`:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `MBI_NUM_CHANNELS` | (Required) Number of output channels for a single MBI | |
+| `MBI_SHIFT_REG_WIDTH` | (Required) Length of shift register for a single MBI, in bits | |
+| `MBI_NUM_DRIVER` | (Required) Number of MBI drivers | |
+| `MBI_LED_GPIO_PINS` | (Required) Array of MCU-managed LED GPIO pins in order of row/column index | |
+| `MBI_LED_GPIO_OUTPUT_MODE` | (Required) GPIO pad mode for LED GPIO pins | |
+| `MBI_LED_DIRECTION` | (Required) Direction from MCU-managed LED pin to output channel of MBI. Accepted values: `ROW2COL` or `COL2ROW` | |
+| `MBI_PWM_DRIVER` | (Required) PWM driver to use for GCLK signal | |
+| `MBI_PWM_CHANNEL` | (Required) PWM channel to use | |
+| `MBI_PWM_OUTPUT_MODE` | (Optional) PWM driver output mode | `PWM_OUTPUT_ACTIVE_LOW` |
+| `MBI_PWM_COUNTER_FREQUENCY` | (Optional) PWM counter frequency, in Hz | 8000000 |
+| `MBI_PWM_PERIOD` | (Optional) PWM period in ticks. Output frequency = `MBI_PWM_COUNTER_FREQUENCY` / `MBI_PWM_PERIOD` | 2 |
+| `MBI_TIMER_DRIVER` | (Required) GPT timer driver to use for continuous flushing of a row/column color data | |
+| `MBI_TIMER_COUNTER_FREQUENCY` | (Optional) Timer counter frequency, in Hz | 2000 |
+| `MBI_TIMER_PERIOD` | (Optional) Timer period in ticks. Flushing frequency = `MBI_TIMER_COUNTER_FREQUENCY` / `MBI_TIMER_PERIOD` | 2 |
+| `MBI_LE_PIN` | (Required) MCU-managed LE pin | |
+| `MBI_LE_OUTPUT_MODE` | (Required) GPIO pad mode for LE pin | |
+| `MBI_SDI_PIN` | (Required) MCU-managed SDI pin | |
+| `MBI_SDI_OUTPUT_MODE` | (Required) GPIO pad mode for SDI pin | |
+| `MBI_DCLK_PIN` | (Required) MCU-managed DCLK pin | |
+| `MBI_DCLK_OUTPUT_MODE` | (Required) GPIO pad mode for DCLK pin | |
+| `MBI_GCLK_PIN` | (Required) MCU-managed GCLK pin | |
+| `MBI_GCLK_OUTPUT_MODE` | (Required) GPIO pad mode for GCLK pin | |
+| `MBI_POWER_ENABLE_PIN` | (Optional) MCU-managed pin for enabling power to MBI(s) | |
+| `MBI_POWER_OUTPUT_MODE` | GPIO pad mode for power enable pin | |
+| `MBI_POWER_ACTIVE_HL` | Enable power on high/low signal. Accepted values: `HIGH` or `LOW` | |
+| `MBI_NOPS` | (Optional) Number of no-op delays (multiplied by 3) to ensure MBI timing requirements | |
+| `MBI_DATA_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from shift register to buffers. | |
+| `MBI_GLOBAL_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from buffers to comparators. | |
+
+Here is an example using 2 MBIA043 drivers.
+
+```c
+// MBIA043 (at 5V)
+#define MBI_NUM_CHANNELS 16
+#define MBI_SHIFT_REG_WIDTH 10
+#define MBI_DATA_LATCH 1
+#define MBI_GLOBAL_LATCH 2
+
+#define MBI_NUM_DRIVER 2
+
+// PWM to generate GCLK clock signal
+// Desired output/GCLK frequency =  3.6 MHz
+#define MBI_PWM_DRIVER PWMD_GPTM1
+#define MBI_PWM_CHANNEL 0
+#define MBI_PWM_OUTPUT_MODE PWM_OUTPUT_ACTIVE_LOW
+#define MBI_PWM_COUNTER_FREQUENCY (3600000UL * 2)
+#define MBI_PWM_PERIOD 2UL
+
+// MBI timer for flushing color data for a single row
+#define MBI_TIMER_DRIVER GPTD_BFTM0
+
+// MCU manages column pins; MBI's manage row pins
+#define MBI_LED_DIRECTION COL2ROW
+// MCU-managed LED column pins
+#define MBI_LED_GPIO_PINS \
+    { C8, C7, B5, B4, B3, B2, C6, C5 }
+#define MBI_LED_GPIO_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+
+// MCU-managed MBI pins
+// These pins connect to pull-up resistor to 5V, so use open-drain.
+#define MBI_LE_PIN A15
+#define MBI_LE_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_SDI_PIN C2
+#define MBI_LE_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_DCLK_PIN A14
+#define MBI_LE_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_GCLK_PIN C0
+#define MBI_GCLK_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_TM))
+
+// MCU-managed MBI 5V power supply enable (active-low)
+#define MBI_POWER_ENABLE_PIN C1
+#define MBI_POWER_ACTIVE_HL LOW
+#define MBI_POWER_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+```
+
+>! Note that the RGB matrix defined in info.json refers to key matrix associated to an LED index. However, Key and LED matrices may differ, so an LED matrix to LED index needs to be defined.
+
+Define channel and LED matrix configuration in your `<keyboard>.c`:
+
+```c
+/*
+ * Channel Setup:
+ *         ┌───────┐
+ *    SDI->│       │->SDO1_2
+ * R_ROW0<-│       │->G_ROW6
+ * R_ROW1<-│       │->G_ROW5
+ * R_ROW2<-│       │->G_ROW4
+ * R_ROW3<-│MBIA043│->G_ROW3
+ * R_ROW4<-│   A   │->G_ROW2
+ * R_ROW5<-│       │->G_ROW1
+ * R_ROW6<-│       │->G_ROW0
+ * R_ROW7<-│       │->R_ROW8
+ *         └───────┘
+ *         ┌───────┐
+ * SDO1_2->│       │->SDO
+ * G_ROW7<-│       │->unused
+ * G_ROW8<-│       │->unused
+ * B_ROW0<-│       │->unused
+ * B_ROW1<-│MBIA043│->unused
+ * B_ROW2<-│   B   │->unused
+ * B_ROW3<-│       │->B_ROW8
+ * B_ROW4<-│       │->B_ROW7
+ * B_ROW5<-│       │->B_ROW6
+ *         └───────┘
+ */
+// clang-format off
+const mbi_led_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
+    {
+        /* Color channel
+           |
+           |         MBI-managed row/column index
+           |         | */
+        {MBI_RED_CH, 0},
+        {MBI_RED_CH, 1},
+        {MBI_RED_CH, 2},
+        {MBI_RED_CH, 3},
+        {MBI_RED_CH, 4},
+        {MBI_RED_CH, 5},
+        {MBI_RED_CH, 6},
+        {MBI_RED_CH, 7},
+        {MBI_RED_CH, 8},
+        {MBI_GREEN_CH, 0},
+        {MBI_GREEN_CH, 1},
+        {MBI_GREEN_CH, 2},
+        {MBI_GREEN_CH, 3},
+        {MBI_GREEN_CH, 4},
+        {MBI_GREEN_CH, 5},
+        {MBI_GREEN_CH, 6},
+    },
+    {
+        {MBI_GREEN_CH, 7},
+        {MBI_GREEN_CH, 8},
+        {MBI_BLUE_CH, 0},
+        {MBI_BLUE_CH, 1},
+        {MBI_BLUE_CH, 2},
+        {MBI_BLUE_CH, 3},
+        {MBI_BLUE_CH, 4},
+        {MBI_BLUE_CH, 5},
+        {MBI_BLUE_CH, 6},
+        {MBI_BLUE_CH, 7},
+        {MBI_BLUE_CH, 8},
+        {MBI_UNUSED_CH, 0},
+        {MBI_UNUSED_CH, 0},
+        {MBI_UNUSED_CH, 0},
+        {MBI_UNUSED_CH, 0},
+        {MBI_UNUSED_CH, 0},
+    },
+};
+// clang-format on
+
+// LED Matrix to LED Index
+// Since COL2ROW, MBI manages rows while MCU manages columns
+// clang-format off
+const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MATRIX_ROWS] = {
+    /*          Col0 Col1 Col2 Col3 Col4 Col5 Col6 Col7*/
+    /*Row0*/ {  0,   1,   2,   3,   4,   5,   6,   7    },
+    /*Row1*/ {  14,  15,  16,  17,  18,  19,  20,  21   },
+    /*Row2*/ {  28,  29,  30,  31,  32,  33,  34,  35   },
+    /*Row3*/ {  41,  42,  43,  44,  45,  46,  47,  48   },
+    /*Row4*/ {  53,  54,  55,  8,   9,   10,  11,  13   },
+    /*Row5*/ {  42,  63,  12,  22,  23,  24,  25,  27   },
+    /*Row6*/ {  NLD, NLD, 26,  36,  37,  38,  39,  40   },
+    /*Row7*/ {  NLD, 56,  57,  49,  50,  51,  52,  NLD  },
+    /*Row8*/ {  NLD, NLD, 58,  59,  60,  61,  NLD, 62   },
+    /*Row9*/ {  NLD, NLD, NLD, NLD, NLD, NLD, NLD, NLD  },
+    /*Row10*/{  NLD, NLD, NLD, NLD, NLD, NLD, NLD, NLD  },
+    /*Row11*/{  NLD, NLD, NLD, NLD, NLD, NLD, NLD, NLD  },
+    /*Row12*/{  NLD, NLD, NLD, NLD, NLD, NLD, NLD, NLD  },
+    /*Row13*/{  NLD, NLD, NLD, NLD, NLD, NLD, NLD, NLD  },
+    /*Row14*/{  NLD, NLD, NLD, NLD, NLD, NLD, NLD, NLD  },
+    /*Row15*/{  NLD, NLD, NLD, NLD, NLD, NLD, NLD, NLD  },
+};
+// clang-format on
+```
+
+---
 
 ## Common Configuration :id=common-configuration
 
