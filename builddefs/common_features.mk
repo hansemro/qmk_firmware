@@ -340,7 +340,7 @@ LED_MATRIX_DRIVER := snled27351
 endif
 
 LED_MATRIX_ENABLE ?= no
-VALID_LED_MATRIX_TYPES := is31fl3218 is31fl3731 is31fl3733 is31fl3736 is31fl3737 is31fl3741 is31fl3742a is31fl3743a is31fl3745 is31fl3746a snled27351 custom
+VALID_LED_MATRIX_TYPES := is31fl3218 is31fl3731 is31fl3733 is31fl3736 is31fl3737 is31fl3741 is31fl3742a is31fl3743a is31fl3745 is31fl3746a snled27351 mbi custom
 
 ifeq ($(strip $(LED_MATRIX_ENABLE)), yes)
     ifeq ($(filter $(LED_MATRIX_DRIVER),$(VALID_LED_MATRIX_TYPES)),)
@@ -425,6 +425,12 @@ ifeq ($(strip $(LED_MATRIX_ENABLE)), yes)
         SRC += snled27351-mono.c
     endif
 
+    ifeq ($(strip $(LED_MATRIX_DRIVER)), mbi)
+		OPT_DEFS += -DMBI_LED_TYPE=MONO
+        COMMON_VPATH += $(DRIVER_PATH)/led
+        SRC += mbi.c
+    endif
+
 endif
 
 # Deprecated driver names - do not use
@@ -437,7 +443,7 @@ endif
 
 RGB_MATRIX_ENABLE ?= no
 
-VALID_RGB_MATRIX_TYPES := aw20216s is31fl3218 is31fl3731 is31fl3733 is31fl3736 is31fl3737 is31fl3741 is31fl3742a is31fl3743a is31fl3745 is31fl3746a snled27351 ws2812 custom
+VALID_RGB_MATRIX_TYPES := aw20216s is31fl3218 is31fl3731 is31fl3733 is31fl3736 is31fl3737 is31fl3741 is31fl3742a is31fl3743a is31fl3745 is31fl3746a snled27351 ws2812 mbi custom
 ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
     ifeq ($(filter $(RGB_MATRIX_DRIVER),$(VALID_RGB_MATRIX_TYPES)),)
         $(call CATASTROPHIC_ERROR,Invalid RGB_MATRIX_DRIVER,RGB_MATRIX_DRIVER="$(RGB_MATRIX_DRIVER)" is not a valid matrix type)
@@ -534,6 +540,12 @@ ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
 
     ifeq ($(strip $(RGB_MATRIX_DRIVER)), apa102)
         APA102_DRIVER_REQUIRED := yes
+    endif
+
+    ifeq ($(strip $(RGB_MATRIX_DRIVER)), mbi)
+		OPT_DEFS += -DMBI_LED_TYPE=RGB
+        COMMON_VPATH += $(DRIVER_PATH)/led
+        SRC += mbi.c
     endif
 
     ifeq ($(strip $(RGB_MATRIX_CUSTOM_KB)), yes)
