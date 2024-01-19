@@ -185,23 +185,6 @@ void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr) {
     }
 }
 
-/* Transmit data to shift-register with shift_amount number of DCLK pulses,
- * and read shift_amount bits of data from (last-in-cascade) shift-register.
- */
-uint16_t mbi_shift_recv(uint16_t data, int shift_amount) {
-    uint16_t recv = 0;
-    while (shift_amount-- > 0) {
-        mbi_io_wait;
-        writePinLow(MBI_DCLK_PIN);
-        recv = (recv << 1) | readPin(MBI_SDO_PIN);
-        writePin(MBI_SDI_PIN, data & MBI_SHIFT_REG_MSB_MASK);
-        mbi_io_wait;
-        writePinHigh(MBI_DCLK_PIN);
-        data = data << 1;
-    }
-    return recv;
-}
-
 /* Write val to each MBI's configuration registers. */
 void mbi_write_configuration(uint16_t val) {
     mbi_send_instruction(MBI_ENABLE_WRITE_CONFIGURATION);
@@ -220,12 +203,10 @@ __attribute__((weak)) void mbi_init_pins(void) {
     palSetLineMode(MBI_GCLK_PIN, MBI_GCLK_OUTPUT_MODE);
     palSetLineMode(MBI_LE_PIN, MBI_LE_OUTPUT_MODE);
     palSetLineMode(MBI_SDI_PIN, MBI_SDI_OUTPUT_MODE);
-    palSetLineMode(MBI_SDO_PIN, MBI_SDO_INPUT_MODE);
     setPinOutput(MBI_DCLK_PIN);
     setPinOutput(MBI_GCLK_PIN);
     setPinOutput(MBI_LE_PIN);
     setPinOutput(MBI_SDI_PIN);
-    setPinInput(MBI_SDO_PIN);
     writePinHigh(MBI_DCLK_PIN);
     writePinHigh(MBI_GCLK_PIN);
     writePinHigh(MBI_LE_PIN);
