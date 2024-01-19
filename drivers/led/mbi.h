@@ -269,7 +269,7 @@ typedef struct {
 } mbi_channel_t;
 
 /* Output channel to color channel mapping */
-extern const mbi_channel_t mbi_channels[MBI_NUM_CASCADE][MBI_NUM_CHANNELS];
+extern const mbi_channel_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS];
 
 /* LED Matrix to LED Index */
-extern const uint8_t led_matrix_co[MATRIX_ROWS][MATRIX_COLS];
+extern const uint8_t g_mbi_led_matrix_co[MATRIX_ROWS][MATRIX_COLS];

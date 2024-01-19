@@ -72,12 +72,12 @@ static void mbi_flush_isr(GPTDriver *gptp) {
         uint8_t mbi_ch_idx;
         uint8_t led_idx;
         for (int j = MBI_NUM_DRIVER - 1; j >= 1; j--) {
-            color_ch = mbi_channels[j][i].color_channel;
-            mbi_ch_idx = mbi_channels[j][i].color_index;
+            color_ch = g_mbi_channels[j][i].color_channel;
+            mbi_ch_idx = g_mbi_channels[j][i].color_index;
 #if (MBI_LED_DIRECTION == ROW2COL)
-            led_idx = led_matrix_co[led_gpio_idx][mbi_ch_idx];
+            led_idx = g_mbi_led_matrix_co[led_gpio_idx][mbi_ch_idx];
 #elif (MBI_LED_DIRECTION == COL2ROW)
-            led_idx = led_matrix_co[mbi_ch_idx][led_gpio_idx];
+            led_idx = g_mbi_led_matrix_co[mbi_ch_idx][led_gpio_idx];
 #endif
             switch (color_ch) {
 #if (MBI_LED_TYPE == RGB)
@@ -100,12 +100,12 @@ static void mbi_flush_isr(GPTDriver *gptp) {
                     mbi_shift_data(0, MBI_SHIFT_REG_WIDTH);
             }
         }
-        color_ch = mbi_channels[0][i].color_channel;
-        mbi_ch_idx = mbi_channels[0][i].color_index;
+        color_ch = g_mbi_channels[0][i].color_channel;
+        mbi_ch_idx = g_mbi_channels[0][i].color_index;
 #if (MBI_LED_DIRECTION == ROW2COL)
-        led_idx = led_matrix_co[led_gpio_idx][mbi_ch_idx];
+        led_idx = g_mbi_led_matrix_co[led_gpio_idx][mbi_ch_idx];
 #elif (MBI_LED_DIRECTION == COL2ROW)
-        led_idx = led_matrix_co[mbi_ch_idx][led_gpio_idx];
+        led_idx = g_mbi_led_matrix_co[mbi_ch_idx][led_gpio_idx];
 #endif
         switch (color_ch) {
 #if (MBI_LED_TYPE == RGB)
