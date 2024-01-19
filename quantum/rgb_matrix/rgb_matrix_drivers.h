@@ -31,6 +31,8 @@
 #    include "snled27351.h"
 #elif defined(RGB_MATRIX_WS2812)
 #    include "ws2812.h"
+#elif defined(RGB_MATRIX_MBI)
+#    include "mbi.h"
 #endif
 
 typedef struct {
