@@ -30,8 +30,8 @@
 #endif
 
 /* number of MBI(s) */
-#ifndef MBI_NUM_CASCADE
-#    error "MBI_NUM_CASCADE is not defined"
+#ifndef MBI_NUM_DRIVER
+#    error "MBI_NUM_DRIVER is not defined"
 #endif
 
 /* RGB or Grayscale (mono) LEDs */
