@@ -71,7 +71,7 @@ static void mbi_flush_isr(GPTDriver *gptp) {
         uint8_t color_ch;
         uint8_t mbi_ch_idx;
         uint8_t led_idx;
-        for (int j = MBI_NUM_CASCADE - 1; j >= 1; j--) {
+        for (int j = MBI_NUM_DRIVER - 1; j >= 1; j--) {
             color_ch = mbi_channels[j][i].color_channel;
             mbi_ch_idx = mbi_channels[j][i].color_index;
 #if (MBI_LED_DIRECTION == ROW2COL)
@@ -206,10 +206,10 @@ uint16_t mbi_shift_recv(uint16_t data, int shift_amount) {
 void mbi_write_configuration(uint16_t val) {
     mbi_send_instruction(MBI_ENABLE_WRITE_CONFIGURATION);
     int i = 0;
-    for (; i < MBI_NUM_CASCADE - 1; i++) {
+    for (; i < MBI_NUM_DRIVER - 1; i++) {
         mbi_shift_data(val, MBI_SHIFT_REG_WIDTH);
     }
-    if (i < MBI_NUM_CASCADE) {
+    if (i < MBI_NUM_DRIVER) {
         mbi_shift_data_instr(val, MBI_SHIFT_REG_WIDTH, MBI_WRITE_CONFIGURATION);
     }
 }
