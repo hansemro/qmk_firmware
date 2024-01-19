@@ -127,14 +127,6 @@
 #    error "MBI_SDI_OUTPUT_MODE is not defined"
 #endif
 
-#ifndef MBI_SDO_PIN
-#    error "MBI_SDO_PIN is not defined"
-#endif
-
-#ifndef MBI_SDO_INPUT_MODE
-#    error "MBI_SDO_INPUT_MODE is not defined"
-#endif
-
 #ifndef MBI_DCLK_PIN
 #    error "MBI_DCLK_PIN is not defined"
 #endif
@@ -199,23 +191,6 @@
 #    error "MBI_GLOBAL_LATCH is not defined"
 #endif
 
-/* Move configuration register to shift-register */
-#ifndef MBI_READ_CONFIGURATION
-#    error "MBI_READ_CONFIGURATION is not defined"
-#endif
-
-/* If previous instruction was MBI_ENABLE_WRITE_CONFIGURATION, then move
- * data in shift-register to configuration register
- */
-#ifndef MBI_WRITE_CONFIGURATION
-#    error "MBI_WRITE_CONFIGURATION is not defined"
-#endif
-
-/* Enable MBI_WRITE_CONFIGURATION */
-#ifndef MBI_ENABLE_WRITE_CONFIGURATION
-#    error "MBI_ENABLE_WRITE_CONFIGURATION is not defined"
-#endif
-
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
 void mbi_send_instruction(int instr);
 
@@ -232,13 +207,6 @@ void mbi_shift_data(uint16_t data, int shift_amount);
  * Note: Transmission begins with MSB at data[15].
  */
 void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr);
-
-/* Transmit data to shift-register with shift_amount number of DCLK pulses,
- * and read shift_amount bits of data from (last-in-cascade) shift-register.
- *
- * Note: Transmission begins with MSB at data[15].
- */
-uint16_t mbi_shift_recv(uint16_t data, int shift_amount);
 
 /* Write val to each MBI's configuration registers.
  *
