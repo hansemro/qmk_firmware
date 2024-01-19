@@ -40,7 +40,7 @@ void mbi_shift_data(uint16_t data, int shift_amount) {
         mbi_nop_delay();
         // clock in data
         writePinHigh(MBI_DCLK_PIN);
-        data = (data & 0x7fff) << 1;
+        data = data << 1;
     }
     return;
 }
@@ -79,7 +79,7 @@ uint16_t mbi_shift_recv(uint16_t data, int shift_amount) {
         mbi_nop_delay();
         // clock in data
         writePinHigh(MBI_DCLK_PIN);
-        data = (data & 0x7fff) << 1;
+        data = data << 1;
     }
     return recv;
 }

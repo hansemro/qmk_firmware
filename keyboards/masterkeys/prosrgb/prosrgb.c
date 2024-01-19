@@ -31,13 +31,13 @@ typedef struct PACKED {
 // mbia043_leds[1]: front buffer
 static mbia043_led_t mbia043_leds[2][MATRIX_ROWS * MBI_NUM_CHANNELS] = {0};
 
-static uint32_t LEDA_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
-static uint8_t  LED_ROW_IDX                     = 0;
+static uint32_t LED_GPIO_ROW_PINS[MATRIX_ROWS] = LED_ROW_PINS;
+static uint8_t  LED_ROW_IDX                    = 0;
 
 /* Disable row pins by setting to Hi-Z */
 static void mbia043_reset_row_pins(void) {
     for (int i = 0; i < MATRIX_ROWS; i++) {
-        writePinHigh(LEDA_GPIO_ROW_PINS[i]);
+        writePinHigh(LED_GPIO_ROW_PINS[i]);
     }
     return;
 }
@@ -50,6 +50,7 @@ static void mbia043_reset_row_pins(void) {
  */
 static void mbia043_write_color_row(int row) {
     writePinLow(MBI_LE_PIN);
+    // Write 0s to unused buffers
     for (int i = 0; i < MBI_NUM_CHANNELS - MATRIX_COLS; i++) {
         mbi_shift_data(0, MBI_SHIFT_REG_WIDTH);
         mbi_shift_data(0, MBI_SHIFT_REG_WIDTH);
@@ -136,9 +137,9 @@ static void mbia043_init(void) {
     setPinInput(MBI_SDO_PIN);
 
     for (int i = 0; i < MATRIX_ROWS; i++) {
-        setPinOutput(LEDA_GPIO_ROW_PINS[i]);
-        palSetLineMode(LEDA_GPIO_ROW_PINS[i], PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO));
-        writePinHigh(LEDA_GPIO_ROW_PINS[i]);
+        setPinOutput(LED_GPIO_ROW_PINS[i]);
+        palSetLineMode(LED_GPIO_ROW_PINS[i], PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO));
+        writePinHigh(LED_GPIO_ROW_PINS[i]);
     }
 
     /* Power on MBIA */
@@ -176,10 +177,10 @@ const rgb_matrix_driver_t rgb_matrix_driver = {
     .set_color_all = mbia043_set_color_all,
 };
 
-// Toggle RGB on Caps and Scroll Lock status
+// Toggles RGB off for Caps and Scroll Lock keys if disabled
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    if (!host_keyboard_led_state().caps_lock) mbia043_set_color(50, 0, 0, 0);
-    if (!host_keyboard_led_state().scroll_lock) mbia043_set_color(14, 0, 0, 0);
+    if (!host_keyboard_led_state().caps_lock) mbia043_set_color(50, RGB_OFF);
+    if (!host_keyboard_led_state().scroll_lock) mbia043_set_color(14, RGB_OFF);
     return false;
 }
 #endif
