@@ -224,6 +224,8 @@ void mbi_set_value(int index, uint8_t value);
 void mbi_set_value_all(uint8_t value);
 #endif
 void mbi_flush(void);
+/* activate row/column pin and update buffers for next row/column */
+void mbi_flush_isr(void);
 
 #define MBI_UNUSED_CH 0
 #define MBI_MONO_CH 1
