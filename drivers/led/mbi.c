@@ -246,11 +246,11 @@ __attribute__((weak)) void mbi_init_pins(void) {
 #endif
 }
 
-#if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION) && defined(MBI_CONFIGURATION)
 __attribute__((weak)) void mbi_init_config(void) {
+#if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION) && defined(MBI_CONFIGURATION)
     mbi_write_configuration(MBI_CONFIGURATION);
-}
 #endif
+}
 
 __attribute__((weak)) void mbi_init_timers(void) {
     /* Configure PWM (for GCLK pin) */
@@ -268,10 +268,8 @@ __attribute__((weak)) void mbi_init(void) {
     /* Configure pins */
     mbi_init_pins();
 
-#if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION) && defined(MBI_CONFIGURATION)
     /* Configure MBI */
     mbi_init_config();
-#endif
 
     /* Start/configure GCLK PWM and timer */
     mbi_init_timers();
