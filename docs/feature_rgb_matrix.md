@@ -619,6 +619,8 @@ Here is an example using 2 MBIA043 drivers.
 Define channel and LED matrix configuration in your `<keyboard>.c`:
 
 ```c
+#include "mbi.h"
+
 /*
  * Channel Setup:
  *         ┌───────┐
@@ -690,6 +692,12 @@ const mbi_led_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
     },
 };
 // clang-format on
+
+#ifndef NO_LED
+#    define NLD 255
+#else
+#    define NLD NO_LED
+#endif
 
 // LED Matrix to LED Index
 // Since COL2ROW, MBI manages rows while MCU manages columns
