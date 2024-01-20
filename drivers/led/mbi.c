@@ -42,7 +42,7 @@ typedef struct {
 // mbi_leds[1]: front buffer (sent to MBI)
 static mbi_led_t mbi_leds[2][MBI_LED_COUNT];
 
-static void mbi_flush_isr(void) {
+void mbi_flush_isr(void) {
     /* disable ROW/COL pins */
 #if (MBI_LED_DIRECTION == ROW2COL)
     for (int i = 0; i < MATRIX_ROWS; i++)
