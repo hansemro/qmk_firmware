@@ -208,12 +208,6 @@ void mbi_shift_data(uint16_t data, int shift_amount);
  */
 void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr);
 
-/* Write val to each MBI's configuration registers.
- *
- * Note: order of array follows order from SDO to SDI pins.
- */
-void mbi_write_configuration(uint16_t val);
-
 /* initialize mbi driver(s) */
 void mbi_init(void);
 #if (MBI_LED_TYPE == RGB)
