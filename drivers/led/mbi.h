@@ -217,12 +217,17 @@ void mbi_write_configuration(uint16_t val);
 /* initialize mbi driver(s) */
 void mbi_init(void);
 #if (MBI_LED_TYPE == RGB)
+/* write RGB color to back buffer at a specific index */
 void mbi_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
+/* write RGB color to entire back buffer */
 void mbi_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
 #elif (MBI_LED_TYPE == MONO)
+/* write grayscale value to back buffer at a specific index */
 void mbi_set_value(int index, uint8_t value);
+/* write grayscale value to entire back buffer */
 void mbi_set_value_all(uint8_t value);
 #endif
+/* updates front buffer from back buffer */
 void mbi_flush(void);
 /* activate row/column pin and update buffers for next row/column */
 void mbi_flush_isr(void);
