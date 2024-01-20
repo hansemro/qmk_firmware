@@ -646,14 +646,15 @@ Define channel and LED matrix configuration in your `<keyboard>.c`:
  */
 // clang-format off
 const mbi_led_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
+    /* MBI A */
     {
         /* Color channel
            |
            |         MBI-managed row/column index
            |         | */
-        {MBI_RED_CH, 0},
-        {MBI_RED_CH, 1},
-        {MBI_RED_CH, 2},
+        {MBI_RED_CH, 0}, /* MBI output channel 0 */
+        {MBI_RED_CH, 1}, /* MBI output channel 1 */
+        {MBI_RED_CH, 2}, /* ... */
         {MBI_RED_CH, 3},
         {MBI_RED_CH, 4},
         {MBI_RED_CH, 5},
@@ -666,8 +667,9 @@ const mbi_led_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
         {MBI_GREEN_CH, 3},
         {MBI_GREEN_CH, 4},
         {MBI_GREEN_CH, 5},
-        {MBI_GREEN_CH, 6},
+        {MBI_GREEN_CH, 6}, /* MBI output channel 15 */
     },
+    /* MBI B */
     {
         {MBI_GREEN_CH, 7},
         {MBI_GREEN_CH, 8},
@@ -692,7 +694,7 @@ const mbi_led_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
 // LED Matrix to LED Index
 // Since COL2ROW, MBI manages rows while MCU manages columns
 // clang-format off
-const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MATRIX_ROWS] = {
+const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MATRIX_COLS] = {
     /*          Col0 Col1 Col2 Col3 Col4 Col5 Col6 Col7*/
     /*Row0*/ {  0,   1,   2,   3,   4,   5,   6,   7    },
     /*Row1*/ {  14,  15,  16,  17,  18,  19,  20,  21   },
