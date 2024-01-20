@@ -614,7 +614,7 @@ Here is an example using 2 MBIA043 drivers.
 #define MBI_POWER_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
 ```
 
->! Note that the RGB matrix defined in info.json refers to key matrix associated to an LED index. However, Key and LED matrices may differ, so an LED matrix to LED index needs to be defined.
+!> Note that the RGB matrix defined in info.json refers to key matrix associated to an LED index. However, Key and LED matrices may differ, so an LED matrix to LED index needs to be defined.
 
 Define channel and LED matrix configuration in your `<keyboard>.c`:
 
