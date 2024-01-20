@@ -144,6 +144,7 @@ static GPTConfig mbi_timer_config = {
 
 /* user-defined overridable functions */
 __attribute__((weak)) void mbi_init_pins(void);
+__attribute__((weak)) void mbi_init_config(void);
 __attribute__((weak)) void mbi_init_timers(void);
 
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
@@ -245,6 +246,12 @@ __attribute__((weak)) void mbi_init_pins(void) {
 #endif
 }
 
+#if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION) && defined(MBI_CONFIGURATION)
+__attribute__((weak)) void mbi_init_config(void) {
+    mbi_write_configuration(MBI_CONFIGURATION);
+}
+#endif
+
 __attribute__((weak)) void mbi_init_timers(void) {
     /* Configure PWM (for GCLK pin) */
     gclk_pwm_config.channels[MBI_PWM_CHANNEL].mode = MBI_PWM_OUTPUT_MODE;
@@ -260,6 +267,11 @@ __attribute__((weak)) void mbi_init_timers(void) {
 __attribute__((weak)) void mbi_init(void) {
     /* Configure pins */
     mbi_init_pins();
+
+#if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION) && defined(MBI_CONFIGURATION)
+    /* Configure MBI */
+    mbi_init_config();
+#endif
 
     /* Start/configure GCLK PWM and timer */
     mbi_init_timers();

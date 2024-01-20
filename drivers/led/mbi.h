@@ -198,6 +198,13 @@
 #    error "MBI_WRITE_CONFIGURATION defined without defining MBI_ENABLE_WRITE_CONFIGURATION"
 #endif
 
+/* (Optional) Configuration value to set each MBI on initialization */
+#if defined(MBI_CONFIGURATION)
+#    if !defined(MBI_WRITE_CONFIGURATION) || !defined(MBI_ENABLE_WRITE_CONFIGURATION)
+#        error "MBI_WRITE_CONFIGURATION and MBI_ENABLE_WRITE_CONFIGURATION must be defined to set MBI_CONFIGURATION"
+#    endif
+#endif
+
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
 void mbi_send_instruction(int instr);
 
