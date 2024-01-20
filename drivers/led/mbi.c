@@ -189,6 +189,20 @@ void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr) {
     }
 }
 
+#if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION)
+/* Write val to each MBI configuration register. */
+void mbi_write_configuration(uint16_t val) {
+    mbi_send_instruction(MBI_ENABLE_WRITE_CONFIGURATION);
+    int i = 0;
+    for (; i < MBI_NUM_DRIVER - 1; i++) {
+        mbi_shift_data(val, MBI_SHIFT_REG_WIDTH);
+    }
+    if (i < MBI_NUM_DRIVER) {
+        mbi_shift_data_instr(val, MBI_SHIFT_REG_WIDTH, MBI_WRITE_CONFIGURATION);
+    }
+}
+#endif
+
 /* Configure and initialize MBI and LED pins */
 __attribute__((weak)) void mbi_init_pins(void) {
     palSetLineMode(MBI_DCLK_PIN, MBI_DCLK_OUTPUT_MODE);

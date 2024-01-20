@@ -191,6 +191,13 @@
 #    error "MBI_GLOBAL_LATCH is not defined"
 #endif
 
+/* If previous instruction was MBI_ENABLE_WRITE_CONFIGURATION, then move
+ * data in shift-register to configuration register
+ */
+#if defined(MBI_WRITE_CONFIGURATION) && !defined(MBI_ENABLE_WRITE_CONFIGURATION)
+#    error "MBI_WRITE_CONFIGURATION defined without defining MBI_ENABLE_WRITE_CONFIGURATION"
+#endif
+
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
 void mbi_send_instruction(int instr);
 
@@ -207,6 +214,11 @@ void mbi_shift_data(uint16_t data, int shift_amount);
  * Note: Transmission begins with MSB at data[15].
  */
 void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr);
+
+#if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION)
+/* Write val to each MBI configuration register. */
+void mbi_write_configuration(uint16_t val);
+#endif
 
 /* initialize mbi driver(s) */
 void mbi_init(void);
