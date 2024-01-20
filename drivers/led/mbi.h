@@ -260,4 +260,8 @@ typedef struct {
 extern const mbi_channel_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS];
 
 /* LED Matrix to LED Index */
-extern const uint8_t g_mbi_led_matrix_co[MATRIX_ROWS][MATRIX_COLS];
+#if (MBI_LED_DIRECTION == ROW2COL)
+extern const uint8_t g_mbi_led_matrix_co[MATRIX_ROWS][MBI_NUM_CHANNELS];
+#elif (MBI_LED_DIRECTION == COL2ROW)
+extern const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MATRIX_COLS];
+#endif
