@@ -11,6 +11,7 @@
  */
 
 #include <stdint.h>
+#include "gpio.h"
 
 /* number of output channels of a single MBI */
 #ifndef MBI_NUM_CHANNELS
@@ -276,9 +277,14 @@ typedef struct {
 /* Output channel to color channel mapping */
 extern const mbi_channel_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS];
 
-/* LED Matrix to LED Index */
 #if (MBI_LED_DIRECTION == ROW2COL)
+/* LED Matrix to LED Index */
 extern const uint8_t g_mbi_led_matrix_co[MATRIX_ROWS][MBI_NUM_CHANNELS];
+/* LED row pins */
+extern pin_t led_pins[MATRIX_ROWS];
 #elif (MBI_LED_DIRECTION == COL2ROW)
+/* LED Matrix to LED Index */
 extern const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MATRIX_COLS];
+/* LED column pins */
+extern pin_t g_led_pins[MATRIX_COLS];
 #endif
