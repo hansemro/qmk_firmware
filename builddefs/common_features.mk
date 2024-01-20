@@ -432,7 +432,7 @@ ifeq ($(strip $(LED_MATRIX_ENABLE)), yes)
     endif
 
     ifeq ($(strip $(LED_MATRIX_DRIVER)), mbi)
-		OPT_DEFS += -DMBI_LED_TYPE=MONO
+		OPT_DEFS += -DMBI_LED_TYPE=MBI_LED_TYPE_MONO
         COMMON_VPATH += $(DRIVER_PATH)/led
         SRC += mbi.c
     endif
@@ -553,7 +553,7 @@ ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
     endif
 
     ifeq ($(strip $(RGB_MATRIX_DRIVER)), mbi)
-		OPT_DEFS += -DMBI_LED_TYPE=RGB
+		OPT_DEFS += -DMBI_LED_TYPE=MBI_LED_TYPE_RGB
         COMMON_VPATH += $(DRIVER_PATH)/led
         SRC += mbi.c
     endif

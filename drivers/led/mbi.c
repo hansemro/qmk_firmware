@@ -29,11 +29,11 @@ static PWMConfig gclk_pwm_config = {
 };
 
 typedef struct {
-#if (MBI_LED_TYPE == RGB)
+#if (MBI_LED_TYPE == MBI_LED_TYPERGB)
     uint16_t r;
     uint16_t g;
     uint16_t b;
-#elif (MBI_LED_TYPE == MONO)
+#elif (MBI_LED_TYPE == MBI_LED_TYPEMONO)
     uint16_t v;
 #endif
 } mbi_led_t;
@@ -80,7 +80,7 @@ void mbi_flush_isr(void) {
             led_idx = g_mbi_led_matrix_co[mbi_ch_idx][led_gpio_idx];
 #endif
             switch (color_ch) {
-#if (MBI_LED_TYPE == RGB)
+#if (MBI_LED_TYPE == MBI_LED_TYPERGB)
                 case MBI_RED_CH:
                     mbi_shift_data(mbi_leds[1][led_idx].r, MBI_SHIFT_REG_WIDTH);
                     break;
@@ -90,7 +90,7 @@ void mbi_flush_isr(void) {
                 case MBI_BLUE_CH:
                     mbi_shift_data(mbi_leds[1][led_idx].b, MBI_SHIFT_REG_WIDTH);
                     break;
-#elif (MBI_LED_TYPE == MONO)
+#elif (MBI_LED_TYPE == MBI_LED_TYPEMONO)
                 case MBI_MONO_CH:
                     mbi_shift_data(mbi_leds[1][led_idx].v, MBI_SHIFT_REG_WIDTH);
                     break;
@@ -108,7 +108,7 @@ void mbi_flush_isr(void) {
         led_idx = g_mbi_led_matrix_co[mbi_ch_idx][led_gpio_idx];
 #endif
         switch (color_ch) {
-#if (MBI_LED_TYPE == RGB)
+#if (MBI_LED_TYPE == MBI_LED_TYPERGB)
             case MBI_RED_CH:
                 mbi_shift_data_instr(mbi_leds[1][led_idx].r, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
                 break;
@@ -118,7 +118,7 @@ void mbi_flush_isr(void) {
             case MBI_BLUE_CH:
                 mbi_shift_data_instr(mbi_leds[1][led_idx].b, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
                 break;
-#elif (MBI_LED_TYPE == MONO)
+#elif (MBI_LED_TYPE == MBI_LED_TYPEMONO)
             case MBI_MONO_CH:
                 mbi_shift_data_instr(mbi_leds[1][led_idx].v, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
                 break;
@@ -277,7 +277,7 @@ __attribute__((weak)) void mbi_init(void) {
     mbi_init_timers();
 }
 
-#if (MBI_LED_TYPE == RGB)
+#if (MBI_LED_TYPE == MBI_LED_TYPERGB)
 void mbi_set_color(int index, uint8_t red, uint8_t green, uint8_t blue) {
     // Lazy scaling
     mbi_leds[0][index].r = red << (MBI_SHIFT_REG_WIDTH - 8);
@@ -291,7 +291,7 @@ void mbi_set_color_all(uint8_t red, uint8_t green, uint8_t blue) {
     }
 }
 
-#elif (MBI_LED_TYPE == MONO)
+#elif (MBI_LED_TYPE == MBI_LED_TYPEMONO)
 void mbi_set_value(int index, uint8_t value) {
     // Lazy scaling
     mbi_leds[0][index].v = value << (MBI_SHIFT_REG_WIDTH - 8);
