@@ -12,9 +12,9 @@
 
 #ifdef MBI_LED_DIRECTION
 #    if (MBI_LED_DIRECTION == ROW2COL) && defined(MBI_LED_GPIO_PINS)
-static pin_t led_pins[MATRIX_ROWS] = MBI_LED_GPIO_PINS;
+pin_t g_led_pins[MATRIX_ROWS] = MBI_LED_GPIO_PINS;
 #    elif (MBI_LED_DIRECTION == COL2ROW) && defined(MBI_LED_GPIO_PINS)
-static pin_t led_pins[MATRIX_COLS] = MBI_LED_GPIO_PINS;
+pin_t g_led_pins[MATRIX_COLS] = MBI_LED_GPIO_PINS;
 #    endif
 #endif
 
@@ -46,17 +46,17 @@ void mbi_flush_isr(void) {
     /* disable ROW/COL pins */
 #if (MBI_LED_DIRECTION == ROW2COL)
     for (int i = 0; i < MATRIX_ROWS; i++)
-        writePinHigh(led_pins[i]);
+        writePinHigh(g_led_pins[i]);
 #elif (MBI_LED_DIRECTION == COL2ROW)
     for (int i = 0; i < MATRIX_COLS; i++)
-        writePinHigh(led_pins[i]);
+        writePinHigh(g_led_pins[i]);
 #endif
 
     /* latch previous data */
     mbi_send_instruction(MBI_GLOBAL_LATCH);
 
     /* activate ROW/COL pin */
-    writePinLow(led_pins[led_gpio_idx]);
+    writePinLow(g_led_pins[led_gpio_idx]);
 
     led_gpio_idx += 1;
 #if (MBI_LED_DIRECTION == ROW2COL)
@@ -214,23 +214,23 @@ __attribute__((weak)) void mbi_init_pins(void) {
     setPinOutput(MBI_GCLK_PIN);
     setPinOutput(MBI_LE_PIN);
     setPinOutput(MBI_SDI_PIN);
-    writePinHigh(MBI_DCLK_PIN);
-    writePinHigh(MBI_GCLK_PIN);
-    writePinHigh(MBI_LE_PIN);
-    writePinHigh(MBI_SDI_PIN);
+    writePinLow(MBI_DCLK_PIN);
+    writePinLow(MBI_GCLK_PIN);
+    writePinLow(MBI_LE_PIN);
+    writePinLow(MBI_SDI_PIN);
 
     /* setup LED ROW/COL pins*/
 #if (MBI_LED_DIRECTION == ROW2COL)
     for (int i = 0; i < MATRIX_ROWS; i++) {
-        palSetLineMode(led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
-        setPinOutput(led_pins[i]);
-        writePinHigh(led_pins[i]);
+        palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
+        setPinOutput(g_led_pins[i]);
+        writePinHigh(g_led_pins[i]);
     }
 #elif (MBI_LED_DIRECTION == COL2ROW)
     for (int i = 0; i < MATRIX_COLS; i++) {
-        palSetLineMode(led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
-        setPinOutput(led_pins[i]);
-        writePinHigh(led_pins[i]);
+        palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
+        setPinOutput(g_led_pins[i]);
+        writePinHigh(g_led_pins[i]);
     }
 #endif
 
