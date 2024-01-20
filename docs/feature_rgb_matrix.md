@@ -567,6 +567,9 @@ You can use 1 or more MBI IC's. You can define the following items in `config.h`
 | `MBI_NOPS` | (Optional) Number of no-op delays (multiplied by 3) to ensure MBI timing requirements | |
 | `MBI_DATA_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from shift register to buffers. | |
 | `MBI_GLOBAL_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from buffers to comparators. | |
+| `MBI_CONFIGURATION` | (Optional) Value to set each MBI configuration register. | |
+| `MBI_WRITE_CONFIGURATION` | (Optional) Number of DCLK rising edges with LE asserted to transfer data from shift register to configuration register (if writing to configuration register is enabled). | |
+| `MBI_ENABLE_WRITE_CONFIGURATION` | (Optional) Number of DCLK rising edges with LE asserted to enable writing to configuration register. | |
 
 Here is an example using 2 MBIA043 drivers.
 
@@ -576,6 +579,11 @@ Here is an example using 2 MBIA043 drivers.
 #define MBI_SHIFT_REG_WIDTH 10
 #define MBI_DATA_LATCH 1
 #define MBI_GLOBAL_LATCH 2
+#define MBI_WRITE_CONFIGURATION 8
+#define MBI_ENABLE_WRITE_CONFIGURATION 18
+
+// MBI configuration
+#define MBI_CONFIGURATION 0xc
 
 #define MBI_NUM_DRIVER 2
 
