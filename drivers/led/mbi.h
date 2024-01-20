@@ -35,15 +35,25 @@
 #endif
 
 /* RGB or Grayscale (mono) LEDs */
+#define MBI_LED_TYPE_MONO 0
+#define MBI_LED_TYPE_RGB 1
+
 #ifdef MBI_LED_TYPE
-#    if (MBI_LED_TYPE != RGB) && (MBI_LED_TYPE != MONO)
-#        error "MBI_LED_TYPE is not defined to either RGB or MONO"
+#    if (MBI_LED_TYPE != MBI_LED_TYPE_RGB) && (MBI_LED_TYPE != MBI_LED_TYPE_MONO)
+#        error "MBI_LED_TYPE is not defined to either MBI_LED_TYPE_RGB or MBI_LED_TYPE_MONO"
 #    endif
 #else
-#    error "MBI_LED_TYPE is not defined to either RGB or MONO"
+#    error "MBI_LED_TYPE is not defined to either MBI_LED_TYPE_RGB or MBI_LED_TYPE_MONO"
 #endif
 
 /* LED matrix direction: ROW2COL or COL2ROW */
+#ifndef COL2ROW
+#    define COL2ROW 0
+#endif
+#ifndef ROW2COL
+#    define ROW2COL 1
+#endif
+
 #ifndef MBI_LED_DIRECTION
 #    error "MBI_LED_DIRECTION is not defined to either ROW2COL or COL2ROW"
 #else
@@ -144,6 +154,13 @@
 #endif
 
 /* Some keyboards have a pin to enable power to MBI */
+#ifndef HIGH
+#    define HIGH 1
+#endif
+#ifndef LOW
+#    define LOW 0
+#endif
+
 #ifdef MBI_POWER_ENABLE_PIN
 #    if !defined(MBI_POWER_ACTIVE_HL) && (MBI_POWER_ACTIVE_HL != HIGH) && (MBI_POWER_ACTIVE_HL != LOW)
 #        error "MBI_POWER_ACTIVE_HL must be defined to either HIGH or LOW"
@@ -229,12 +246,12 @@ void mbi_write_configuration(uint16_t val);
 
 /* initialize mbi driver(s) */
 void mbi_init(void);
-#if (MBI_LED_TYPE == RGB)
+#if (MBI_LED_TYPE == MBI_LED_TYPE_RGB)
 /* write RGB color to back buffer at a specific index */
 void mbi_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
 /* write RGB color to entire back buffer */
 void mbi_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
-#elif (MBI_LED_TYPE == MONO)
+#elif (MBI_LED_TYPE == MBI_LED_TYPE_MONO)
 /* write grayscale value to back buffer at a specific index */
 void mbi_set_value(int index, uint8_t value);
 /* write grayscale value to entire back buffer */
