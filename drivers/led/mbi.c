@@ -42,7 +42,7 @@ typedef struct {
 // mbi_leds[1]: front buffer (sent to MBI)
 static mbi_led_t mbi_leds[2][MBI_LED_COUNT];
 
-static void mbi_flush_isr(GPTDriver *gptp) {
+static void mbi_flush_isr(void) {
     /* disable ROW/COL pins */
 #if (MBI_LED_DIRECTION == ROW2COL)
     for (int i = 0; i < MATRIX_ROWS; i++)
@@ -132,10 +132,14 @@ static void mbi_flush_isr(GPTDriver *gptp) {
     writePinLow(MBI_DCLK_PIN);
 }
 
+static void mbi_gpt_flush_isr(GPTDriver *gptp) {
+    mbi_flush_isr();
+}
+
 /* ROW/COL update frequency = MBI_TIMER_COUNTER_FREQUENCY / MBI_TIMER_PERIOD */
 static GPTConfig mbi_timer_config = {
     .frequency = MBI_TIMER_COUNTER_FREQUENCY,
-    .callback  = mbi_flush_isr,
+    .callback  = mbi_gpt_flush_isr,
 };
 
 /* user-defined overridable functions */
