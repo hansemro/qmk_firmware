@@ -181,7 +181,7 @@
 #    elif defined(PROTOCOL_CHIBIOS)
 #        include "hal.h"
 #        include "chibios_config.h"
-#        if defined(HT32F165x) || defined(HT32F523x2) || defined(STM32F0XX) || defined(STM32F1XX) || defined(STM32F3XX) || defined(STM32F4XX) || defined(STM32L0XX) || defined(GD32VF103) || defined(MCU_RP)
+#        if defined(HT32) || defined(STM32F0XX) || defined(STM32F1XX) || defined(STM32F3XX) || defined(STM32F4XX) || defined(STM32L0XX) || defined(GD32VF103) || defined(MCU_RP)
 #            define MBI_NOPS (40 / (1000000000L / (CPU_CLOCK / 3))) // This calculates how many loops of 3 nops to run to delay 40 ns
 #        else
 #            error MBI_NOPS configuration required
