@@ -545,6 +545,7 @@ You can use 1 or more MBI IC's. You can define the following items in `config.h`
 | `MBI_LED_GPIO_PINS` | (Required) Array of MCU-managed LED GPIO pins in order of row/column index | |
 | `MBI_LED_GPIO_OUTPUT_MODE` | (Required) GPIO pad mode for LED GPIO pins | |
 | `MBI_LED_DIRECTION` | (Required) Direction from MCU-managed LED pin to output channel of MBI. Accepted values: `ROW2COL` or `COL2ROW` | |
+| `MBI_NUM_LED_GPIO_PINS` | (Required) Number of LED GPIO pins | |
 | `MBI_PWM_DRIVER` | (Required) PWM driver to use for GCLK signal | |
 | `MBI_PWM_CHANNEL` | (Required) PWM channel to use | |
 | `MBI_PWM_OUTPUT_MODE` | (Optional) PWM driver output mode | `PWM_OUTPUT_ACTIVE_LOW` |
@@ -603,6 +604,7 @@ Here is an example using 2 MBIA043 drivers.
 // MCU-managed LED column pins
 #define MBI_LED_GPIO_PINS \
     { C8, C7, B5, B4, B3, B2, C6, C5 }
+#define MBI_NUM_LED_GPIO_PINS 8
 #define MBI_LED_GPIO_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
 
 // MCU-managed MBI pins
@@ -710,7 +712,7 @@ const mbi_led_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
 // LED Matrix to LED Index
 // Since COL2ROW, MBI manages rows while MCU manages columns
 // clang-format off
-const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MATRIX_COLS] = {
+const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MBI_NUM_LED_GPIO_PINS] = {
     /*          Col0 Col1 Col2 Col3 Col4 Col5 Col6 Col7*/
     /*Row0*/ {  0,   1,   2,   3,   4,   5,   6,   7    },
     /*Row1*/ {  14,  15,  16,  17,  18,  19,  20,  21   },
