@@ -4,9 +4,21 @@
 #pragma once
 
 /*
- * LED or RGB Matrix driver for Macroblock MBIA043/MBIA045/MBI5042/MBI5043 (LED
- * drivers with proprietary SPI-like interface) using PWM for GCLK and
- * General Purpose Timer (GPT) for flushing color data.
+ * LED or RGB Matrix driver for Macroblock MBI LED drivers with proprietary
+ * SPI-like control interface using PWM for GCLK and General Purpose Timer
+ * (GPT) for flushing color data.
+ *
+ * This driver can support the following MBI families:
+ * - MBIA04X
+ * - MBI504X
+ * - possibly others with the same control interface
+ *
+ * Although MBI parts may have two or more instructions, this driver will only
+ * require the Data Latch and Global Latch instructions. MBI instructions to
+ * write to configuration register is made optional for MBI parts without a
+ * (documented) configuration register (such as MBIA043).
+ *
+ * This driver does not pre-define instructions or configuration settings.
  */
 
 #include <stdint.h>
@@ -217,6 +229,12 @@
 #if defined(MBI_WRITE_CONFIGURATION) && !defined(MBI_ENABLE_WRITE_CONFIGURATION)
 #    error "MBI_WRITE_CONFIGURATION defined without defining MBI_ENABLE_WRITE_CONFIGURATION"
 #endif
+
+/*
+ * Configuration setting notes for boards defining MBI_CONFIGURATION:
+ * - If "Data Loading" setting exists, select option for <MBI_NUM_CHANNELS> of Data Latch + 1 of Global Latch
+ * - If "N-bit PWM Counter Mode" setting exists, keep it consistent with MBI_SHIFT_REG_WIDTH
+ */
 
 /* (Optional) Configuration value to set each MBI on initialization */
 #if defined(MBI_CONFIGURATION)
