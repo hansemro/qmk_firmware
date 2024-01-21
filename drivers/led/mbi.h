@@ -4,7 +4,7 @@
 #pragma once
 
 /*
- * Bit-banged driver for Macroblock MBIA043/MBIA045/MBI5042/MBI5043 (LED
+ * LED or RGB Matrix driver for Macroblock MBIA043/MBIA045/MBI5042/MBI5043 (LED
  * drivers with proprietary SPI-like interface) using PWM for GCLK and
  * General Purpose Timer (GPT) for flushing color data.
  */
@@ -38,6 +38,7 @@
 #define MBI_LED_TYPE_MONO 0
 #define MBI_LED_TYPE_RGB 1
 
+/* Select between Mono or RGB type driver */
 #ifdef MBI_LED_TYPE
 #    if (MBI_LED_TYPE != MBI_LED_TYPE_RGB) && (MBI_LED_TYPE != MBI_LED_TYPE_MONO)
 #        error "MBI_LED_TYPE is not defined to either MBI_LED_TYPE_RGB or MBI_LED_TYPE_MONO"
@@ -76,6 +77,7 @@
 #    define MBI_LED_COUNT (MBI_NUM_CHANNELS * MBI_NUM_LED_GPIO_PINS)
 #endif
 
+/* PWM driver to use for generating GCLK clock signal */
 #ifndef MBI_PWM_DRIVER
 #    error "MBI_PWM_DRIVER is not defined"
 #endif
@@ -102,6 +104,7 @@
 #    endif
 #endif
 
+/* GPT timer driver to use for continuous row/column pin cycling and data flushing */
 #ifndef MBI_TIMER_DRIVER
 #    error "MBI_TIMER_DRIVER is not defined"
 #endif
@@ -154,7 +157,6 @@
 #    error "MBI_GCLK_OUTPUT_MODE is not defined"
 #endif
 
-/* Some keyboards have a pin to enable power to MBI */
 #ifndef HIGH
 #    define HIGH 1
 #endif
@@ -162,6 +164,7 @@
 #    define LOW 0
 #endif
 
+/* (Optional) MCU-managed pin to enable power to MBI */
 #ifdef MBI_POWER_ENABLE_PIN
 #    if !defined(MBI_POWER_ACTIVE_HL) && (MBI_POWER_ACTIVE_HL != HIGH) && (MBI_POWER_ACTIVE_HL != LOW)
 #        error "MBI_POWER_ACTIVE_HL must be defined to either HIGH or LOW"
@@ -170,7 +173,6 @@
 #        error "MBI_POWER_OUTPUT_MODE is not defined"
 #    endif
 #endif
-
 
 /* Insert nop delays to operate under 25MHz */
 #ifndef MBI_NOPS
@@ -197,7 +199,7 @@
         }                                       \
     } while (0)
 
-/* INSTRUCTIONS: */
+/* MBI INSTRUCTIONS: */
 
 /* Move data in shift-register to a single buffer */
 #ifndef MBI_DATA_LATCH
