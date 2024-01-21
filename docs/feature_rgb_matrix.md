@@ -565,7 +565,7 @@ You can use 1 or more chained MBI IC's. You can define the following items in `c
 | `MBI_POWER_ENABLE_PIN` | (Optional) MCU-managed pin for enabling power to MBI(s) | |
 | `MBI_POWER_OUTPUT_MODE` | GPIO pad mode for power enable pin | |
 | `MBI_POWER_ACTIVE_HL` | Enable power on high/low signal. Accepted values: `HIGH` or `LOW` | |
-| `MBI_NOPS` | (Optional) Number of no-op delays (multiplied by 3) to ensure MBI timing requirements | |
+| `MBI_NOPS` | (Required) Number of no-op delays (multiplied by 3) to ensure MBI timing requirements. Not required to be defined for some platforms. | |
 | `MBI_DATA_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from shift register to buffers. | |
 | `MBI_GLOBAL_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from buffers to comparators. | |
 | `MBI_CONFIGURATION` | (Optional) Value to set each MBI configuration register. | |
@@ -587,6 +587,8 @@ Here is an example using 2 MBIA043 drivers.
 #define MBI_CONFIGURATION 0xc
 
 #define MBI_NUM_DRIVER 2
+// Insert no-ops to meet timing requirements
+#define MBI_NOPS 2
 
 // PWM to generate GCLK clock signal
 // Desired output/GCLK frequency =  3.6 MHz
