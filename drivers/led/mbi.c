@@ -205,38 +205,38 @@ void mbi_write_configuration(uint16_t val) {
 
 /* Configure and initialize MBI and LED pins */
 __attribute__((weak)) void mbi_init_pins(void) {
-    palSetLineMode(MBI_DCLK_PIN, MBI_DCLK_OUTPUT_MODE);
-    palSetLineMode(MBI_GCLK_PIN, MBI_GCLK_OUTPUT_MODE);
-    palSetLineMode(MBI_LE_PIN, MBI_LE_OUTPUT_MODE);
-    palSetLineMode(MBI_SDI_PIN, MBI_SDI_OUTPUT_MODE);
     setPinOutput(MBI_DCLK_PIN);
     setPinOutput(MBI_GCLK_PIN);
     setPinOutput(MBI_LE_PIN);
     setPinOutput(MBI_SDI_PIN);
-    writePinLow(MBI_DCLK_PIN);
-    writePinLow(MBI_GCLK_PIN);
-    writePinLow(MBI_LE_PIN);
-    writePinLow(MBI_SDI_PIN);
+    palSetLineMode(MBI_DCLK_PIN, MBI_DCLK_OUTPUT_MODE);
+    palSetLineMode(MBI_GCLK_PIN, MBI_GCLK_OUTPUT_MODE);
+    palSetLineMode(MBI_LE_PIN, MBI_LE_OUTPUT_MODE);
+    palSetLineMode(MBI_SDI_PIN, MBI_SDI_OUTPUT_MODE);
+    writePinHigh(MBI_DCLK_PIN);
+    writePinHigh(MBI_GCLK_PIN);
+    writePinHigh(MBI_LE_PIN);
+    writePinHigh(MBI_SDI_PIN);
 
     /* setup LED ROW/COL pins*/
 #if (MBI_LED_DIRECTION == ROW2COL)
     for (int i = 0; i < MATRIX_ROWS; i++) {
-        palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
         setPinOutput(g_led_pins[i]);
+        palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
         writePinHigh(g_led_pins[i]);
     }
 #elif (MBI_LED_DIRECTION == COL2ROW)
     for (int i = 0; i < MATRIX_COLS; i++) {
-        palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
         setPinOutput(g_led_pins[i]);
+        palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
         writePinHigh(g_led_pins[i]);
     }
 #endif
 
     /* Enable power to MBI(s) if managed by MCU */
 #ifdef MBI_POWER_ENABLE_PIN
-    palSetLineMode(MBI_POWER_ENABLE_PIN, MBI_POWER_OUTPUT_MODE);
     setPinOutput(MBI_POWER_ENABLE_PIN);
+    palSetLineMode(MBI_POWER_ENABLE_PIN, MBI_POWER_OUTPUT_MODE);
 #    if (MBI_POWER_ACTIVE_HL == HIGH)
     writePinHigh(MBI_POWER_ENABLE_PIN);
 #    elif (MBI_POWER_ACTIVE_HL == LOW)
