@@ -273,7 +273,7 @@ void mbi_flush_isr(void);
 
 typedef struct {
     uint8_t color_channel;
-    uint8_t color_index; // ROW/COL index
+    uint8_t color_index; // MBI ROW/COL index for the color channel
 } mbi_channel_t;
 
 /* Output channel to color channel mapping */
