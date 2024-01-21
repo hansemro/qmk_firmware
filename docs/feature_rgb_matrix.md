@@ -626,6 +626,10 @@ Here is an example using 2 MBIA043 drivers.
 
 !> Note that this driver requires an LED matrix to LED index table in addition to the standard Key matrix to LED index table. This is to account for Key coordinate mapping differences or additional LEDs.
 
+!> Note that the LED entries in `rgb_matrix.layout` in `info.json` are specified with Key matrix coordinates instead of LED matrix coordinates.
+
+?> Acknowledge that the LED index for a key allows the LED matrix to map to the Key matrix, but the value itself is arbitrary. By extension, the order of LED entries in `rgb_matrix.layout` in `info.json` is also arbitrary. However, make sure that the entry index (which is also the LED index) remains consistent with the index in the LED matrix to LED index table.
+
 Define channel and LED matrix configuration in your `<keyboard>.c`:
 
 ```c
