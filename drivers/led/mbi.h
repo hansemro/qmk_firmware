@@ -56,14 +56,6 @@
 
 #ifndef MBI_LED_DIRECTION
 #    error "MBI_LED_DIRECTION is not defined to either ROW2COL or COL2ROW"
-#else
-#    if (MBI_LED_DIRECTION == ROW2COL)
-#        define MBI_LED_COUNT (MBI_NUM_CHANNELS * MATRIX_ROWS)
-#    elif (MBI_LED_DIRECTION == COL2ROW)
-#        define MBI_LED_COUNT (MBI_NUM_CHANNELS * MATRIX_COLS)
-#    else
-#        error "MBI_LED_DIRECTION is not defined to either ROW2COL or COL2ROW"
-#    endif
 #endif
 
 /* ROW/COL GPIO pins connected to anode of LEDs */
@@ -73,6 +65,12 @@
 
 #ifndef MBI_LED_GPIO_OUTPUT_MODE
 #    error "MBI_LED_GPIO_OUTPUT_MODE is not defined"
+#endif
+
+#ifndef MBI_NUM_LED_GPIO_PINS
+#    error "MBI_NUM_LED_GPIO_PINS is not defined"
+#else
+#    define MBI_LED_COUNT (MBI_NUM_CHANNELS * MBI_NUM_LED_GPIO_PINS)
 #endif
 
 #ifndef MBI_PWM_DRIVER
@@ -276,14 +274,12 @@ typedef struct {
 /* Output channel to color channel mapping */
 extern const mbi_channel_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS];
 
+/* LED Matrix to LED Index */
 #if (MBI_LED_DIRECTION == ROW2COL)
-/* LED Matrix to LED Index */
-extern const uint8_t g_mbi_led_matrix_co[MATRIX_ROWS][MBI_NUM_CHANNELS];
-/* LED row pins */
-extern pin_t led_pins[MATRIX_ROWS];
+extern const uint8_t g_mbi_led_matrix_co[MBI_NUM_LED_GPIO_PINS][MBI_NUM_CHANNELS];
 #elif (MBI_LED_DIRECTION == COL2ROW)
-/* LED Matrix to LED Index */
-extern const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MATRIX_COLS];
-/* LED column pins */
-extern pin_t g_led_pins[MATRIX_COLS];
+extern const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MBI_NUM_LED_GPIO_PINS];
 #endif
+
+/* LED row/column pins */
+extern pin_t g_led_pins[MBI_NUM_LED_GPIO_PINS];

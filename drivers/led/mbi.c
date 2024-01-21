@@ -9,13 +9,7 @@
 #    error "Split keyboard not supported"
 #endif
 
-#ifdef MBI_LED_DIRECTION
-#    if (MBI_LED_DIRECTION == ROW2COL) && defined(MBI_LED_GPIO_PINS)
-pin_t g_led_pins[MATRIX_ROWS] = MBI_LED_GPIO_PINS;
-#    elif (MBI_LED_DIRECTION == COL2ROW) && defined(MBI_LED_GPIO_PINS)
-pin_t g_led_pins[MATRIX_COLS] = MBI_LED_GPIO_PINS;
-#    endif
-#endif
+pin_t g_led_pins[MBI_NUM_LED_GPIO_PINS] = MBI_LED_GPIO_PINS;
 
 static uint8_t led_gpio_idx = 0;
 
@@ -43,13 +37,8 @@ static mbi_led_t mbi_leds[2][MBI_LED_COUNT];
 
 void mbi_flush_isr(void) {
     /* disable ROW/COL pins */
-#if (MBI_LED_DIRECTION == ROW2COL)
-    for (int i = 0; i < MATRIX_ROWS; i++)
+    for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++)
         writePinHigh(g_led_pins[i]);
-#elif (MBI_LED_DIRECTION == COL2ROW)
-    for (int i = 0; i < MATRIX_COLS; i++)
-        writePinHigh(g_led_pins[i]);
-#endif
 
     /* latch previous data */
     mbi_send_instruction(MBI_GLOBAL_LATCH);
@@ -58,11 +47,7 @@ void mbi_flush_isr(void) {
     writePinLow(g_led_pins[led_gpio_idx]);
 
     led_gpio_idx += 1;
-#if (MBI_LED_DIRECTION == ROW2COL)
-    led_gpio_idx = (led_gpio_idx >= MATRIX_ROWS) ? 0 : led_gpio_idx;
-#elif (MBI_LED_DIRECTION == COL2ROW)
-    led_gpio_idx = (led_gpio_idx >= MATRIX_COLS) ? 0 : led_gpio_idx;
-#endif
+    led_gpio_idx = (led_gpio_idx >= MBI_NUM_LED_GPIO_PINS) ? 0 : led_gpio_idx;
 
     /* flush data for next ROW/COL */
     writePinLow(MBI_LE_PIN);
@@ -219,19 +204,11 @@ __attribute__((weak)) void mbi_init_pins(void) {
     writePinHigh(MBI_SDI_PIN);
 
     /* setup LED ROW/COL pins*/
-#if (MBI_LED_DIRECTION == ROW2COL)
-    for (int i = 0; i < MATRIX_ROWS; i++) {
+    for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
         setPinOutput(g_led_pins[i]);
         palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
         writePinHigh(g_led_pins[i]);
     }
-#elif (MBI_LED_DIRECTION == COL2ROW)
-    for (int i = 0; i < MATRIX_COLS; i++) {
-        setPinOutput(g_led_pins[i]);
-        palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
-        writePinHigh(g_led_pins[i]);
-    }
-#endif
 
     /* Enable power to MBI(s) if managed by MCU */
 #ifdef MBI_POWER_ENABLE_PIN
