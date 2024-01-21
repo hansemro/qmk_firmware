@@ -113,7 +113,7 @@ const led_matrix_driver_t led_matrix_driver = {
     .set_value_all = snled27351_set_value_all,
 };
 
-#elif defined(LED_MATRIX_SNLED27351)
+#elif defined(LED_MATRIX_MBI)
 const led_matrix_driver_t led_matrix_driver = {
     .init          = mbi_init,
     .flush         = mbi_flush,
