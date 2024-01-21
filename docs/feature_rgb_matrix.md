@@ -535,13 +535,13 @@ RGB_MATRIX_ENABLE = yes
 RGB_MATRIX_DRIVER = mbi
 ```
 
-You can use 1 or more MBI IC's. You can define the following items in `config.h`:
+You can use 1 or more chained MBI IC's. You can define the following items in `config.h`:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `MBI_NUM_CHANNELS` | (Required) Number of output channels for a single MBI | |
-| `MBI_SHIFT_REG_WIDTH` | (Required) Length of shift register for a single MBI, in bits | |
-| `MBI_NUM_DRIVER` | (Required) Number of MBI drivers | |
+| `MBI_NUM_CHANNELS` | (Required) Number of output channels per MBI | |
+| `MBI_SHIFT_REG_WIDTH` | (Required) Length of shift register per MBI, in bits | |
+| `MBI_NUM_DRIVER` | (Required) Number of chained MBI drivers | |
 | `MBI_LED_GPIO_PINS` | (Required) Array of MCU-managed LED GPIO pins in order of row/column index | |
 | `MBI_LED_GPIO_OUTPUT_MODE` | (Required) GPIO pad mode for LED GPIO pins | |
 | `MBI_LED_DIRECTION` | (Required) Direction from MCU-managed LED pin to output channel of MBI. Accepted values: `ROW2COL` or `COL2ROW` | |
@@ -624,7 +624,7 @@ Here is an example using 2 MBIA043 drivers.
 #define MBI_POWER_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
 ```
 
-!> Note that the RGB matrix defined in info.json refers to key matrix associated to an LED index. However, Key and LED matrices may differ, so an LED matrix to LED index needs to be defined.
+!> Note that this driver requires an LED matrix to LED index table in addition to the standard Key matrix to LED index table. This is to account for Key coordinate mapping differences or additional LEDs.
 
 Define channel and LED matrix configuration in your `<keyboard>.c`:
 
