@@ -46,7 +46,10 @@
 #    error "MBI_LED_TYPE is not defined to either MBI_LED_TYPE_RGB or MBI_LED_TYPE_MONO"
 #endif
 
-/* LED matrix direction: ROW2COL or COL2ROW */
+/* LED matrix directions:
+ * - COL2ROW: from MCU-managed column pins to MBI-managed row pins
+ * - ROW2COL: from MCU-managed row pins to MBI-managed column pins
+ */
 #ifndef COL2ROW
 #    define COL2ROW 0
 #endif
@@ -58,9 +61,9 @@
 #    error "MBI_LED_DIRECTION is not defined to either ROW2COL or COL2ROW"
 #endif
 
-/* ROW/COL GPIO pins connected to anode of LEDs */
+/* MCU-managed row/column LED pins */
 #ifndef MBI_LED_GPIO_PINS
-#    error "MBI_LED_GPIO_PINS"
+#    error "MBI_LED_GPIO_PINS is not defined with an array of pins"
 #endif
 
 #ifndef MBI_LED_GPIO_OUTPUT_MODE
