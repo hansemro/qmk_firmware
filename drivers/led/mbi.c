@@ -37,14 +37,23 @@ static mbi_led_t mbi_leds[2][MBI_LED_COUNT];
 
 void mbi_flush_isr(void) {
     /* disable ROW/COL pins */
-    for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++)
+    for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
+#if (MBI_LED_GPIO_ACTIVE_HL == LOW)
         writePinHigh(g_led_pins[i]);
+#elif (MBI_LED_GPIO_ACTIVE_HL == HIGH)
+        writePinLow(g_led_pins[i]);
+#endif
+    }
 
     /* latch previous data */
     mbi_send_instruction(MBI_GLOBAL_LATCH);
 
     /* activate ROW/COL pin */
+#if (MBI_LED_GPIO_ACTIVE_HL == LOW)
     writePinLow(g_led_pins[led_gpio_idx]);
+#elif (MBI_LED_GPIO_ACTIVE_HL == HIGH)
+    writePinHigh(g_led_pins[led_gpio_idx]);
+#endif
 
     led_gpio_idx += 1;
     led_gpio_idx = (led_gpio_idx >= MBI_NUM_LED_GPIO_PINS) ? 0 : led_gpio_idx;
@@ -207,7 +216,11 @@ __attribute__((weak)) void mbi_init_pins(void) {
     for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
         setPinOutput(g_led_pins[i]);
         palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
+#if (MBI_LED_GPIO_ACTIVE_HL == LOW)
         writePinHigh(g_led_pins[i]);
+#elif (MBI_LED_GPIO_ACTIVE_HL == HIGH)
+        writePinLow(g_led_pins[i]);
+#endif
     }
 
     /* Enable power to MBI(s) if managed by MCU */
