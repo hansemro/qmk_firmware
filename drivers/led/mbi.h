@@ -254,17 +254,13 @@
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
 void mbi_send_instruction(int instr);
 
-/* Transmit data to shift-register with shift_amount number of DCLK pulses.
- *
- * Note: Transmission begins with MSB at data[15].
- */
+/* Transmit `shift_amount` bits of `data` to shift-register. */
 void mbi_shift_data(uint16_t data, int shift_amount);
 
-/* Transmit data to shift-register with shift_amount number of DCLK pulses,
- * and assert LE for the last instr number of DCLK pulses.
+/* Transmit `shift_amount` bits of `data` to shift-register, and assert LE for
+ * the last `instr` number of DCLK pulses.
  *
- * Note: Assumes instr is less than shift_amount.
- * Note: Transmission begins with MSB at data[15].
+ * Note: Assumes `instr` is less than `shift_amount`.
  */
 void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr);
 
