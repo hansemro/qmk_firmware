@@ -252,17 +252,17 @@
 #endif
 
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
-void mbi_send_instruction(int instr);
+void mbi_send_instruction(uint8_t instr);
 
 /* Transmit `shift_amount` bits of `data` to shift-register. */
-void mbi_shift_data(uint16_t data, int shift_amount);
+void mbi_shift_data(uint16_t data, uint8_t shift_amount);
 
 /* Transmit `shift_amount` bits of `data` to shift-register, and assert LE for
  * the last `instr` number of DCLK pulses.
  *
  * Note: Assumes `instr` is less than `shift_amount`.
  */
-void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr);
+void mbi_shift_data_instr(uint16_t data, uint8_t shift_amount, uint8_t instr);
 
 #if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION)
 /* Write val to each MBI configuration register. */
