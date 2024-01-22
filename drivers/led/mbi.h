@@ -89,6 +89,21 @@
 #    define MBI_LED_COUNT (MBI_NUM_CHANNELS * MBI_NUM_LED_GPIO_PINS)
 #endif
 
+#ifndef HIGH
+#    define HIGH 1
+#endif
+#ifndef LOW
+#    define LOW 0
+#endif
+
+#ifdef MBI_LED_GPIO_ACTIVE_HL
+#    if (MBI_LED_GPIO_ACTIVE_HL != HIGH) && (MBI_LED_GPIO_ACTIVE_HL != LOW)
+#        error "MBI_LED_GPIO_ACTIVE_HL must be defined to either HIGH or LOW"
+#    endif
+#else
+#    error "MBI_LED_GPIO_ACTIVE_HL is not defined"
+#endif
+
 /* PWM driver to use for generating GCLK clock signal */
 #ifndef MBI_PWM_DRIVER
 #    error "MBI_PWM_DRIVER is not defined"
@@ -167,13 +182,6 @@
 
 #ifndef MBI_GCLK_OUTPUT_MODE
 #    error "MBI_GCLK_OUTPUT_MODE is not defined"
-#endif
-
-#ifndef HIGH
-#    define HIGH 1
-#endif
-#ifndef LOW
-#    define LOW 0
 #endif
 
 /* (Optional) MCU-managed pin to enable power to MBI */
