@@ -154,8 +154,7 @@ void mbi_send_instruction(int instr) {
     writePinLow(MBI_LE_PIN);
 }
 
-/* Transmit data to shift-register with shift_amount number of DCLK pulses.
- */
+/* Transmit `shift_amount` bits of `data` to shift-register. */
 void mbi_shift_data(uint16_t data, int shift_amount) {
     while (shift_amount-- > 0) {
         mbi_io_wait;
@@ -167,10 +166,10 @@ void mbi_shift_data(uint16_t data, int shift_amount) {
     }
 }
 
-/* Transmit data to shift-register with shift_amount number of DCLK pulses,
- * and assert LE for the last instr number of DCLK pulses.
+/* Transmit `shift_amount` bits of `data` to shift-register, and assert LE for
+ * the last `instr` number of DCLK pulses.
  *
- * Note: Assumes instr is less than shift_amount.
+ * Note: Assumes `instr` is less than `shift_amount`.
  */
 void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr) {
     if (instr < shift_amount) {
@@ -184,7 +183,7 @@ void mbi_shift_data_instr(uint16_t data, int shift_amount, int instr) {
 }
 
 #if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION)
-/* Write val to each MBI configuration register. */
+/* Write `val` to each MBI configuration register. */
 void mbi_write_configuration(uint16_t val) {
     mbi_send_instruction(MBI_ENABLE_WRITE_CONFIGURATION);
     int i = 0;
