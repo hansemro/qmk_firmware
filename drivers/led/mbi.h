@@ -46,6 +46,20 @@
 #    error "MBI_NUM_DRIVER is not defined"
 #endif
 
+/* MBI Data Loading Types:
+ * - Serial: MCU drives serial data to first MBI with serial data output of
+ *           one MBI driving input of next MBI
+ * - Parallel: MCU drives serial data to each MBI in parallel
+ */
+#define MBI_LOAD_TYPE_SERIAL 0
+#define MBI_LOAD_TYPE_PARALLEL 1
+
+#if (MBI_NUM_DRIVER == 1) && !defined(MBI_LOAD_TYPE)
+#    define MBI_LOAD_TYPE MBI_LOAD_TYPE_SERIAL
+#elif !defined(MBI_LOAD_TYPE)
+#    error "MBI_LOAD_TYPE must be defined to either MBI_LOAD_TYPE_SERIAL or MBI_LOAD_TYPE_PARALLEL"
+#endif
+
 /* RGB or Grayscale (mono) LEDs */
 #define MBI_LED_TYPE_MONO 0
 #define MBI_LED_TYPE_RGB 1
@@ -160,8 +174,8 @@
 #    error "MBI_LE_OUTPUT_MODE is not defined"
 #endif
 
-#ifndef MBI_SDI_PIN
-#    error "MBI_SDI_PIN is not defined"
+#if !defined(MBI_SDI_PIN) && !defined(MBI_SDI_PINS)
+#    error "define either MBI_SDI_PIN or MBI_SDI_PINS (for parallel operation)"
 #endif
 
 #ifndef MBI_SDI_OUTPUT_MODE
@@ -264,6 +278,18 @@ void mbi_shift_data(uint16_t data, uint8_t shift_amount);
  */
 void mbi_shift_data_instr(uint16_t data, uint8_t shift_amount, uint8_t instr);
 
+#if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_PARALLEL)
+/* Transmit `shift_amount` bits of `data[n]` to nth driver's shift-register. */
+void mbi_parallel_shift_data(const uint16_t data[MBI_NUM_DRIVER], uint8_t shift_amount);
+
+/* Transmit `shift_amount` bits of `data[n]` to nth driver's shift-register,
+ * and assert LE for the last `instr` number of DCLK pulses.
+ *
+ * Note: Assumes `instr` is less than `shift_amount`.
+ */
+void mbi_parallel_shift_data_instr(const uint16_t data[MBI_NUM_DRIVER], uint8_t shift_amount, uint8_t instr);
+#endif
+
 #if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION)
 /* Write val to each MBI configuration register. */
 void mbi_write_configuration(uint16_t val);
@@ -310,3 +336,7 @@ extern const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MBI_NUM_LED_GPIO_PINS
 
 /* LED row/column pins */
 extern pin_t g_led_pins[MBI_NUM_LED_GPIO_PINS];
+
+#if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_PARALLEL)
+extern pin_t g_sdi_pins[MBI_NUM_DRIVER];
+#endif

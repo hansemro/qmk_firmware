@@ -9,6 +9,10 @@
 #    error "Split keyboard not supported"
 #endif
 
+#if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_PARALLEL)
+pin_t g_sdi_pins[MBI_NUM_DRIVER] = MBI_SDI_PINS;
+#endif
+
 pin_t g_led_pins[MBI_NUM_LED_GPIO_PINS] = MBI_LED_GPIO_PINS;
 
 static uint8_t led_gpio_idx = 0;
@@ -61,19 +65,55 @@ void mbi_flush_isr(void) {
     /* flush data for next ROW/COL */
     writePinLow(MBI_LE_PIN);
     for (int i = MBI_NUM_CHANNELS - 1; i >= 0; i--) {
+#if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_PARALLEL)
+        uint16_t color_arr[MBI_NUM_DRIVER];
+        uint8_t mbi_ch_idx;
+        uint8_t led_idx;
+        for (int j = 0; j < MBI_NUM_DRIVER; j++) {
+            uint8_t color_ch = g_mbi_channels[j][i].color_channel;
+            mbi_ch_idx = g_mbi_channels[j][i].color_index;
+            // led_idx is possibly the same for all drivers
+#    if (MBI_LED_DIRECTION == ROW2COL)
+            led_idx = g_mbi_led_matrix_co[led_gpio_idx][mbi_ch_idx];
+#    elif (MBI_LED_DIRECTION == COL2ROW)
+            led_idx = g_mbi_led_matrix_co[mbi_ch_idx][led_gpio_idx];
+#    endif
+            switch (color_ch) {
+#    if (MBI_LED_TYPE == MBI_LED_TYPE_RGB)
+                case MBI_RED_CH:
+                    color_arr[j] = mbi_leds[1][led_idx].r;
+                    break;
+                case MBI_GREEN_CH:
+                    color_arr[j] = mbi_leds[1][led_idx].g;
+                    break;
+                case MBI_BLUE_CH:
+                    color_arr[j] = mbi_leds[1][led_idx].b;
+                    break;
+#    elif (MBI_LED_TYPE == MBI_LED_TYPE_MONO)
+                case MBI_MONO_CH:
+                    color_arr[j] = mbi_leds[1][led_idx].v;
+                    break;
+#    endif
+                case MBI_UNUSED_CH:
+                default:
+                    color_arr[j] = 0;
+            }
+        }
+        mbi_parallel_shift_data_instr(color_arr, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
+#else // (MBI_LOAD_TYPE == MBI_LOAD_TYPE_SERIAL)
         uint8_t color_ch;
         uint8_t mbi_ch_idx;
         uint8_t led_idx;
         for (int j = MBI_NUM_DRIVER - 1; j >= 1; j--) {
             color_ch = g_mbi_channels[j][i].color_channel;
             mbi_ch_idx = g_mbi_channels[j][i].color_index;
-#if (MBI_LED_DIRECTION == ROW2COL)
+#    if (MBI_LED_DIRECTION == ROW2COL)
             led_idx = g_mbi_led_matrix_co[led_gpio_idx][mbi_ch_idx];
-#elif (MBI_LED_DIRECTION == COL2ROW)
+#    elif (MBI_LED_DIRECTION == COL2ROW)
             led_idx = g_mbi_led_matrix_co[mbi_ch_idx][led_gpio_idx];
-#endif
+#    endif
             switch (color_ch) {
-#if (MBI_LED_TYPE == MBI_LED_TYPE_RGB)
+#    if (MBI_LED_TYPE == MBI_LED_TYPE_RGB)
                 case MBI_RED_CH:
                     mbi_shift_data(mbi_leds[1][led_idx].r, MBI_SHIFT_REG_WIDTH);
                     break;
@@ -83,11 +123,11 @@ void mbi_flush_isr(void) {
                 case MBI_BLUE_CH:
                     mbi_shift_data(mbi_leds[1][led_idx].b, MBI_SHIFT_REG_WIDTH);
                     break;
-#elif (MBI_LED_TYPE == MBI_LED_TYPE_MONO)
+#    elif (MBI_LED_TYPE == MBI_LED_TYPE_MONO)
                 case MBI_MONO_CH:
                     mbi_shift_data(mbi_leds[1][led_idx].v, MBI_SHIFT_REG_WIDTH);
                     break;
-#endif
+#    endif
                 case MBI_UNUSED_CH:
                 default:
                     mbi_shift_data(0, MBI_SHIFT_REG_WIDTH);
@@ -95,13 +135,13 @@ void mbi_flush_isr(void) {
         }
         color_ch = g_mbi_channels[0][i].color_channel;
         mbi_ch_idx = g_mbi_channels[0][i].color_index;
-#if (MBI_LED_DIRECTION == ROW2COL)
+#    if (MBI_LED_DIRECTION == ROW2COL)
         led_idx = g_mbi_led_matrix_co[led_gpio_idx][mbi_ch_idx];
-#elif (MBI_LED_DIRECTION == COL2ROW)
+#    elif (MBI_LED_DIRECTION == COL2ROW)
         led_idx = g_mbi_led_matrix_co[mbi_ch_idx][led_gpio_idx];
-#endif
+#    endif
         switch (color_ch) {
-#if (MBI_LED_TYPE == MBI_LED_TYPE_RGB)
+#    if (MBI_LED_TYPE == MBI_LED_TYPE_RGB)
             case MBI_RED_CH:
                 mbi_shift_data_instr(mbi_leds[1][led_idx].r, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
                 break;
@@ -111,17 +151,20 @@ void mbi_flush_isr(void) {
             case MBI_BLUE_CH:
                 mbi_shift_data_instr(mbi_leds[1][led_idx].b, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
                 break;
-#elif (MBI_LED_TYPE == MBI_LED_TYPE_MONO)
+#    elif (MBI_LED_TYPE == MBI_LED_TYPE_MONO)
             case MBI_MONO_CH:
                 mbi_shift_data_instr(mbi_leds[1][led_idx].v, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
                 break;
-#endif
+#    endif
             case MBI_UNUSED_CH:
             default:
                 mbi_shift_data_instr(0, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
         }
+#endif
     }
+#if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_SERIAL)
     writePinLow(MBI_SDI_PIN);
+#endif
     writePinLow(MBI_DCLK_PIN);
 }
 
@@ -159,7 +202,12 @@ void mbi_shift_data(uint16_t data, uint8_t shift_amount) {
     while (shift_amount-- > 0) {
         mbi_io_wait;
         writePinLow(MBI_DCLK_PIN);
+#if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_PARALLEL)
+        for (int i = 0; i < MBI_NUM_DRIVER; i++)
+            writePin(g_sdi_pins[i], data & MBI_SHIFT_REG_MSB_MASK);
+#else // (MBI_LOAD_TYPE == MBI_LOAD_TYPE_SERIAL)
         writePin(MBI_SDI_PIN, data & MBI_SHIFT_REG_MSB_MASK);
+#endif
         mbi_io_wait;
         writePinHigh(MBI_DCLK_PIN);
         data = data << 1;
@@ -182,10 +230,51 @@ void mbi_shift_data_instr(uint16_t data, uint8_t shift_amount, uint8_t instr) {
     }
 }
 
+#if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_PARALLEL)
+/* Transmit `shift_amount` bits of `data[n]` to nth driver's shift-register. */
+void mbi_parallel_shift_data(const uint16_t data[MBI_NUM_DRIVER], uint8_t shift_amount) {
+    int offset = 0;
+    while (shift_amount-- > 0) {
+        mbi_io_wait;
+        writePinLow(MBI_DCLK_PIN);
+        for (int i = 0; i < MBI_NUM_DRIVER; i++) {
+            writePin(g_sdi_pins[i], data[i] & (MBI_SHIFT_REG_MSB_MASK >> offset));
+        }
+        mbi_io_wait;
+        writePinHigh(MBI_DCLK_PIN);
+        offset++;
+    }
+}
+
+
+/* Transmit `shift_amount` bits of `data[n]` to nth driver's shift-register,
+ * and assert LE for the last `instr` number of DCLK pulses.
+ *
+ * Note: Assumes `instr` is less than `shift_amount`.
+ */
+void mbi_parallel_shift_data_instr(const uint16_t data[MBI_NUM_DRIVER], uint8_t shift_amount, uint8_t instr) {
+    if (instr < shift_amount) {
+        uint16_t tmp[MBI_NUM_DRIVER];
+        for (int i = 0; i < MBI_NUM_DRIVER; i++) {
+            tmp[i] = data[i] << (shift_amount - instr);
+        }
+        writePinLow(MBI_LE_PIN);
+        mbi_parallel_shift_data(data, shift_amount - instr);
+        writePinHigh(MBI_LE_PIN);
+        mbi_parallel_shift_data(tmp, instr);
+        writePinLow(MBI_LE_PIN);
+    }
+}
+#endif
+
+
 #if defined(MBI_WRITE_CONFIGURATION) && defined(MBI_ENABLE_WRITE_CONFIGURATION)
 /* Write `val` to each MBI configuration register. */
 void mbi_write_configuration(uint16_t val) {
     mbi_send_instruction(MBI_ENABLE_WRITE_CONFIGURATION);
+#if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_PARALLEL)
+    mbi_shift_data_instr(val, MBI_SHIFT_REG_WIDTH, MBI_WRITE_CONFIGURATION);
+#else // (MBI_LOAD_TYPE == MBI_LOAD_TYPE_SERIAL)
     int i = 0;
     for (; i < MBI_NUM_DRIVER - 1; i++) {
         mbi_shift_data(val, MBI_SHIFT_REG_WIDTH);
@@ -193,6 +282,7 @@ void mbi_write_configuration(uint16_t val) {
     if (i < MBI_NUM_DRIVER) {
         mbi_shift_data_instr(val, MBI_SHIFT_REG_WIDTH, MBI_WRITE_CONFIGURATION);
     }
+#endif
 }
 #endif
 
@@ -201,15 +291,23 @@ __attribute__((weak)) void mbi_init_pins(void) {
     setPinOutput(MBI_DCLK_PIN);
     setPinOutput(MBI_GCLK_PIN);
     setPinOutput(MBI_LE_PIN);
-    setPinOutput(MBI_SDI_PIN);
     palSetLineMode(MBI_DCLK_PIN, MBI_DCLK_OUTPUT_MODE);
     palSetLineMode(MBI_GCLK_PIN, MBI_GCLK_OUTPUT_MODE);
     palSetLineMode(MBI_LE_PIN, MBI_LE_OUTPUT_MODE);
-    palSetLineMode(MBI_SDI_PIN, MBI_SDI_OUTPUT_MODE);
     writePinHigh(MBI_DCLK_PIN);
     writePinHigh(MBI_GCLK_PIN);
     writePinHigh(MBI_LE_PIN);
+#if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_PARALLEL)
+    for (int i = 0; i < MBI_NUM_DRIVER; i++) {
+        setPinOutput(g_sdi_pins[i]);
+        palSetLineMode(g_sdi_pins[i], MBI_SDI_OUTPUT_MODE);
+        writePinHigh(g_sdi_pins[i]);
+    }
+#else // if (MBI_LOAD_TYPE == MBI_LOAD_TYPE_SERIAL)
+    setPinOutput(MBI_SDI_PIN);
+    palSetLineMode(MBI_SDI_PIN, MBI_SDI_OUTPUT_MODE);
     writePinHigh(MBI_SDI_PIN);
+#endif
 
     /* setup LED ROW/COL pins*/
     for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
