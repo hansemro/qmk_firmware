@@ -545,6 +545,7 @@ You can use 1 or more chained MBI IC's. You can define the following items in `c
 | `MBI_LED_GPIO_PINS` | (Required) Array of MCU-managed LED GPIO pins in order of row/column index | |
 | `MBI_LED_GPIO_OUTPUT_MODE` | (Required) GPIO pad mode for LED GPIO pins | |
 | `MBI_LED_DIRECTION` | (Required) Direction from MCU-managed LED pin to output channel of MBI. Accepted values: `ROW2COL` or `COL2ROW` | |
+| `MBI_LED_GPIO_ACTIVE_HL` | Enable MCU-managed LED pin on high/low signal. Accepted values: `HIGH` or `LOW` | |
 | `MBI_NUM_LED_GPIO_PINS` | (Required) Number of LED GPIO pins | |
 | `MBI_PWM_DRIVER` | (Required) PWM driver to use for GCLK signal | |
 | `MBI_PWM_CHANNEL` | (Required) PWM channel to use | |
@@ -608,6 +609,7 @@ Here is an example using 2 MBIA043 drivers.
     { C8, C7, B5, B4, B3, B2, C6, C5 }
 #define MBI_NUM_LED_GPIO_PINS 8
 #define MBI_LED_GPIO_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_LED_GPIO_ACTIVE_HL LOW
 
 // MCU-managed MBI pins
 // These pins connect to pull-up resistor to 5V, so use open-drain.
