@@ -665,7 +665,7 @@ Define channel and LED matrix configuration in your `<keyboard>.c`:
  *         └───────┘
  */
 // clang-format off
-const mbi_led_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
+const mbi_channel_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
     /* MBI A */
     {
         /* Color channel
