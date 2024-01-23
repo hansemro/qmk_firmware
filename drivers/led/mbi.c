@@ -285,7 +285,7 @@ void mbi_set_value(int index, uint8_t value) {
 
 void mbi_set_value_all(uint8_t value) {
     for (int i = 0; i < MBI_LED_COUNT; i++) {
-        mbi_set_value_all(i, value);
+        mbi_set_value(i, value);
     }
 }
 #endif
