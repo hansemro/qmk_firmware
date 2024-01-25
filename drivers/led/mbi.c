@@ -193,10 +193,6 @@ void mbi_write_configuration(uint16_t val) {
 
 /* Configure and initialize MBI and LED pins */
 __attribute__((weak)) void mbi_init_pins(void) {
-    setPinOutput(MBI_DCLK_PIN);
-    setPinOutput(MBI_GCLK_PIN);
-    setPinOutput(MBI_LE_PIN);
-    setPinOutput(MBI_SDI_PIN);
     palSetLineMode(MBI_DCLK_PIN, MBI_DCLK_OUTPUT_MODE);
     palSetLineMode(MBI_GCLK_PIN, MBI_GCLK_OUTPUT_MODE);
     palSetLineMode(MBI_LE_PIN, MBI_LE_OUTPUT_MODE);
@@ -208,7 +204,6 @@ __attribute__((weak)) void mbi_init_pins(void) {
 
     /* setup LED ROW/COL pins*/
     for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
-        setPinOutput(g_led_pins[i]);
         palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
 #if (MBI_LED_GPIO_ACTIVE_STATE == LOW)
         writePinHigh(g_led_pins[i]);
@@ -219,7 +214,6 @@ __attribute__((weak)) void mbi_init_pins(void) {
 
     /* Enable power to MBI(s) if managed by MCU */
 #ifdef MBI_POWER_ENABLE_PIN
-    setPinOutput(MBI_POWER_ENABLE_PIN);
     palSetLineMode(MBI_POWER_ENABLE_PIN, MBI_POWER_OUTPUT_MODE);
 #    if (MBI_POWER_ACTIVE_STATE == HIGH)
     writePinHigh(MBI_POWER_ENABLE_PIN);
