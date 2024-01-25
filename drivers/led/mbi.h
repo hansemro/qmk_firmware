@@ -271,6 +271,10 @@ void mbi_write_configuration(uint16_t val);
 
 /* initialize mbi driver(s) */
 void mbi_init(void);
+void mbi_init_pins(void);
+void mbi_init_config(void);
+void mbi_init_timers(void);
+
 #if (MBI_LED_TYPE == MBI_LED_TYPE_RGB)
 /* write RGB color to back buffer at a specific index */
 void mbi_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
