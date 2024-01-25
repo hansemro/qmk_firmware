@@ -96,12 +96,12 @@
 #    define LOW 0
 #endif
 
-#ifdef MBI_LED_GPIO_ACTIVE_HL
-#    if (MBI_LED_GPIO_ACTIVE_HL != HIGH) && (MBI_LED_GPIO_ACTIVE_HL != LOW)
-#        error "MBI_LED_GPIO_ACTIVE_HL must be defined to either HIGH or LOW"
+#ifdef MBI_LED_GPIO_ACTIVE_STATE
+#    if (MBI_LED_GPIO_ACTIVE_STATE != HIGH) && (MBI_LED_GPIO_ACTIVE_STATE != LOW)
+#        error "MBI_LED_GPIO_ACTIVE_STATE must be defined to either HIGH or LOW"
 #    endif
 #else
-#    error "MBI_LED_GPIO_ACTIVE_HL is not defined"
+#    error "MBI_LED_GPIO_ACTIVE_STATE is not defined"
 #endif
 
 /* PWM driver to use for generating GCLK clock signal */
@@ -186,8 +186,8 @@
 
 /* (Optional) MCU-managed pin to enable power to MBI */
 #ifdef MBI_POWER_ENABLE_PIN
-#    if !defined(MBI_POWER_ACTIVE_HL) && (MBI_POWER_ACTIVE_HL != HIGH) && (MBI_POWER_ACTIVE_HL != LOW)
-#        error "MBI_POWER_ACTIVE_HL must be defined to either HIGH or LOW"
+#    if !defined(MBI_POWER_ACTIVE_STATE) && (MBI_POWER_ACTIVE_STATE != HIGH) && (MBI_POWER_ACTIVE_STATE != LOW)
+#        error "MBI_POWER_ACTIVE_STATE must be defined to either HIGH or LOW"
 #    endif
 #    ifndef MBI_POWER_OUTPUT_MODE
 #        error "MBI_POWER_OUTPUT_MODE is not defined"

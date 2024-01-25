@@ -38,9 +38,9 @@ static mbi_led_t mbi_leds[2][MBI_LED_COUNT];
 void mbi_flush_isr(void) {
     /* disable ROW/COL pins */
     for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
-#if (MBI_LED_GPIO_ACTIVE_HL == LOW)
+#if (MBI_LED_GPIO_ACTIVE_STATE == LOW)
         writePinHigh(g_led_pins[i]);
-#elif (MBI_LED_GPIO_ACTIVE_HL == HIGH)
+#elif (MBI_LED_GPIO_ACTIVE_STATE == HIGH)
         writePinLow(g_led_pins[i]);
 #endif
     }
@@ -49,9 +49,9 @@ void mbi_flush_isr(void) {
     mbi_send_instruction(MBI_GLOBAL_LATCH);
 
     /* activate ROW/COL pin */
-#if (MBI_LED_GPIO_ACTIVE_HL == LOW)
+#if (MBI_LED_GPIO_ACTIVE_STATE == LOW)
     writePinLow(g_led_pins[led_gpio_idx]);
-#elif (MBI_LED_GPIO_ACTIVE_HL == HIGH)
+#elif (MBI_LED_GPIO_ACTIVE_STATE == HIGH)
     writePinHigh(g_led_pins[led_gpio_idx]);
 #endif
 
@@ -210,9 +210,9 @@ __attribute__((weak)) void mbi_init_pins(void) {
     for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
         setPinOutput(g_led_pins[i]);
         palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
-#if (MBI_LED_GPIO_ACTIVE_HL == LOW)
+#if (MBI_LED_GPIO_ACTIVE_STATE == LOW)
         writePinHigh(g_led_pins[i]);
-#elif (MBI_LED_GPIO_ACTIVE_HL == HIGH)
+#elif (MBI_LED_GPIO_ACTIVE_STATE == HIGH)
         writePinLow(g_led_pins[i]);
 #endif
     }
@@ -221,9 +221,9 @@ __attribute__((weak)) void mbi_init_pins(void) {
 #ifdef MBI_POWER_ENABLE_PIN
     setPinOutput(MBI_POWER_ENABLE_PIN);
     palSetLineMode(MBI_POWER_ENABLE_PIN, MBI_POWER_OUTPUT_MODE);
-#    if (MBI_POWER_ACTIVE_HL == HIGH)
+#    if (MBI_POWER_ACTIVE_STATE == HIGH)
     writePinHigh(MBI_POWER_ENABLE_PIN);
-#    elif (MBI_POWER_ACTIVE_HL == LOW)
+#    elif (MBI_POWER_ACTIVE_STATE == LOW)
     writePinLow(MBI_POWER_ENABLE_PIN);
 #    endif
 #endif
