@@ -543,7 +543,7 @@ You can use 1 or more chained MBI IC's. You can define the following items in `c
 | `MBI_SHIFT_REG_WIDTH` | (Required) Length of shift register per MBI, in bits | |
 | `MBI_NUM_DRIVER` | (Required) Number of chained MBI drivers | |
 | `MBI_LED_GPIO_PINS` | (Required) Array of MCU-managed LED GPIO pins in order of row/column index | |
-| `MBI_LED_GPIO_OUTPUT_MODE` | (Required) GPIO pad mode for LED GPIO pins | |
+| `MBI_LED_GPIO_OUTPUT_MODE` | (Optional) GPIO pad mode for LED GPIO pins | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_LED_DIRECTION` | (Required) Direction from MCU-managed LED pin to output channel of MBI. Accepted values: `ROW2COL` or `COL2ROW` | |
 | `MBI_LED_GPIO_ACTIVE_STATE` | Enable MCU-managed LED pin on high/low signal. Accepted values: `HIGH` or `LOW` | |
 | `MBI_NUM_LED_GPIO_PINS` | (Required) Number of LED GPIO pins | |
@@ -556,15 +556,15 @@ You can use 1 or more chained MBI IC's. You can define the following items in `c
 | `MBI_TIMER_COUNTER_FREQUENCY` | (Optional) Timer counter frequency, in Hz | 2000 |
 | `MBI_TIMER_PERIOD` | (Optional) Timer period in ticks. Flushing frequency = `MBI_TIMER_COUNTER_FREQUENCY` / `MBI_TIMER_PERIOD` | 2 |
 | `MBI_LE_PIN` | (Required) MCU-managed LE pin | |
-| `MBI_LE_OUTPUT_MODE` | (Required) GPIO pad mode for LE pin | |
+| `MBI_LE_OUTPUT_MODE` | (Optional) GPIO pad mode for LE pin | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_SDI_PIN` | (Required) MCU-managed SDI pin | |
-| `MBI_SDI_OUTPUT_MODE` | (Required) GPIO pad mode for SDI pin | |
+| `MBI_SDI_OUTPUT_MODE` | (Optional) GPIO pad mode for SDI pin | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_DCLK_PIN` | (Required) MCU-managed DCLK pin | |
-| `MBI_DCLK_OUTPUT_MODE` | (Required) GPIO pad mode for DCLK pin | |
+| `MBI_DCLK_OUTPUT_MODE` | (Optional) GPIO pad mode for DCLK pin | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_GCLK_PIN` | (Required) MCU-managed GCLK pin | |
-| `MBI_GCLK_OUTPUT_MODE` | (Required) GPIO pad mode for GCLK pin | |
+| `MBI_GCLK_OUTPUT_MODE` | (Optional) GPIO pad mode for GCLK pin | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_POWER_ENABLE_PIN` | (Optional) MCU-managed pin for enabling power to MBI(s) | |
-| `MBI_POWER_OUTPUT_MODE` | GPIO pad mode for power enable pin | |
+| `MBI_POWER_OUTPUT_MODE` | GPIO pad mode for power enable pin | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_POWER_ACTIVE_STATE` | Enable power on high/low signal. Accepted values: `HIGH` or `LOW` | |
 | `MBI_NOPS` | (Required) Number of no-op delays (multiplied by 3) to ensure MBI timing requirements. Not required to be defined for some platforms. | |
 | `MBI_DATA_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from shift register to buffers. | |
