@@ -117,18 +117,15 @@
 #    define MBI_PWM_OUTPUT_MODE PWM_OUTPUT_ACTIVE_LOW
 #endif
 
-#if !defined(MBI_PWM_COUNTER_FREQUENCY) && !defined(MBI_PWM_PERIOD)
-/* PWM counter frequency in Hz */
-#    define MBI_PWM_COUNTER_FREQUENCY 8000000UL
-/* PWM period in counter ticks */
+/* PWM period in counter ticks >= 2 */
+#ifndef MBI_PWM_PERIOD
 #    define MBI_PWM_PERIOD 2UL
-#else
-#    ifndef MBI_PWM_COUNTER_FREQUENCY
-#        error "MBI_PWM_COUNTER_FREQUENCY is not defined"
-#    endif
-#    ifndef MBI_PWM_PERIOD
-#        error "MBI_PWM_PERIOD is not defined"
-#    endif
+#endif
+
+/* PWM counter frequency in Hz = desired GCLK frequency * MBI_PWM_PERIOD */
+#ifndef MBI_PWM_COUNTER_FREQUENCY
+/* default: 4 MHz GCLK */
+#    define MBI_PWM_COUNTER_FREQUENCY (4000000UL * MBI_PWM_PERIOD)
 #endif
 
 /* GPT timer driver to use for continuous row/column pin cycling and data flushing */
@@ -136,18 +133,15 @@
 #    error "MBI_TIMER_DRIVER is not defined"
 #endif
 
-#if !defined(MBI_TIMER_COUNTER_FREQUENCY) && !defined(MBI_TIMER_PERIOD)
-/* Timer counter frequency in Hz */
-#    define MBI_TIMER_COUNTER_FREQUENCY 2000UL
-/* Timer period in counter ticks */
+/* Timer period in counter ticks >= 2 */
+#ifndef MBI_TIMER_PERIOD
 #    define MBI_TIMER_PERIOD 2UL
-#else
-#    ifndef MBI_TIMER_COUNTER_FREQUENCY
-#        error "MBI_TIMER_COUNTER_FREQUENCY is not defined"
-#    endif
-#    ifndef MBI_TIMER_PERIOD
-#        error "MBI_TIMER_PERIOD is not defined"
-#    endif
+#endif
+
+/* Timer counter frequency in Hz = desired LED refresh rate * MBI_NUM_LED_GPIO_PINS * MBI_TIMER_PERIOD */
+#ifndef MBI_TIMER_COUNTER_FREQUENCY
+/* default: 120 Hz LED refresh rate */
+#    define MBI_TIMER_COUNTER_FREQUENCY (120UL * MBI_NUM_LED_GPIO_PINS * MBI_TIMER_PERIOD)
 #endif
 
 /* MBI PINS */
