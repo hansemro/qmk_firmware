@@ -80,7 +80,7 @@
 #endif
 
 #ifndef MBI_LED_GPIO_OUTPUT_MODE
-#    error "MBI_LED_GPIO_OUTPUT_MODE is not defined"
+#    define MBI_LED_GPIO_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
 #endif
 
 #ifndef MBI_NUM_LED_GPIO_PINS
@@ -157,7 +157,7 @@
 #endif
 
 #ifndef MBI_LE_OUTPUT_MODE
-#    error "MBI_LE_OUTPUT_MODE is not defined"
+#    define MBI_LE_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
 #endif
 
 #ifndef MBI_SDI_PIN
@@ -165,7 +165,7 @@
 #endif
 
 #ifndef MBI_SDI_OUTPUT_MODE
-#    error "MBI_SDI_OUTPUT_MODE is not defined"
+#    define MBI_SDI_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
 #endif
 
 #ifndef MBI_DCLK_PIN
@@ -173,7 +173,7 @@
 #endif
 
 #ifndef MBI_DCLK_OUTPUT_MODE
-#    error "MBI_DCLK_OUTPUT_MODE is not defined"
+#    define MBI_DCLK_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
 #endif
 
 #ifndef MBI_GCLK_PIN
@@ -181,7 +181,7 @@
 #endif
 
 #ifndef MBI_GCLK_OUTPUT_MODE
-#    error "MBI_GCLK_OUTPUT_MODE is not defined"
+#    define MBI_GCLK_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
 #endif
 
 /* (Optional) MCU-managed pin to enable power to MBI */
@@ -190,7 +190,7 @@
 #        error "MBI_POWER_ACTIVE_STATE must be defined to either HIGH or LOW"
 #    endif
 #    ifndef MBI_POWER_OUTPUT_MODE
-#        error "MBI_POWER_OUTPUT_MODE is not defined"
+#        define MBI_POWER_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
 #    endif
 #endif
 
