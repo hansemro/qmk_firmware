@@ -135,11 +135,6 @@ static GPTConfig mbi_timer_config = {
     .callback  = mbi_gpt_flush_isr,
 };
 
-/* user-defined overridable functions */
-__attribute__((weak)) void mbi_init_pins(void);
-__attribute__((weak)) void mbi_init_config(void);
-__attribute__((weak)) void mbi_init_timers(void);
-
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
 void mbi_send_instruction(uint8_t instr) {
     writePinLow(MBI_LE_PIN);
