@@ -554,7 +554,7 @@ You can use 1 or more chained MBI IC's. You can define the following items in `c
 | `MBI_PWM_PERIOD` | (Optional) PWM period in ticks. Output frequency = `MBI_PWM_COUNTER_FREQUENCY` / `MBI_PWM_PERIOD` | 2 |
 | `MBI_TIMER_DRIVER` | (Required) GPT timer driver to use for continuous flushing of a row/column color data | |
 | `MBI_TIMER_COUNTER_FREQUENCY` | (Optional) Timer counter frequency, in Hz | 2000 |
-| `MBI_TIMER_PERIOD` | (Optional) Timer period in ticks. Flushing frequency = `MBI_TIMER_COUNTER_FREQUENCY` / `MBI_TIMER_PERIOD` | 2 |
+| `MBI_TIMER_PERIOD` | (Optional) Timer period in ticks. LED refresh rate = `MBI_TIMER_COUNTER_FREQUENCY` / (`MBI_TIMER_PERIOD` * `MBI_NUM_LED_GPIO_PINS`) | 2 |
 | `MBI_LE_PIN` | (Required) MCU-managed LE pin | |
 | `MBI_LE_OUTPUT_MODE` | (Optional) GPIO pad mode for LE pin | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_SDI_PIN` | (Required) MCU-managed SDI pin | |
