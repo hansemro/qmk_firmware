@@ -541,13 +541,19 @@ You can use 1 or more chained MBI IC's. You can define the following items in `c
 |----------|-------------|---------|
 | `MBI_NUM_CHANNELS` | (Required) Number of output channels per MBI | |
 | `MBI_SHIFT_REG_WIDTH` | (Required) Length of shift register per MBI, in bits | |
+| `MBI_DATA_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from shift register to buffers. | |
+| `MBI_GLOBAL_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from buffers to comparators. | |
+| `MBI_CONFIGURATION` | (Optional) Value to set each MBI configuration register. | |
+| `MBI_WRITE_CONFIGURATION` | (Optional) Number of DCLK rising edges with LE asserted to transfer data from shift register to configuration register (if writing to configuration register is enabled). | |
+| `MBI_ENABLE_WRITE_CONFIGURATION` | (Optional) Number of DCLK rising edges with LE asserted to enable writing to configuration register. | |
+| `MBI_NOPS` | (Required) Number of no-op delays (multiplied by 3) to ensure MBI timing requirements. Not required to be defined for some platforms. | |
 | `MBI_NUM_DRIVER` | (Required) Number of chained MBI drivers | |
 | `MBI_LED_GPIO_PINS` | (Required) Array of MCU-managed LED GPIO pins in order of row/column index | |
 | `MBI_LED_GPIO_OUTPUT_MODE` | (Optional) GPIO pad mode for LED GPIO pins | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_LED_DIRECTION` | (Required) Direction from MCU-managed LED pin to output channel of MBI. Accepted values: `ROW2COL` or `COL2ROW` | |
 | `MBI_LED_GPIO_ACTIVE_STATE` | Enable MCU-managed LED pin on high/low signal. Accepted values: `HIGH` or `LOW` | |
 | `MBI_NUM_LED_GPIO_PINS` | (Required) Number of LED GPIO pins | |
-| `MBI_PWM_DRIVER` | (Required) PWM driver to use for GCLK signal | |
+| `MBI_PWM_DRIVER` | (Required) PWM driver to use for generating GCLK clock signal | |
 | `MBI_PWM_CHANNEL` | (Required) PWM channel to use | |
 | `MBI_PWM_OUTPUT_MODE` | (Optional) PWM driver output mode | `PWM_OUTPUT_ACTIVE_LOW` |
 | `MBI_PWM_COUNTER_FREQUENCY` | (Optional) PWM counter frequency, in Hz | 8000000 |
@@ -566,12 +572,6 @@ You can use 1 or more chained MBI IC's. You can define the following items in `c
 | `MBI_POWER_ENABLE_PIN` | (Optional) MCU-managed pin for enabling power to MBI(s) | |
 | `MBI_POWER_OUTPUT_MODE` | GPIO pad mode for power enable pin | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_POWER_ACTIVE_STATE` | Enable power on high/low signal. Accepted values: `HIGH` or `LOW` | |
-| `MBI_NOPS` | (Required) Number of no-op delays (multiplied by 3) to ensure MBI timing requirements. Not required to be defined for some platforms. | |
-| `MBI_DATA_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from shift register to buffers. | |
-| `MBI_GLOBAL_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from buffers to comparators. | |
-| `MBI_CONFIGURATION` | (Optional) Value to set each MBI configuration register. | |
-| `MBI_WRITE_CONFIGURATION` | (Optional) Number of DCLK rising edges with LE asserted to transfer data from shift register to configuration register (if writing to configuration register is enabled). | |
-| `MBI_ENABLE_WRITE_CONFIGURATION` | (Optional) Number of DCLK rising edges with LE asserted to enable writing to configuration register. | |
 
 Here is an example using 2 MBIA043 drivers.
 
