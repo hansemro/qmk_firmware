@@ -742,7 +742,7 @@ const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MBI_NUM_LED_GPIO_PINS] = {
 // clang-format on
 ```
 
-Initialization functions (`mbi_init_pins`, `mbi_init_config`, `mbi_init_timers`, and `mbi_init`) may be overriden in your `<keyboard.c`:
+Initialization functions (`mbi_init_pins`, `mbi_init_config`, `mbi_init_timers`, and `mbi_init`) may be overriden in your `<keyboard>.c`:
 
 ```c
 void mbi_init_pins(void) {
