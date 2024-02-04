@@ -9,7 +9,7 @@
 #    error "Split keyboard not supported"
 #endif
 
-pin_t g_led_pins[MBI_NUM_LED_GPIO_PINS] = MBI_LED_GPIO_PINS;
+pin_t g_mbi_led_pins[MBI_NUM_LED_GPIO_PINS] = MBI_LED_GPIO_PINS;
 
 static uint8_t led_gpio_idx = 0;
 
@@ -39,9 +39,9 @@ void mbi_flush_isr(void) {
     /* disable ROW/COL pins */
     for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
 #if (MBI_LED_GPIO_ACTIVE_STATE == LOW)
-        writePinHigh(g_led_pins[i]);
+        writePinHigh(g_mbi_led_pins[i]);
 #elif (MBI_LED_GPIO_ACTIVE_STATE == HIGH)
-        writePinLow(g_led_pins[i]);
+        writePinLow(g_mbi_led_pins[i]);
 #endif
     }
 
@@ -50,9 +50,9 @@ void mbi_flush_isr(void) {
 
     /* activate ROW/COL pin */
 #if (MBI_LED_GPIO_ACTIVE_STATE == LOW)
-    writePinLow(g_led_pins[led_gpio_idx]);
+    writePinLow(g_mbi_led_pins[led_gpio_idx]);
 #elif (MBI_LED_GPIO_ACTIVE_STATE == HIGH)
-    writePinHigh(g_led_pins[led_gpio_idx]);
+    writePinHigh(g_mbi_led_pins[led_gpio_idx]);
 #endif
 
     led_gpio_idx += 1;
@@ -204,11 +204,11 @@ __attribute__((weak)) void mbi_init_pins(void) {
 
     /* setup LED ROW/COL pins*/
     for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
-        palSetLineMode(g_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
+        palSetLineMode(g_mbi_led_pins[i], MBI_LED_GPIO_OUTPUT_MODE);
 #if (MBI_LED_GPIO_ACTIVE_STATE == LOW)
-        writePinHigh(g_led_pins[i]);
+        writePinHigh(g_mbi_led_pins[i]);
 #elif (MBI_LED_GPIO_ACTIVE_STATE == HIGH)
-        writePinLow(g_led_pins[i]);
+        writePinLow(g_mbi_led_pins[i]);
 #endif
     }
 

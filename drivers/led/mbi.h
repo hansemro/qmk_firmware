@@ -307,4 +307,4 @@ extern const uint8_t g_mbi_led_matrix_co[MBI_NUM_CHANNELS][MBI_NUM_LED_GPIO_PINS
 #endif
 
 /* LED row/column pins */
-extern pin_t g_led_pins[MBI_NUM_LED_GPIO_PINS];
+extern pin_t g_mbi_led_pins[MBI_NUM_LED_GPIO_PINS];
