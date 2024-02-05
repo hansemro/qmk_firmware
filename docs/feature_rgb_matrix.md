@@ -601,6 +601,9 @@ Here is an example using 2 MBIA043 drivers.
 
 // MBI timer for flushing color data for a single row
 #define MBI_TIMER_DRIVER GPTD_BFTM0
+// Default: 120 Hz LED refresh rate
+// #define MBI_TIMER_PERIOD 2UL
+// #define MBI_TIMER_COUNTER_FREQUENCY (120UL * MBI_NUM_LED_GPIO_PINS * MBI_TIMER_PERIOD)
 
 // MCU manages column pins; MBI's manage row pins
 #define MBI_LED_DIRECTION COL2ROW
