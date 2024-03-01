@@ -169,6 +169,210 @@ const is31_led PROGMEM g_is31_scaling[ISSI_MANUAL_SCALING] = {
 Where LED Index is the position of the LED in the `g_is31_leds` array. The `scaling` value between 0 and 255 to be written to the Scaling Register.
 
 ---
+### MBI :id=mbi
+
+
+There is basic support for monochromatic LED matrix lighting with the Macroblock MBIA04X/MBI504X LED Driver with proprietary SPI-like control interface. To enable it, add this to your `rules.mk`:
+
+```make
+LED_MATRIX_ENABLE = yes
+LED_MATRIX_DRIVER = mbi
+```
+
+You can use 1 or more chained MBI IC's. You can define the following items in `config.h`:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `MBI_NUM_CHANNELS` | (Required) Number of output channels per MBI | |
+| `MBI_SHIFT_REG_WIDTH` | (Required) Length of shift register per MBI, in bits | |
+| `MBI_DATA_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from shift register to buffers. | |
+| `MBI_GLOBAL_LATCH` | (Required) Number of DCLK rising edges with LE asserted to transfer data from buffers to comparators. | |
+| `MBI_CONFIGURATION` | (Optional) Value to set each MBI configuration register. | |
+| `MBI_WRITE_CONFIGURATION` | (Optional) Number of DCLK rising edges with LE asserted to transfer data from shift register to configuration register (if writing to configuration register is enabled). | |
+| `MBI_ENABLE_WRITE_CONFIGURATION` | (Optional) Number of DCLK rising edges with LE asserted to enable writing to configuration register. | |
+| `MBI_NOPS` | (Required) Number of no-op delays (multiplied by 3) to ensure MBI timing requirements. Not required to be defined for some platforms. | |
+| `MBI_NUM_DRIVER` | (Required) Number of chained MBI drivers | |
+| `MBI_LED_GPIO_PINS` | (Required) Array of MCU-managed LED GPIO pins in order of row/column index | |
+| `MBI_LED_GPIO_OUTPUT_MODE` | (Optional) GPIO pad mode for LED GPIO pins | `PAL_MODE_OUTPUT_PUSHPULL` |
+| `MBI_LED_DIRECTION` | (Required) Direction from MCU-managed LED pin to output channel of MBI. Accepted values: `ROW2COL` or `COL2ROW` | |
+| `MBI_LED_GPIO_ACTIVE_STATE` | Enable MCU-managed LED pin on high/low signal. Accepted values: `HIGH` or `LOW` | |
+| `MBI_NUM_LED_GPIO_PINS` | (Required) Number of LED GPIO pins | |
+| `MBI_PWM_DRIVER` | (Required) PWM driver to use for generating GCLK clock signal | |
+| `MBI_PWM_CHANNEL` | (Required) PWM channel to use | |
+| `MBI_PWM_OUTPUT_MODE` | (Optional) PWM driver output mode | `PWM_OUTPUT_ACTIVE_LOW` |
+| `MBI_PWM_COUNTER_FREQUENCY` | (Optional) PWM counter frequency, in Hz | 8000000 |
+| `MBI_PWM_PERIOD` | (Optional) PWM period in ticks. Output frequency = `MBI_PWM_COUNTER_FREQUENCY` / `MBI_PWM_PERIOD` | 2 |
+| `MBI_TIMER_DRIVER` | (Required) GPT timer driver to use for continuous flushing of a row/column color data | |
+| `MBI_TIMER_COUNTER_FREQUENCY` | (Optional) Timer counter frequency, in Hz | 2000 |
+| `MBI_TIMER_PERIOD` | (Optional) Timer period in ticks. LED refresh rate = `MBI_TIMER_COUNTER_FREQUENCY` / (`MBI_TIMER_PERIOD` * `MBI_NUM_LED_GPIO_PINS`) | 2 |
+| `MBI_LE_PIN` | (Required) MCU-managed LE pin | |
+| `MBI_LE_OUTPUT_MODE` | (Optional) GPIO pad mode for LE pin | `PAL_MODE_OUTPUT_PUSHPULL` |
+| `MBI_SDI_PIN` | (Required) MCU-managed SDI pin | |
+| `MBI_SDI_OUTPUT_MODE` | (Optional) GPIO pad mode for SDI pin | `PAL_MODE_OUTPUT_PUSHPULL` |
+| `MBI_DCLK_PIN` | (Required) MCU-managed DCLK pin | |
+| `MBI_DCLK_OUTPUT_MODE` | (Optional) GPIO pad mode for DCLK pin | `PAL_MODE_OUTPUT_PUSHPULL` |
+| `MBI_GCLK_PIN` | (Required) MCU-managed GCLK pin | |
+| `MBI_GCLK_OUTPUT_MODE` | (Optional) GPIO pad mode for GCLK pin | `PAL_MODE_OUTPUT_PUSHPULL` |
+| `MBI_POWER_ENABLE_PIN` | (Optional) MCU-managed pin for enabling power to MBI(s) | |
+| `MBI_POWER_OUTPUT_MODE` | GPIO pad mode for power enable pin | `PAL_MODE_OUTPUT_PUSHPULL` |
+| `MBI_POWER_ACTIVE_STATE` | Enable power on high/low signal. Accepted values: `HIGH` or `LOW` | |
+
+Here is an example using a single MBI5042 driver.
+
+```c
+// MBI5042 (at 5V)
+#define MBI_NUM_CHANNELS 16
+#define MBI_SHIFT_REG_WIDTH 10
+#define MBI_DATA_LATCH 1
+#define MBI_GLOBAL_LATCH 3
+#define MBI_WRITE_CONFIGURATION 11
+#define MBI_ENABLE_WRITE_CONFIGURATION 15
+
+// MBI configuration
+#define MBI_CONFIGURATION 0x12c
+
+#define MBI_NUM_DRIVER 1
+// Insert no-ops to meet timing requirements
+#define MBI_NOPS 2
+
+// PWM to generate GCLK clock signal
+// Desired output/GCLK frequency =  3.7 MHz
+#define MBI_PWM_DRIVER PWMD_GPTM1
+#define MBI_PWM_CHANNEL 0
+#define MBI_PWM_OUTPUT_MODE PWM_OUTPUT_ACTIVE_LOW
+#define MBI_PWM_PERIOD 2UL
+#define MBI_PWM_COUNTER_FREQUENCY (3700000UL * MBI_PWM_PERIOD)
+
+// MBI timer for flushing color data for a single column
+#define MBI_TIMER_DRIVER GPTD_BFTM0
+// Default: 120 Hz LED refresh rate
+// #define MBI_TIMER_PERIOD 2UL
+// #define MBI_TIMER_COUNTER_FREQUENCY (120UL * MBI_NUM_LED_GPIO_PINS * MBI_TIMER_PERIOD)
+
+// MCU manages row pins; MBI's manage column pins
+#define MBI_LED_DIRECTION ROW2COL
+// MCU-managed LED row pins
+#define MBI_LED_GPIO_PINS \
+    { C15, C14, B5, B4, B3, B2, D3, D2 }
+#define MBI_NUM_LED_GPIO_PINS 8
+#define MBI_LED_GPIO_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_LED_GPIO_ACTIVE_STATE LOW
+
+// MCU-managed MBI pins
+// These pins connect to pull-up resistor to 5V, so use open-drain.
+#define MBI_LE_PIN A15
+#define MBI_LE_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_SDI_PIN C12
+#define MBI_SDI_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_DCLK_PIN A14
+#define MBI_DCLK_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_GCLK_PIN C10
+#define MBI_GCLK_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_TM))
+
+// MCU-managed MBI 5V power supply enable (active-low)
+#define MBI_POWER_ENABLE_PIN C11
+#define MBI_POWER_ACTIVE_STATE LOW
+#define MBI_POWER_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+```
+
+!> Note that this driver requires an LED matrix to LED index table in addition to the standard Key matrix to LED index table. This is to account for Key coordinate mapping differences or additional LEDs.
+
+!> Note that the LED entries in `rgb_matrix.layout` in `info.json` are specified with Key matrix coordinates instead of LED matrix coordinates.
+
+?> Acknowledge that the LED index for a key allows the LED matrix to map to the Key matrix, but the value itself is arbitrary. By extension, the order of LED entries in `rgb_matrix.layout` in `info.json` is also arbitrary. However, make sure that the entry index (which is also the LED index) remains consistent with the index in the LED matrix to LED index table.
+
+Define channel and LED matrix configuration in your `<keyboard>.c`:
+
+```c
+#include "mbi.h"
+
+/*
+ * Channel Setup:
+ *         ┌───────┐
+ *    SDI->│       │->SDO
+ *   COL0<-│       │->unused
+ *   COL1<-│       │->unused
+ *   COL2<-│       │->COL13
+ *   COL3<-│MBI5042│->COL12
+ *   COL4<-│   A   │->COL11
+ *   COL5<-│       │->COL10
+ *   COL6<-│       │->COL9
+ *   COL7<-│       │->COL8
+ *         └───────┘
+ */
+// clang-format off
+const mbi_channel_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
+    /* MBI A */
+    {
+    /*    Color channel (either MONO or UNUSED)
+     *    |
+     *    |            MBI-managed row/column index
+     *    |            | */
+        { MBI_MONO_CH, 0 }, /* MBI output channel 0 */
+        { MBI_MONO_CH, 1 }, /* MBI output channel 1 */
+        { MBI_MONO_CH, 2 }, /* ... */
+        { MBI_MONO_CH, 3 },
+        { MBI_MONO_CH, 4 },
+        { MBI_MONO_CH, 5 },
+        { MBI_MONO_CH, 6 },
+        { MBI_MONO_CH, 7 },
+        { MBI_MONO_CH, 8 },
+        { MBI_MONO_CH, 9 },
+        { MBI_MONO_CH, 10 },
+        { MBI_MONO_CH, 11 },
+        { MBI_MONO_CH, 12 },
+        { MBI_MONO_CH, 13 },
+        { MBI_UNUSED_CH, 0 },
+        { MBI_UNUSED_CH, 0 }, /* MBI output channel 15 */
+    },
+};
+// clang-format on
+
+#ifndef NO_LED
+#    define NLD 255
+#else
+#    define NLD NO_LED
+#endif
+
+// LED Matrix to LED Index
+// Since ROW2COL, MCU manages rows while MBI manages columns
+// clang-format off
+const uint8_t g_mbi_led_matrix_co[MBI_NUM_LED_GPIO_PINS][MBI_NUM_CHANNELS] = {
+    /*          Col0 Col1 Col2 Col3 Col4 Col5 Col6 Col7 Col8 Col9 Col10 Col11 Col12 Col13 Col14 Col15 */
+    /*Row0*/ {  0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,   11,   12,   26,   NLD,  NLD },
+    /*Row1*/ {  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,   24,   25,   NLD,  NLD,  NLD },
+    /*Row2*/ {  31,  32,  33,  34,  35,  36,  37,  38,  39,  40,  41,   42,   43,   44,   NLD,  NLD },
+    /*Row3*/ {  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,   60,   NLD,  61,   NLD,  NLD },
+    /*Row4*/ {  65,  NLD, 66,  67,  68,  69,  70,  71,  72,  73,  74,   75,   NLD,  76,   NLD,  NLD },
+    /*Row5*/ {  81,  82,  83,  NLD, NLD, NLD, 84,  NLD, NLD, 85,  86,   87,   88,   27,   NLD,  NLD },
+    /*Row6*/ {  89,  90,  77,  78,  62,  63,  45,  46,  28,  NLD, NLD,  NLD,  NLD,  NLD,  NLD,  NLD },
+    /*Row7*/ {  91,  80,  79,  64,  NLD, 48,  47,  29,  30,  NLD, NLD,  92,   93,   94,   NLD,  NLD },
+};
+// clang-format on
+```
+
+Initialization functions (`mbi_init_pins`, `mbi_init_config`, `mbi_init_timers`, and `mbi_init`) may be overriden in your `<keyboard>.c`:
+
+```c
+void mbi_init_pins(void) {
+    // initialize pins
+    ...
+}
+
+void mbi_init_config(void) {
+    // set MBI configuration register
+    ...
+}
+
+void mbi_init_timers(void) {
+    // setup and start GCLK signal
+    ...
+    // setup timer with callback to mbi_flush_isr()
+    ...
+}
+```
+
+---
 
 ## Common Configuration :id=common-configuration
 
