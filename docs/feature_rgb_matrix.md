@@ -671,45 +671,45 @@ Define channel and LED matrix configuration in your `<keyboard>.c`:
 const mbi_channel_t g_mbi_channels[MBI_NUM_DRIVER][MBI_NUM_CHANNELS] = {
     /* MBI A */
     {
-        /* Color channel
-           |
-           |         MBI-managed row/column index
-           |         | */
-        {MBI_RED_CH, 0}, /* MBI output channel 0 */
-        {MBI_RED_CH, 1}, /* MBI output channel 1 */
-        {MBI_RED_CH, 2}, /* ... */
-        {MBI_RED_CH, 3},
-        {MBI_RED_CH, 4},
-        {MBI_RED_CH, 5},
-        {MBI_RED_CH, 6},
-        {MBI_RED_CH, 7},
-        {MBI_RED_CH, 8},
-        {MBI_GREEN_CH, 0},
-        {MBI_GREEN_CH, 1},
-        {MBI_GREEN_CH, 2},
-        {MBI_GREEN_CH, 3},
-        {MBI_GREEN_CH, 4},
-        {MBI_GREEN_CH, 5},
-        {MBI_GREEN_CH, 6}, /* MBI output channel 15 */
+    /*    Color channel (RED, GREEN, BLUE, or UNUSED)
+     *    |
+     *    |           MBI-managed row/column index
+     *    |           | */
+        { MBI_RED_CH, 0 }, /* MBI output channel 0 */
+        { MBI_RED_CH, 1 }, /* MBI output channel 1 */
+        { MBI_RED_CH, 2 }, /* ... */
+        { MBI_RED_CH, 3 },
+        { MBI_RED_CH, 4 },
+        { MBI_RED_CH, 5 },
+        { MBI_RED_CH, 6 },
+        { MBI_RED_CH, 7 },
+        { MBI_RED_CH, 8 },
+        { MBI_GREEN_CH, 0 },
+        { MBI_GREEN_CH, 1 },
+        { MBI_GREEN_CH, 2 },
+        { MBI_GREEN_CH, 3 },
+        { MBI_GREEN_CH, 4 },
+        { MBI_GREEN_CH, 5 },
+        { MBI_GREEN_CH, 6 }, /* MBI output channel 15 */
     },
     /* MBI B */
     {
-        {MBI_GREEN_CH, 7},
-        {MBI_GREEN_CH, 8},
-        {MBI_BLUE_CH, 0},
-        {MBI_BLUE_CH, 1},
-        {MBI_BLUE_CH, 2},
-        {MBI_BLUE_CH, 3},
-        {MBI_BLUE_CH, 4},
-        {MBI_BLUE_CH, 5},
-        {MBI_BLUE_CH, 6},
-        {MBI_BLUE_CH, 7},
-        {MBI_BLUE_CH, 8},
-        {MBI_UNUSED_CH, 0},
-        {MBI_UNUSED_CH, 0},
-        {MBI_UNUSED_CH, 0},
-        {MBI_UNUSED_CH, 0},
-        {MBI_UNUSED_CH, 0},
+        { MBI_GREEN_CH, 7 },
+        { MBI_GREEN_CH, 8 },
+        { MBI_BLUE_CH, 0 },
+        { MBI_BLUE_CH, 1 },
+        { MBI_BLUE_CH, 2 },
+        { MBI_BLUE_CH, 3 },
+        { MBI_BLUE_CH, 4 },
+        { MBI_BLUE_CH, 5 },
+        { MBI_BLUE_CH, 6 },
+        { MBI_BLUE_CH, 7 },
+        { MBI_BLUE_CH, 8 },
+        { MBI_UNUSED_CH, 0 },
+        { MBI_UNUSED_CH, 0 },
+        { MBI_UNUSED_CH, 0 },
+        { MBI_UNUSED_CH, 0 },
+        { MBI_UNUSED_CH, 0 },
     },
 };
 // clang-format on
