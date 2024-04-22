@@ -195,7 +195,7 @@ You can use 1 or more chained MBI IC's. You can define the following items in `c
 | `MBI_LED_GPIO_PINS` | (Required) Array of MCU-managed LED GPIO pins in order of row/column index | |
 | `MBI_LED_GPIO_OUTPUT_MODE` | (Optional) GPIO pad mode for LED GPIO pins | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_LED_DIRECTION` | (Required) Direction from MCU-managed LED pin to output channel of MBI. Accepted values: `ROW2COL` or `COL2ROW` | |
-| `MBI_LED_GPIO_ACTIVE_STATE` | Enable MCU-managed LED pin on high/low signal. Accepted values: `HIGH` or `LOW` | |
+| `MBI_LED_GPIO_ACTIVE_STATE` | Enable MCU-managed LED pin on high/low signal. Accepted values: `ACTIVE_HIGH` or `ACTIVE_LOW` | |
 | `MBI_NUM_LED_GPIO_PINS` | (Required) Number of LED GPIO pins | |
 | `MBI_PWM_DRIVER` | (Required) PWM driver to use for generating GCLK clock signal | |
 | `MBI_PWM_CHANNEL` | (Required) PWM channel to use | |
@@ -215,7 +215,7 @@ You can use 1 or more chained MBI IC's. You can define the following items in `c
 | `MBI_GCLK_OUTPUT_MODE` | (Optional) GPIO pad mode for GCLK pin | `PAL_MODE_OUTPUT_PUSHPULL` |
 | `MBI_POWER_ENABLE_PIN` | (Optional) MCU-managed pin for enabling power to MBI(s) | |
 | `MBI_POWER_OUTPUT_MODE` | GPIO pad mode for power enable pin | `PAL_MODE_OUTPUT_PUSHPULL` |
-| `MBI_POWER_ACTIVE_STATE` | Enable power on high/low signal. Accepted values: `HIGH` or `LOW` | |
+| `MBI_POWER_ACTIVE_STATE` | Enable power on high/low signal. Accepted values: `ACTIVE_HIGH` or `ACTIVE_LOW` | |
 
 Here is an example using a single MBI5042 driver.
 
@@ -256,7 +256,7 @@ Here is an example using a single MBI5042 driver.
     { C15, C14, B5, B4, B3, B2, D3, D2 }
 #define MBI_NUM_LED_GPIO_PINS 8
 #define MBI_LED_GPIO_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
-#define MBI_LED_GPIO_ACTIVE_STATE LOW
+#define MBI_LED_GPIO_ACTIVE_STATE ACTIVE_LOW
 
 // MCU-managed MBI pins
 // These pins connect to pull-up resistor to 5V, so use open-drain.
@@ -271,7 +271,7 @@ Here is an example using a single MBI5042 driver.
 
 // MCU-managed MBI 5V power supply enable (active-low)
 #define MBI_POWER_ENABLE_PIN C11
-#define MBI_POWER_ACTIVE_STATE LOW
+#define MBI_POWER_ACTIVE_STATE ACTIVE_LOW
 #define MBI_POWER_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
 ```
 
