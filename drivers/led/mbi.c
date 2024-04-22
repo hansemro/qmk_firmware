@@ -35,7 +35,7 @@ typedef struct {
 // mbi_leds[1]: front buffer (sent to MBI)
 static mbi_led_t mbi_leds[2][MBI_LED_COUNT];
 
-void mbi_flush_isr(void) {
+inline void mbi_flush_isr(void) {
     /* disable ROW/COL pins */
     for (int i = 0; i < MBI_NUM_LED_GPIO_PINS; i++) {
 #if (MBI_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
@@ -114,7 +114,7 @@ static GPTConfig mbi_timer_config = {
 };
 
 /* Send 'instr' number of DCLK pulses while LE is asserted high. */
-void mbi_send_instruction(uint8_t instr) {
+void inline mbi_send_instruction(uint8_t instr) {
     writePinLow(MBI_LE_PIN);
     mbi_io_wait;
     writePinHigh(MBI_LE_PIN);
@@ -128,7 +128,7 @@ void mbi_send_instruction(uint8_t instr) {
 }
 
 /* Transmit `shift_amount` bits of `data` to shift-register. */
-void mbi_shift_data(uint16_t data, uint8_t shift_amount) {
+void inline mbi_shift_data(uint16_t data, uint8_t shift_amount) {
     while (shift_amount-- > 0) {
         mbi_io_wait;
         writePinLow(MBI_DCLK_PIN);
@@ -144,7 +144,7 @@ void mbi_shift_data(uint16_t data, uint8_t shift_amount) {
  *
  * Note: Assumes `instr` is less than `shift_amount`.
  */
-void mbi_shift_data_instr(uint16_t data, uint8_t shift_amount, uint8_t instr) {
+void inline mbi_shift_data_instr(uint16_t data, uint8_t shift_amount, uint8_t instr) {
     if (instr < shift_amount) {
         writePinLow(MBI_LE_PIN);
         mbi_shift_data(data, shift_amount - instr);
