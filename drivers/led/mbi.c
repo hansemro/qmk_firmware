@@ -64,7 +64,8 @@ void mbi_flush_isr(void) {
         uint8_t color_ch;
         uint8_t mbi_ch_idx;
         uint8_t led_idx;
-        for (int j = MBI_NUM_DRIVER - 1; j >= 1; j--) {
+        uint16_t color_val;
+        for (int j = MBI_NUM_DRIVER - 1; j >= 0; j--) {
             color_ch = g_mbi_channels[j][i].color_channel;
             mbi_ch_idx = g_mbi_channels[j][i].color_index;
 #if (MBI_LED_DIRECTION == ROW2COL)
@@ -75,50 +76,27 @@ void mbi_flush_isr(void) {
             switch (color_ch) {
 #if (MBI_LED_TYPE == MBI_LED_TYPE_RGB)
                 case MBI_RED_CH:
-                    mbi_shift_data(mbi_leds[1][led_idx].r, MBI_SHIFT_REG_WIDTH);
+                    color_val = mbi_leds[1][led_idx].r;
                     break;
                 case MBI_GREEN_CH:
-                    mbi_shift_data(mbi_leds[1][led_idx].g, MBI_SHIFT_REG_WIDTH);
+                    color_val = mbi_leds[1][led_idx].g;
                     break;
                 case MBI_BLUE_CH:
-                    mbi_shift_data(mbi_leds[1][led_idx].b, MBI_SHIFT_REG_WIDTH);
+                    color_val = mbi_leds[1][led_idx].b;
                     break;
 #elif (MBI_LED_TYPE == MBI_LED_TYPE_MONO)
                 case MBI_MONO_CH:
-                    mbi_shift_data(mbi_leds[1][led_idx].v, MBI_SHIFT_REG_WIDTH);
+                    color_val = mbi_leds[1][led_idx].v;
                     break;
 #endif
                 case MBI_UNUSED_CH:
                 default:
-                    mbi_shift_data(0, MBI_SHIFT_REG_WIDTH);
+                    color_val = 0;
             }
-        }
-        color_ch = g_mbi_channels[0][i].color_channel;
-        mbi_ch_idx = g_mbi_channels[0][i].color_index;
-#if (MBI_LED_DIRECTION == ROW2COL)
-        led_idx = g_mbi_led_matrix_co[led_gpio_idx][mbi_ch_idx];
-#elif (MBI_LED_DIRECTION == COL2ROW)
-        led_idx = g_mbi_led_matrix_co[mbi_ch_idx][led_gpio_idx];
-#endif
-        switch (color_ch) {
-#if (MBI_LED_TYPE == MBI_LED_TYPE_RGB)
-            case MBI_RED_CH:
-                mbi_shift_data_instr(mbi_leds[1][led_idx].r, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
-                break;
-            case MBI_GREEN_CH:
-                mbi_shift_data_instr(mbi_leds[1][led_idx].g, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
-                break;
-            case MBI_BLUE_CH:
-                mbi_shift_data_instr(mbi_leds[1][led_idx].b, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
-                break;
-#elif (MBI_LED_TYPE == MBI_LED_TYPE_MONO)
-            case MBI_MONO_CH:
-                mbi_shift_data_instr(mbi_leds[1][led_idx].v, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
-                break;
-#endif
-            case MBI_UNUSED_CH:
-            default:
-                mbi_shift_data_instr(0, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
+            if (j == 0)
+                mbi_shift_data_instr(color_val, MBI_SHIFT_REG_WIDTH, MBI_DATA_LATCH);
+            else
+                mbi_shift_data(color_val, MBI_SHIFT_REG_WIDTH);
         }
     }
     writePinLow(MBI_SDI_PIN);
