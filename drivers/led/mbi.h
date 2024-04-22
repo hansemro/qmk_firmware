@@ -285,11 +285,13 @@ void mbi_flush(void);
 /* activate row/column pin and update buffers for next row/column */
 void mbi_flush_isr(void);
 
-#define MBI_UNUSED_CH 0
-#define MBI_MONO_CH 1
-#define MBI_RED_CH 1
-#define MBI_GREEN_CH 2
-#define MBI_BLUE_CH 3
+enum mbi_color_ch {
+    MBI_UNUSED_CH,
+    MBI_MONO_CH,
+    MBI_RED_CH,
+    MBI_GREEN_CH,
+    MBI_BLUE_CH,
+};
 
 typedef struct {
     uint8_t color_channel;
