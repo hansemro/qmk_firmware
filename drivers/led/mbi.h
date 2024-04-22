@@ -89,16 +89,16 @@
 #    define MBI_LED_COUNT (MBI_NUM_CHANNELS * MBI_NUM_LED_GPIO_PINS)
 #endif
 
-#ifndef HIGH
-#    define HIGH 1
+#ifndef ACTIVE_HIGH
+#    define ACTIVE_HIGH 1
 #endif
 #ifndef LOW
-#    define LOW 0
+#    define ACTIVE_LOW 0
 #endif
 
 #ifdef MBI_LED_GPIO_ACTIVE_STATE
-#    if (MBI_LED_GPIO_ACTIVE_STATE != HIGH) && (MBI_LED_GPIO_ACTIVE_STATE != LOW)
-#        error "MBI_LED_GPIO_ACTIVE_STATE must be defined to either HIGH or LOW"
+#    if (MBI_LED_GPIO_ACTIVE_STATE != ACTIVE_HIGH) && (MBI_LED_GPIO_ACTIVE_STATE != ACTIVE_LOW)
+#        error "MBI_LED_GPIO_ACTIVE_STATE must be defined to either ACTIVE_HIGH or ACTIVE_LOW"
 #    endif
 #else
 #    error "MBI_LED_GPIO_ACTIVE_STATE is not defined"
@@ -180,8 +180,8 @@
 
 /* (Optional) MCU-managed pin to enable power to MBI */
 #ifdef MBI_POWER_ENABLE_PIN
-#    if !defined(MBI_POWER_ACTIVE_STATE) && (MBI_POWER_ACTIVE_STATE != HIGH) && (MBI_POWER_ACTIVE_STATE != LOW)
-#        error "MBI_POWER_ACTIVE_STATE must be defined to either HIGH or LOW"
+#    if !defined(MBI_POWER_ACTIVE_STATE) && (MBI_POWER_ACTIVE_STATE != ACTIVE_HIGH) && (MBI_POWER_ACTIVE_STATE != ACTIVE_LOW)
+#        error "MBI_POWER_ACTIVE_STATE must be defined to either ACTIVE_HIGH or ACTIVE_LOW"
 #    endif
 #    ifndef MBI_POWER_OUTPUT_MODE
 #        define MBI_POWER_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
