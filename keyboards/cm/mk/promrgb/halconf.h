@@ -6,6 +6,11 @@
 #define HAL_USE_PAL TRUE
 #define HAL_USE_USB TRUE
 
+#ifdef RGB_MATRIX_ENABLE
+#    define HAL_USE_PWM TRUE
+#    define HAL_USE_GPT TRUE
+#endif
+
 #ifdef EEPROM_DRIVER
 #    define HAL_USE_SPI TRUE
 #    define SPI_USE_WAIT TRUE
