@@ -1,5 +1,7 @@
 # Cooler Master MasterKeys Pro S RGB
 
+TODO: remove pok3rtool usage
+
 A TKL keyboard with per-key RGB lighting.
 
 * Keyboard Maintainer: [hansemro](https://github.com/hansemro)
