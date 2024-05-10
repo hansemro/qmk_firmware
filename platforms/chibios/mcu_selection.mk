@@ -812,6 +812,74 @@ ifneq ($(findstring WB32FQ95, $(MCU)),)
   WB32_BOOTLOADER_ADDRESS ?= 0x1FFFE000
 endif
 
+ifneq (,$(filter $(MCU),HT32F1653 HT32F1654))
+  # Cortex version
+  MCU = cortex-m3
+
+  # ARM version, CORTEX-M0/M1 are 6, CORTEX-M3/M4/M7 are 7
+  ARMV = 7
+
+  ## chip/board settings
+  # - the next two should match the directories in
+  #   <chibios[-contrib]>/os/hal/ports/$(MCU_PORT_NAME)/$(MCU_SERIES)
+  #   OR
+  #   <chibios[-contrib]>/os/hal/ports/$(MCU_FAMILY)/$(MCU_SERIES)
+  MCU_FAMILY = HT32
+  MCU_SERIES = HT32F165x
+
+  # Linker script to use
+  # - it should exist either in <chibios>/os/common/ports/ARMCMx/compilers/GCC/ld/
+  #   or <keyboard_dir>/ld/
+  MCU_LDSCRIPT ?= HT32F1654
+
+  # Startup code to use
+  #  - it should exist in <chibios>/os/common/startup/ARMCMx/compilers/GCC/mk/
+  MCU_STARTUP ?= ht32f165x
+
+  # Board: it should exist either in <chibios>/os/hal/boards/,
+  # <keyboard_dir>/boards/, or drivers/boards/
+  BOARD ?= GENERIC_HT32_F1653_4
+
+  USE_FPU ?= no
+
+  # Bootloader address for HT32 DFU
+  HT32_BOOTLOADER_ADDRESS ?= 0x1F000000
+endif
+
+ifneq (,$(filter $(MCU),HT32F52342 HT32F52352))
+  # Cortex version
+  MCU = cortex-m0plus
+
+  # ARM version, CORTEX-M0/M1 are 6, CORTEX-M3/M4/M7 are 7
+  ARMV = 6
+
+  ## chip/board settings
+  # - the next two should match the directories in
+  #   <chibios[-contrib]>/os/hal/ports/$(MCU_PORT_NAME)/$(MCU_SERIES)
+  #   OR
+  #   <chibios[-contrib]>/os/hal/ports/$(MCU_FAMILY)/$(MCU_SERIES)
+  MCU_FAMILY = HT32
+  MCU_SERIES = HT32F523xx
+
+  # Linker script to use
+  # - it should exist either in <chibios>/os/common/ports/ARMCMx/compilers/GCC/ld/
+  #   or <keyboard_dir>/ld/
+  MCU_LDSCRIPT ?= HT32F52352
+
+  # Startup code to use
+  #  - it should exist in <chibios>/os/common/startup/ARMCMx/compilers/GCC/mk/
+  MCU_STARTUP ?= ht32f523xx
+
+  # Board: it should exist either in <chibios>/os/hal/boards/,
+  # <keyboard_dir>/boards/, or drivers/boards/
+  BOARD ?= GENERIC_HT32_F52342_52
+
+  USE_FPU ?= no
+
+  # Bootloader address for HT32 DFU
+  HT32_BOOTLOADER_ADDRESS ?= 0x1F000000
+endif
+
 ifneq ($(findstring GD32VF103, $(MCU)),)
   # RISC-V
   MCU = risc-v
