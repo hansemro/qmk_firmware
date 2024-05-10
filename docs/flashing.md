@@ -299,6 +299,33 @@ Flashing sequence:
 3. Flash a .bin file
 4. Reset the device into application mode (may be done automatically)
 
+## HT32 ISP DFU
+
+Many HT32 MCUs come preloaded with a factory USB bootloader that cannot be modified nor deleted.
+
+To ensure compatibility with the HT32-DFU bootloader, make sure this block is present in your `rules.mk`:
+
+```make
+# Bootloader selection
+BOOTLOADER = ht32-dfu
+```
+
+Compatible flashers:
+
+* [ht32-dfu](https://github.com/hansemro/ht32-dfu-tool) / `:flash` target in QMK (recommended command line)
+  ```
+  ht32-dfu-tool --wait --reset write --verify 0 <filename>
+  ```
+
+Flashing sequence:
+
+1. Enter the bootloader using any of the following methods:
+    * Tap the `QK_BOOT` keycode
+    * Otherwise, you need to short `BOOT1` (or `BOOT` if not numbered) to GND (via `BOOT1`/`BOOT` button or jumper), short `RESET` to GND (via `RESET` button or jumper), and then let go of the `BOOT1` bridge
+2. Wait for the OS to detect the device
+3. Flash a .bin file
+4. Reset the device into application mode (may be done automatically)
+
 ## Kiibohd DFU
 
 Keyboards produced by Input Club use NXP Kinetis microcontrollers rather than STM32, and come with their own [custom bootloader](https://github.com/kiibohd/controller/tree/master/Bootloader), however the process and protocol is largely the same.
