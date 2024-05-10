@@ -57,6 +57,13 @@ You can also use any ARM chip with USB that [ChibiOS](https://www.chibios.org) s
  * [WB32F3G71xx](http://www.westberrytech.com)
  * [WB32FQ95xx](http://www.westberrytech.com)
 
+### Holtek (HT32)
+
+* [HT32F1653](https://web.archive.org/web/20191230160134/https://www.holtek.com/productdetail/-/vg/HT32F1653_1654)
+* [HT32F1654](https://web.archive.org/web/20191230160134/https://www.holtek.com/productdetail/-/vg/HT32F1653_1654)
+* [HT32F52342](https://web.archive.org/web/20190301180837/http://www.holtek.com/productdetail/-/vg/HT32F52342-52)
+* [HT32F52352](https://web.archive.org/web/20190301180837/http://www.holtek.com/productdetail/-/vg/HT32F52342-52)
+
 ### NXP (Kinetis)
 
  * [MKL26Z64](https://www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/general-purpose-mcus/kl-series-cortex-m0-plus/kinetis-kl2x-72-96-mhz-usb-ultra-low-power-microcontrollers-mcus-based-on-arm-cortex-m0-plus-core:KL2x)
