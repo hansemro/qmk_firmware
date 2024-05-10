@@ -23,6 +23,23 @@ define EXEC_DFU_UTIL
 	$(DFU_UTIL) $(DFU_ARGS) -D $(BUILD_DIR)/$(TARGET).bin
 endef
 
+HT32_DFU_TOOL ?= ht32-dfu-tool
+HT32_DFU_TOOL_WRITE_ADDR ?= 0x0
+
+define EXEC_HT32_DFU_TOOL
+	if ! $(HT32_DFU_TOOL) list | grep -q "Device"; then \
+		printf "$(MSG_BOOTLOADER_NOT_FOUND_QUICK_RETRY)" ;\
+		sleep $(BOOTLOADER_RETRY_TIME) ;\
+		while ! $(HT32_DFU_TOOL) list | grep -q "Device"; do \
+			printf "." ;\
+			sleep $(BOOTLOADER_RETRY_TIME) ;\
+		done ;\
+		printf "\n" ;\
+	fi
+	$(HT32_DFU_TOOL) info
+	$(HT32_DFU_TOOL) -r write $(HT32_DFU_TOOL_WRITE_ADDR) $(BUILD_DIR)/$(TARGET).bin
+endef
+
 WB32_DFU_UPDATER ?= wb32-dfu-updater_cli
 
 define EXEC_WB32_DFU_UPDATER
@@ -113,6 +130,8 @@ else ifeq ($(strip $(MCU_FAMILY)),STM32)
 	$(UNSYNC_OUTPUT_CMD) && $(call EXEC_DFU_UTIL)
 else ifeq ($(strip $(MCU_FAMILY)),WB32)
 	$(UNSYNC_OUTPUT_CMD) && $(call EXEC_WB32_DFU_UPDATER)
+else ifeq ($(strip $(MCU_FAMILY)),HT32)
+	$(UNSYNC_OUTPUT_CMD) && $(call EXEC_HT32_DFU_TOOL)
 else ifeq ($(strip $(MCU_FAMILY)),GD32V)
 	$(UNSYNC_OUTPUT_CMD) && $(call EXEC_DFU_UTIL)
 else
