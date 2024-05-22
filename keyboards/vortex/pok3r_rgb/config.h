@@ -4,14 +4,9 @@
 
 #pragma once
 
-#include "pin_defs.h"
-
-// Bootmagic key on Esc
-// See info.json
+#include_next <config.h>
 
 #define MATRIX_IO_DELAY 0
-
-//#define FORCE_NKRO
 
 #ifdef EEPROM_DRIVER
 // SPI Flash
@@ -29,3 +24,23 @@
 #    define SPI_MISO_PIN B9
 #    define SPI_CS_PIN B10
 #endif
+
+/* MCU -> MBIA_R -> MBIA_G -> MBIA_B -> MCU */
+#define MBIA043_NUM_CASCADE 2 /* one MBIA IC for each color channel */
+/* MBIA pins */
+#define MBIA043_GCLK_PIN C0
+#define MBIA043_DCLK_PIN A14
+#define MBIA043_SDI_PIN C2 /* data sent to first MBIA from MCU */
+#define MBIA043_SDO_PIN B0 /* data sent to MCU from last MBIA */
+#define MBIA043_LE_PIN A15
+/* MBIA 5V power enable */
+#define MBIA043_HAS_POWER_PIN
+/* 5V supply to MBIA ICs is enabled when C1 is low */
+#define MBIA043_PWRCTRL_PIN C1
+
+/* LED COL GPIO Pins */
+#define LED_COL_PINS \
+    { C8, C7, B5, B4, B3, B2, C6, C5 }
+
+#define MBIA043_CONFIGURATION \
+    { 0xc, 0xc }

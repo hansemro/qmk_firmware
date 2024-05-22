@@ -2,8 +2,8 @@
     "manufacturer": "Vortex",
     "keyboard_name": "POK3R RGB",
     "maintainer": "hansemro",
-    "board": "CYKB167_D_V03",
-    "bootloader": "custom",
+    "board": "GENERIC_HT32_F1653_4",
+    "bootloader": "ht32-dfu",
     "bootmagic": {
         "matrix": [0, 0]
     },
@@ -40,7 +40,7 @@
         "cols": ["C9", "A5", "A6", "A7", "C11", "C13", "C14", "C15"],
         "rows": ["C4", "B6", "D0", "B11", "A11", "A0", "A1", "A2", "A3", "A4"]
     },
-    "processor": "cortex-m3",
+    "processor": "HT32F1654",
     "rgb_matrix": {
         "animations": {
             "alphas_mods": true,

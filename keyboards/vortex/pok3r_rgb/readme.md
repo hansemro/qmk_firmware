@@ -18,122 +18,69 @@ Hardware details:
 * GigaDevice 25Q41BT 4 Mibit SPI flash
 * Mini-USB port
 
-## Warning: Flashing QMK to locked HT32 will brick your keyboard
-
-From the factory, the HT32 processor comes with flash protection and debug security enabled. These protections need to be disabled to boot QMK without lockups and leaving the keyboard unresponsive.
-
-* See here for more information on [unlocking HT32 MCU](https://github.com/pok3r-custom/pok3r_re_firmware/wiki/HT32-Unlocking).
-* See section below for [unlocking/unbricking](#UnlockingUnbricking)
-* See here for [unlocking with Raspberry Pi 4](https://github.com/mateuszradomski/re-masterkeys/issues/1#issuecomment-1143137173).
-
 ## How to compile
 
 Make example for this keyboard (after setting up your build environment):
 
-```bash
-make vortex/pok3r_rgb:<keymap>
-```
+    make vortex/pok3r_rgb:default
 
-## Installing (on unlocked keyboard)
+> [!WARNING]
+> Flashing onto keyboard with flash security may result in a soft brick. The following example will
+> only work after a mass erase to clear flash page protection and flash security. See section below
+> on [unlocking/unbricking](#UnlockingUnbricking) for steps to mass erase and flash QMK.
 
-### Building pok3rtool
+Flashing example for **unlocked** keyboard:
 
-`pok3rtool` interfaces with the keyboard while running stock bootloader or stock application firmware. Rebooting to bootloader mode will be necessary for upgrading QMK over USB or returning to stock firmware.
+    make vortex/pok3r_rgb:default:flash
 
-```bash
-git clone https://github.com/pok3r-custom/pok3rtool.git --recursive
-cd pok3rtool
-mkdir build
-cd build
-cmake ..
-make
-```
-
-### Flashing the firmware
-
-Flash QMK firmware with pok3rtool (use appropriate path to firmware binary):
-
-```bash
-pok3rtool -t pok3r_rgb flash V1.03.01 vortex_pok3r_rgb_<keymap>.bin
-```
+See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_tools) and the [make instructions](https://docs.qmk.fm/#/getting_started_make_guide) for more information. Brand new to QMK? Start with our [Complete Newbs Guide](https://docs.qmk.fm/#/newbs).
 
 ## Unlocking/Unbricking
 
-The process of unlocking the HT32 processor involves a flash mass erase procedure followed by restoring the stock IAP bootloader.
+The process of unlocking the HT32 processor involves a flash mass erase procedure. The simplest
+method involves booting to In-System Programming (ISP) mode and using `ht32-dfu-tool`.
 
-Of the two methods available to unlock the processor, the ISP method is recommended as it does not require a JTAG debugger.
-
-### with ISP/Pin-Shorting Method (Recommended)
+### with ISP/Pin-Shorting Method
 
 #### Building and Using ht32-dfu-tool
 
+1. Install latest stable rust toolchain and libusb library with headers.
+
+2. Install `ht32-dfu-tool` with cargo from upstream git repo:
+
 ```bash
-git clone https://github.com/hansemro/ht32-dfu-tool.git
-cd ht32-dfu-tool
-cargo build -r
+cargo install --git https://github.com/hansemro/ht32-dfu-tool
 ```
 
-Short the SEL2 pins on the back of the PCB together then plug in the USB cable. Leave the pins shorted until IAP bootloader is flashed.
+3. Short the SEL3 pins on the back of the PCB together then plug in the keyboard.
 
-If successful, the keyboard should be detected by `ht32-dfu-tool`:
+If successful, the keyboard should boot to ISP and be detected by `ht32-dfu-tool`:
 
 ```bash
-$ ./target/release/ht32-dfu-tool list
+$ ht32-dfu-tool list
 Device 0: [04d9:8010] Model=HT32F1654 Bus=3 Port=4 Addr=66
 ```
 
-Flash [stock USB IAP bootloader](https://github.com/pok3r-custom/pok3r_re_firmware/raw/master/disassemble/pok3r_rgb/builtin_rgb/firmware_builtin_rgb.bin):
+4. With the SEL3 pins shorted, flash QMK binary firmware with mass-erase flag (`-m`).
+
+> [!NOTE]
+> A reset is performed after mass erase, so keep SEL3 pins shorted to re-enter ISP.
+
+> [!WARNING]
+> Mass erase will erase stock In-Application (IAP) bootloader and firmware, so proceed at your own
+> risk.
 
 ```bash
-./target/release/ht32-dfu-tool -w -r write -m -v 0 ./firmware_builtin_rgb.bin
+$ ht32-dfu-tool -w -r write -m 0 /path/to/vortex_pok3r_rgb_default.bin
 ```
 
-Keyboard should now be detected in IAP bootloader mode by `pok3rtool`:
+If successful, the keyboard should be unlocked and reboot into QMK.
 
-```bash
-$ pok3rtool list
-List Devices...
-Vortex POK3R RGB: CLEARED
-```
-
-### with SWD Debugger and OpenOCD
-
-Mass erase with [openocd fork with HT32 support](https://github.com/hansemro/openocd-ht32/tree/ht32f165x-dev):
-
-```
-> halt; ht32f165x mass_erase 0; reset halt
-```
-
-Flash [stock USB IAP bootloader](https://github.com/pok3r-custom/pok3r_re_firmware/raw/master/disassemble/pok3r_rgb/builtin_rgb/firmware_builtin_rgb.bin):
-
-```
-> flash write_image ./firmware_builtin_rgb.bin 0; reset
-```
-
-Keyboard should now be detected in IAP bootloader mode by pok3rtool:
-
-```bash
-$ pok3rtool list
-List Devices...
-Vortex POK3R RGB: CLEARED
-```
-
-## Entering IAP bootloader
+## Entering ISP bootloader
 
 Enter the bootloader in 4 ways:
 
 * **Bootmagic reset**: Hold down the `Esc` key and plug in the keyboard
 * **Keycode in layout**: Press the key mapped to `QK_BOOT` if it is available
 * **Jump to bootloader via Magic command**: With Command enabled, press `LShift+RShift+B` or `LShift+RShift+Esc`
-* **Wipe and reflash bootloader**: See [here](#UnlockingUnbricking)
-
-## Rebooting to FW from IAP bootloader
-
-Use pok3rtool to reboot keyboard back to application (AP) firmware:
-
-```
-$ pok3rtool -t pok3r_rgb reboot
-Opened Vortex POK3R RGB
-Reset to Firmware
-true
-```
+* **Configure BOOT1 pin and reset**: Short `SEL3` header pins together (with a tweezer) and plug in the keyboard
