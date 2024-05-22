@@ -12,6 +12,7 @@
     },
     "diode_direction": "COL2ROW",
     "dip_switch": {
+        "enabled": true,
         "matrix_grid": [
             [9, 0],
             [9, 1],
