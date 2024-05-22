@@ -25,22 +25,56 @@
 #    define SPI_CS_PIN B10
 #endif
 
-/* MCU -> MBIA_R -> MBIA_G -> MBIA_B -> MCU */
-#define MBIA043_NUM_CASCADE 2 /* one MBIA IC for each color channel */
-/* MBIA pins */
-#define MBIA043_GCLK_PIN C0
-#define MBIA043_DCLK_PIN A14
-#define MBIA043_SDI_PIN C2 /* data sent to first MBIA from MCU */
-#define MBIA043_SDO_PIN B0 /* data sent to MCU from last MBIA */
-#define MBIA043_LE_PIN A15
-/* MBIA 5V power enable */
-#define MBIA043_HAS_POWER_PIN
-/* 5V supply to MBIA ICs is enabled when C1 is low */
-#define MBIA043_PWRCTRL_PIN C1
+// MBIA043 (at 5V)
+#define MBI_NUM_CHANNELS 16
+#define MBI_SHIFT_REG_WIDTH 10
+#define MBI_DATA_LATCH 1
+#define MBI_GLOBAL_LATCH 2
+#define MBI_WRITE_CONFIGURATION 8
+#define MBI_ENABLE_WRITE_CONFIGURATION 18
 
-/* LED COL GPIO Pins */
-#define LED_COL_PINS \
+// MBI configuration
+#define MBI_CONFIGURATION 0xc
+
+#define MBI_NUM_DRIVER 2
+// Insert no-ops to meet timing requirements
+//#define MBI_NOPS 2
+
+// PWM to generate GCLK clock signal
+// Desired output/GCLK frequency =  3.6 MHz
+#define MBI_PWM_DRIVER PWMD_GPTM1
+#define MBI_PWM_CHANNEL 0
+#define MBI_PWM_OUTPUT_MODE PWM_OUTPUT_ACTIVE_LOW
+//#define MBI_PWM_COUNTER_FREQUENCY (3600000UL * 2)
+//#define MBI_PWM_PERIOD 2UL
+
+// MBI timer for flushing color data for a single row
+#define MBI_TIMER_DRIVER GPTD_BFTM0
+// Default: 120 Hz LED refresh rate
+// #define MBI_TIMER_PERIOD 2UL
+// #define MBI_TIMER_COUNTER_FREQUENCY (120UL * MBI_NUM_LED_GPIO_PINS * MBI_TIMER_PERIOD)
+
+// MCU manages column pins; MBI's manage row pins
+#define MBI_LED_DIRECTION COL2ROW
+// MCU-managed LED column pins
+#define MBI_LED_GPIO_PINS \
     { C8, C7, B5, B4, B3, B2, C6, C5 }
+#define MBI_NUM_LED_GPIO_PINS 8
+#define MBI_LED_GPIO_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_LED_GPIO_ACTIVE_STATE ACTIVE_LOW
 
-#define MBIA043_CONFIGURATION \
-    { 0xc, 0xc }
+// MCU-managed MBI pins
+// These pins connect to pull-up resistor to 5V, so use open-drain.
+#define MBI_LE_PIN A15
+#define MBI_LE_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_SDI_PIN C2
+#define MBI_SDI_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_DCLK_PIN A14
+#define MBI_DCLK_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
+#define MBI_GCLK_PIN C0
+#define MBI_GCLK_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_TM))
+
+// MCU-managed MBI 5V power supply enable (active-low)
+#define MBI_POWER_ENABLE_PIN C1
+#define MBI_POWER_ACTIVE_STATE ACTIVE_LOW
+#define MBI_POWER_OUTPUT_MODE (PAL_MODE_OUTPUT_OPENDRAIN | PAL_MODE_HT32_AF(AFIO_GPIO))
