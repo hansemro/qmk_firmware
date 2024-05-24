@@ -1,0 +1,47 @@
+{
+    "manufacturer": "Vortex",
+    "maintainer": "hansemro",
+    "board": "GENERIC_HT32_F1653_4",
+    "bootloader": "ht32-dfu",
+    "bootmagic": {
+        "matrix": [0, 0]
+    },
+    "build": {
+        "firmware_format": "bin"
+    },
+    "diode_direction": "COL2ROW",
+    "dip_switch": {
+        "enabled": true,
+        "matrix_grid": [
+            [9, 0],
+            [9, 1],
+            [9, 2],
+            [9, 3]
+        ]
+    },
+    "eeprom": {
+        "driver": "wear_leveling",
+        "wear_leveling": {
+            "backing_size": 8192,
+            "driver": "spi_flash"
+        }
+    },
+    "features": {
+        "bootmagic": true,
+        "command": true,
+        "console": false,
+        "extrakey": true,
+        "mousekey": false,
+        "nkro": true,
+        "rgb_matrix": false
+    },
+    "matrix_pins": {
+        "cols": ["C9", "A5", "A6", "A7", "C11", "C13", "C14", "C15"],
+        "rows": ["C4", "B6", "D0", "B11", "A11", "A0", "A1", "A2", "A3", "A4"]
+    },
+    "processor": "HT32F1654",
+    "usb": {
+        "device_version": "1.0.0",
+        "vid": "0x04D9"
+    }
+}
