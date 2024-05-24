@@ -33,13 +33,17 @@
         "extrakey": true,
         "mousekey": false,
         "nkro": true,
-        "rgb_matrix": false
+        "rgb_matrix": true
     },
     "matrix_pins": {
         "cols": ["C9", "A5", "A6", "A7", "C11", "C13", "C14", "C15"],
         "rows": ["C4", "B6", "D0", "B11", "A11", "A0", "A1", "A2", "A3", "A4"]
     },
     "processor": "HT32F1654",
+    "rgb_matrix": {
+        "driver": "mbi",
+        "sleep": true
+    },
     "usb": {
         "device_version": "1.0.0",
         "vid": "0x04D9"

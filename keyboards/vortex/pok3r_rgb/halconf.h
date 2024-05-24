@@ -13,6 +13,11 @@
 #    define SPI_SELECT_MODE SPI_SELECT_MODE_PAD
 #endif
 
+#ifdef RGB_MATRIX_ENABLE
+#    define HAL_USE_GPT TRUE
+#    define HAL_USE_PWM TRUE
+#endif
+
 #define SERIAL_USB_BUFFERS_SIZE 256
 
 #include_next <halconf.h>
