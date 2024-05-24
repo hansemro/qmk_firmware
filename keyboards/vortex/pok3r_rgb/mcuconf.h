@@ -15,3 +15,13 @@
 #    undef HT32_SPI_USE_SPI1
 #    define HT32_SPI_USE_SPI1 TRUE
 #endif
+
+#ifdef RGB_MATRIX_ENABLE
+// PWM
+#    undef HT32_PWM_USE_GPTM1
+#    define HT32_PWM_USE_GPTM1 TRUE
+
+// GPT
+#    undef HT32_GPT_USE_BFTM0
+#    define HT32_GPT_USE_BFTM0 TRUE
+#endif
