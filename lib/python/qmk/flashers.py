@@ -190,6 +190,15 @@ def _flash_wb32_dfu_updater(file):
     cli.run([cmd, '-t', '-s', '0x08000000', '-D', file], capture_output=False)
 
 
+def _flash_ht32_dfu_tool(file):
+    if shutil.which('ht32-dfu-tool'):
+        cmd = 'ht32-dfu-tool'
+    else:
+        return True
+
+    cli.run([cmd, '-w', 'write' '-v', '0x0', file], capture_output=False)
+
+
 def _flash_isp(mcu, programmer, file):
     programmer = 'usbasp' if programmer == 'usbasploader' else 'usbtiny'
     # Check if the provided mcu has an avrdude-specific name, otherwise pass on what the user provided
@@ -231,6 +240,9 @@ def flasher(mcu, file):
     elif bl == 'wb32-dfu':
         if _flash_wb32_dfu_updater(file):
             return (True, "Please make sure 'wb32-dfu-updater_cli' is available on your system.")
+    elif bl == 'ht32-dfu':
+        if _flash_ht32_dfu_tool(file):
+            return (True, "Please make sure 'ht32-dfu-tool' is available on your system.")
     elif bl == 'usbasploader' or bl == 'usbtinyisp':
         if mcu:
             _flash_isp(mcu, bl, file)
