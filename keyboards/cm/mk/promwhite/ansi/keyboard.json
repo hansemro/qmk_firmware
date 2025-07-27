@@ -1,0 +1,8 @@
+{
+    "keyboard_name": "MasterKeys Pro M White ANSI",
+    "maintainer": "hansemro",
+    "usb": {
+        "device_version": "1.0.0",
+        "pid": "0x004A"
+    }
+}
