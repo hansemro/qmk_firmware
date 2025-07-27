@@ -1,0 +1,7 @@
+{
+    "keyboard_name": "MasterKeys Pro L RGB ANSI",
+    "maintainer": "hansemro",
+    "usb": {
+        "pid": "0x003B"
+    }
+}
