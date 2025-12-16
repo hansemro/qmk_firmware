@@ -1,0 +1,263 @@
+// Copyright (c) 2024 Hansem Ro <hansemro@outlook.com>
+// Copyright 2025 HorrorTroll <https://github.com/HorrorTroll>
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+#pragma once
+
+/*
+ * LED or RGB Matrix driver for MY-SEMI MY937X LED drivers with proprietary
+ * SPI-like control interface using PWM for GCK and General Purpose Timer
+ * (GPT) for flushing color data.
+ *
+ * This driver can support the following MY-SEMI families:
+ * - MY937X
+ *
+ * Although MY937X parts may have two or more instructions, this driver will only
+ * require the Data Latch and Global Latch instructions. MBI instructions to
+ * write to configuration register is made optional for MBI parts without a
+ * (documented) configuration register (such as MBIA043).
+ *
+ * This driver does not pre-define instructions or configuration settings.
+ */
+
+#include <stdint.h>
+#include "gpio.h"
+
+/* number of output channels of a single MY937X */
+#ifndef MY937X_NUM_CHANNELS
+#    error "MY937X_NUM_CHANNELS is not defined"
+#endif
+
+/* width of a single MY937X's shift register in bits */
+#ifndef MY937X_SHIFT_REG_WIDTH
+#    error "MY937X_SHIFT_REG_WIDTH is not defined"
+#else
+#    if (MY937X_SHIFT_REG_WIDTH >= 16) && (MY937X_SHIFT_REG_WIDTH <= 32)
+/* used for sampling most significant bit */
+#        define MY937X_SHIFT_REG_MSB_MASK (1U << (MY937X_SHIFT_REG_WIDTH - 1))
+#    else
+#        error "MY937X_SHIFT_REG_WIDTH must be between 16 and 32 (bits)"
+#    endif
+#endif
+
+/* number of MY937X(s) */
+#ifndef MY937X_NUM_DRIVER
+#    error "MY937X_NUM_DRIVER is not defined"
+#endif
+
+/* RGB or Grayscale (mono) LEDs */
+#define MY937X_LED_TYPE_MONO 0
+#define MY937X_LED_TYPE_RGB 1
+
+/* Select between Mono or RGB type driver */
+#ifdef MY937X_LED_TYPE
+#    if (MY937X_LED_TYPE != MY937X_LED_TYPE_RGB) && (MY937X_LED_TYPE != MY937X_LED_TYPE_MONO)
+#        error "MY937X_LED_TYPE is not defined to either MY937X_LED_TYPE_RGB or MY937X_LED_TYPE_MONO"
+#    endif
+#else
+#    error "MY937X_LED_TYPE is not defined to either MY937X_LED_TYPE_RGB or MY937X_LED_TYPE_MONO"
+#endif
+
+/* LED matrix directions:
+ * - COL2ROW: from MCU-managed column pins to MY937X-managed row pins
+ * - ROW2COL: from MCU-managed row pins to MY937X-managed column pins
+ */
+#ifndef COL2ROW
+#    define COL2ROW 0
+#endif
+#ifndef ROW2COL
+#    define ROW2COL 1
+#endif
+
+#ifndef MY937X_LED_DIRECTION
+#    error "MY937X_LED_DIRECTION is not defined to either ROW2COL or COL2ROW"
+#endif
+
+/* MCU-managed row/column LED pins */
+#ifndef MY937X_LED_GPIO_PINS
+#    error "MY937X_LED_GPIO_PINS is not defined with an array of pins"
+#endif
+
+#ifndef MY937X_LED_GPIO_OUTPUT_MODE
+#    define MY937X_LED_GPIO_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
+#endif
+
+#ifndef MY937X_NUM_LED_GPIO_PINS
+#    error "MY937X_NUM_LED_GPIO_PINS is not defined"
+#else
+#    define MY937X_LED_COUNT (MY937X_NUM_CHANNELS * MY937X_NUM_LED_GPIO_PINS)
+#endif
+
+#ifndef ACTIVE_HIGH
+#    define ACTIVE_HIGH 1
+#endif
+#ifndef ACTIVE_LOW
+#    define ACTIVE_LOW 0
+#endif
+
+#ifdef MY937X_LED_GPIO_ACTIVE_STATE
+#    if (MY937X_LED_GPIO_ACTIVE_STATE != ACTIVE_HIGH) && (MY937X_LED_GPIO_ACTIVE_STATE != ACTIVE_LOW)
+#        error "MY937X_LED_GPIO_ACTIVE_STATE must be defined to either ACTIVE_HIGH or ACTIVE_LOW"
+#    endif
+#else
+#    error "MY937X_LED_GPIO_ACTIVE_STATE is not defined"
+#endif
+
+/* PWM driver to use for generating GCLK clock signal */
+#ifndef MY937X_PWM_DRIVER
+#    error "MY937X_PWM_DRIVER is not defined"
+#endif
+
+#ifndef MY937X_PWM_CHANNEL
+#    error "MY937X_PWM_CHANNEL is not defined"
+#endif
+
+#ifndef MY937X_PWM_OUTPUT_MODE
+#    define MY937X_PWM_OUTPUT_MODE PWM_OUTPUT_ACTIVE_LOW
+#endif
+
+/* PWM period in counter ticks >= 2 */
+#ifndef MY937X_PWM_PERIOD
+#    define MY937X_PWM_PERIOD 8UL
+#endif
+
+/* PWM counter frequency in Hz = desired GCK frequency * MY937X_PWM_PERIOD */
+#ifndef MY937X_PWM_COUNTER_FREQUENCY
+/* default: 4 MHz GCK */
+#    define MY937X_PWM_COUNTER_FREQUENCY 144000000UL
+#endif
+
+/* GPT timer driver to use for continuous row/column pin cycling and data flushing */
+#ifndef MY937X_GPT_DRIVER
+#    error "MY937X_GPT_DRIVER is not defined"
+#endif
+
+/* Timer period in counter ticks >= 2 */
+#ifndef MY937X_GPT_PERIOD
+#    define MY937X_GPT_PERIOD 2UL
+#endif
+
+/* Timer counter frequency in Hz = desired LED refresh rate * MY937X_NUM_LED_GPIO_PINS * MY937X_GPT_PERIOD */
+#ifndef MY937X_GPT_COUNTER_FREQUENCY
+/* default: 120 Hz LED refresh rate */
+#    define MY937X_GPT_COUNTER_FREQUENCY (120UL * MY937X_NUM_LED_GPIO_PINS * MY937X_GPT_PERIOD)
+#endif
+
+/* MY937X pins config */
+#ifndef MY937X_LAT_PIN
+#    error "MY937X_LAT_PIN is not defined"
+#endif
+
+#ifndef MY937X_LAT_OUTPUT_MODE
+#    define MY937X_LAT_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
+#endif
+
+#ifndef MY937X_SDI_PIN
+#    error "MY937X_SDI_PIN is not defined"
+#endif
+
+#ifndef MY937X_SDI_OUTPUT_MODE
+#    define MY937X_SDI_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
+#endif
+
+#ifndef MY937X_DCK_PIN
+#    error "MY937X_DCK_PIN is not defined"
+#endif
+
+#ifndef MY937X_DCK_OUTPUT_MODE
+#    define MY937X_DCK_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
+#endif
+
+#ifndef MY937X_GCK_PIN
+#    error "MY937X_GCK_PIN is not defined"
+#endif
+
+#ifndef MY937X_GCK_OUTPUT_MODE
+#    define MY937X_GCK_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
+#endif
+
+/* (Optional) MCU-managed pin to enable power to MY937X */
+#ifdef MY937X_POWER_ENABLE_PIN
+#    if !defined(MY937X_POWER_ACTIVE_STATE) && (MY937X_POWER_ACTIVE_STATE != ACTIVE_HIGH) && (MY937X_POWER_ACTIVE_STATE != ACTIVE_LOW)
+#        error "MY937X_POWER_ACTIVE_STATE must be defined to either ACTIVE_HIGH or ACTIVE_LOW"
+#    endif
+#    ifndef MY937X_POWER_OUTPUT_MODE
+#        define MY937X_POWER_OUTPUT_MODE PAL_MODE_OUTPUT_PUSHPULL
+#    endif
+#endif
+
+/* Insert nop delays to operate under 20MHz */
+#ifndef MY937X_NOPS
+#    if defined(__AVR__)
+#        define MY937X_NOPS 0 // AVR at 16 MHz already spends 62.5 ns per clock, so no extra delay is needed
+#    elif defined(PROTOCOL_CHIBIOS)
+#        include "hal.h"
+#        include "chibios_config.h"
+#        if defined(AT32F415)
+#            define MY937X_NOPS ((50 + MY937X_NOPS_PER_LOOP - 1) / MY937X_NOPS_PER_LOOP) // This calculates how many loops of 3 nops to run to delay 50 ns
+#            define MY937X_NOPS_PER_LOOP (1000000000L / (CPU_CLOCK / 3))
+#        else
+#            error MY937X_NOPS configuration required
+#            define MY937X_NOPS 0 // this just pleases the compile so the above error is easier to spot
+#        endif
+#    endif
+#endif
+
+#define my937x_io_wait                          \
+    do {                                        \
+        for (int i = 0; i < MY937X_NOPS; i++) { \
+            __asm__ volatile("nop\n\t"          \
+                             "nop\n\t"          \
+                             "nop\n\t");        \
+        }                                       \
+    } while (0)
+
+void my937x_sdi_bit(uint8_t bit);
+void my937x_send_32bits(uint32_t word);
+void my937x_send_16bits(uint16_t word);
+
+/* Send 'instr' number of DCK pulses. */
+void my937x_dck_instruction(uint8_t instr);
+
+void my937x_frame_instruction(void);
+
+/* Write val to each MY937X configuration register. */
+void my937x_write_command_data(void);
+
+void my937x_gck_segment_config(uint32_t cmd, uint16_t *segment_pulses, uint16_t *segments_per_frame);
+void extract_scan_count(uint32_t cmd, uint8_t *scan_count);
+void my937x_write_scan_segment(uint16_t scan_line[MY937X_NUM_DRIVER][MY937X_NUM_CHANNELS]);
+
+/* initialize my937x driver(s) */
+void my937x_init_pins(void);
+void my937x_init_command_data(void);
+void my937x_init_pwm(void);
+void my937x_init_gpt(void);
+
+void my937x_flush_isr(void);
+
+enum my937x_color_ch {
+    MY937X_UNUSED_CH,
+    MY937X_MONO_CH,
+    MY937X_RED_CH,
+    MY937X_GREEN_CH,
+    MY937X_BLUE_CH,
+};
+
+typedef struct {
+    uint8_t color_channel;
+    uint8_t color_index; // MY937X ROW/COL index for the color channel
+} my937x_channel_t;
+
+/* Output channel to color channel mapping */
+extern const my937x_channel_t g_my937x_channels[MY937X_NUM_DRIVER][MY937X_NUM_CHANNELS];
+
+/* LED Matrix to LED Index */
+#if (MY937X_LED_DIRECTION == ROW2COL)
+extern const uint8_t g_my937x_led_matrix_co[MY937X_NUM_LED_GPIO_PINS][MY937X_NUM_CHANNELS];
+#elif (MY937X_LED_DIRECTION == COL2ROW)
+extern const uint8_t g_my937x_led_matrix_co[MY937X_NUM_CHANNELS][MY937X_NUM_LED_GPIO_PINS];
+#endif
+
+/* LED row/column pins */
+extern pin_t g_my937x_led_pins[MY937X_NUM_LED_GPIO_PINS];

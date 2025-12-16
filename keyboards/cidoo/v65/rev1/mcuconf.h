@@ -5,6 +5,12 @@
 
 #include_next <mcuconf.h>
 
+#undef AT32_GPT_USE_TMR3
+#define AT32_GPT_USE_TMR3 TRUE
+
+#undef AT32_PWM_USE_TMR1
+#define AT32_PWM_USE_TMR1 TRUE
+
 #undef AT32_SPI_USE_SPI2
 #define AT32_SPI_USE_SPI2 TRUE
 
