@@ -28,18 +28,6 @@
 #    error "MY937X_NUM_CHANNELS is not defined"
 #endif
 
-/* width of a single MY937X's shift register in bits */
-#ifndef MY937X_SHIFT_REG_WIDTH
-#    error "MY937X_SHIFT_REG_WIDTH is not defined"
-#else
-#    if (MY937X_SHIFT_REG_WIDTH >= 16) && (MY937X_SHIFT_REG_WIDTH <= 32)
-/* used for sampling most significant bit */
-#        define MY937X_SHIFT_REG_MSB_MASK (1U << (MY937X_SHIFT_REG_WIDTH - 1))
-#    else
-#        error "MY937X_SHIFT_REG_WIDTH must be between 16 and 32 (bits)"
-#    endif
-#endif
-
 /* number of MY937X(s) */
 #ifndef MY937X_NUM_DRIVER
 #    error "MY937X_NUM_DRIVER is not defined"

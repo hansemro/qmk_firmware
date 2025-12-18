@@ -44,21 +44,12 @@ inline void my937x_flush_isr(void) {
     uint8_t scan_count;
     extract_scan_count(MY937X_COMMAND_DATA, &scan_count);
 
-    /* Disable ROW/COL pins */
-    for (int i = 0; i < MY937X_NUM_LED_GPIO_PINS; i++) {
-#if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
-        gpio_write_pin_high(g_my937x_led_pins[i]);
-#else
-        gpio_write_pin_low(g_my937x_led_pins[i]);
-#endif
-    }
-
     for (int i = 0; i < scan_count; i++) {
         /* Enable ROW/COL pins */
 #if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
-        gpio_write_pin_low(g_my937x_led_pins[led_gpio_idx]);
-#else
         gpio_write_pin_high(g_my937x_led_pins[led_gpio_idx]);
+#else
+        gpio_write_pin_low(g_my937x_led_pins[led_gpio_idx]);
 #endif
 
         led_gpio_idx += 1;
@@ -98,16 +89,16 @@ inline void my937x_flush_isr(void) {
                     default:
                         color_val = 0;
                 }
-
-                my937x_send_16bits(color_val);
             }
-        }
-    }
 
-    gpio_write_pin_high(MY937X_LAT_PIN);
-    my937x_io_wait;
-    gpio_write_pin_low(MY937X_LAT_PIN);
-    my937x_io_wait;
+            my937x_send_16bits(color_val);
+        }
+
+        gpio_write_pin_high(MY937X_LAT_PIN);
+        my937x_io_wait;
+        gpio_write_pin_low(MY937X_LAT_PIN);
+        my937x_io_wait;
+    }
 }
 
 static void my937x_gpt_flush_isr(GPTDriver *gptp) {
@@ -202,11 +193,11 @@ __attribute__((weak)) void my937x_init_pins(void) {
     for (int i = 0; i < MY937X_NUM_LED_GPIO_PINS; i++) {
         palSetLineMode(g_my937x_led_pins[i], MY937X_LED_GPIO_OUTPUT_MODE);
 
-#if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
-        gpio_write_pin_high(g_my937x_led_pins[i]);
-#else
-        gpio_write_pin_low(g_my937x_led_pins[i]);
-#endif
+//#if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
+//        gpio_write_pin_high(g_my937x_led_pins[i]);
+//#else
+//        gpio_write_pin_low(g_my937x_led_pins[i]);
+//#endif
     }
 
     /* Enable power to MY937X if managed by MCU */
@@ -248,9 +239,9 @@ __attribute__((weak)) void my937x_init_drivers(void) {
 #if (MY937X_LED_TYPE == MY937X_LED_TYPE_RGB)
 void my937x_set_color(int index, uint8_t red, uint8_t green, uint8_t blue) {
     // Lazy scaling
-    my937x_leds[0][index].r = red;
-    my937x_leds[0][index].g = green;
-    my937x_leds[0][index].b = blue;
+    my937x_leds[0][index].r = red << 8;
+    my937x_leds[0][index].g = green << 8;
+    my937x_leds[0][index].b = blue << 8;
 }
 
 void my937x_set_color_all(uint8_t red, uint8_t green, uint8_t blue) {

@@ -15,7 +15,6 @@
 // RGB LED Matrix Driver
 // MY9373 (at 3.3V)
 #define MY937X_NUM_CHANNELS 16
-#define MY937X_SHIFT_REG_WIDTH 32
 #define MY937X_LED_TYPE MY937X_LED_TYPE_RGB
 
 // MY937X configuration
