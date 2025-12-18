@@ -29,6 +29,8 @@
 #    include "is31fl3745-mono.h"
 #elif defined(LED_MATRIX_IS31FL3746A)
 #    include "is31fl3746a-mono.h"
+#elif defined(LED_MATRIX_MY937X)
+#    include "my937x-mono.h"
 #elif defined(LED_MATRIX_SNLED27351)
 #    include "snled27351-mono.h"
 #endif

@@ -121,6 +121,14 @@ const led_matrix_driver_t led_matrix_driver = {
     .set_value_all = is31fl3746a_set_value_all,
 };
 
+#elif defined(LED_MATRIX_MY937X)
+const led_matrix_driver_t led_matrix_driver = {
+    .init          = my937x_init_drivers,
+    .flush         = my937x_flush,
+    .set_value     = my937x_set_value,
+    .set_value_all = my937x_set_value_all,
+};
+
 #elif defined(LED_MATRIX_SNLED27351)
 const led_matrix_driver_t led_matrix_driver = {
     .init          = snled27351_init_drivers,

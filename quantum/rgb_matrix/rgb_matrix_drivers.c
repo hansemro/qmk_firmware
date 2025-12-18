@@ -140,6 +140,14 @@ const rgb_matrix_driver_t rgb_matrix_driver = {
     .set_color_all = aw20216s_set_color_all,
 };
 
+#elif defined(RGB_MATRIX_MY937X)
+const rgb_matrix_driver_t rgb_matrix_driver = {
+    .init          = my937x_init_drivers,
+    .flush         = my937x_flush,
+    .set_color     = my937x_set_color,
+    .set_color_all = my937x_set_color_all,
+};
+
 #elif defined(RGB_MATRIX_WS2812)
 #    if defined(RGBLIGHT_WS2812)
 #        pragma message "Cannot use RGBLIGHT and RGB Matrix using WS2812 at the same time."

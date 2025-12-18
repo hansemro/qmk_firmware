@@ -118,13 +118,13 @@
 
 /* PWM period in counter ticks >= 2 */
 #ifndef MY937X_PWM_PERIOD
-#    define MY937X_PWM_PERIOD 8UL
+#    define MY937X_PWM_PERIOD 2UL
 #endif
 
 /* PWM counter frequency in Hz = desired GCK frequency * MY937X_PWM_PERIOD */
 #ifndef MY937X_PWM_COUNTER_FREQUENCY
 /* default: 4 MHz GCK */
-#    define MY937X_PWM_COUNTER_FREQUENCY 144000000UL
+#    define MY937X_PWM_COUNTER_FREQUENCY (4000000UL * MY937X_PWM_PERIOD)
 #endif
 
 /* GPT timer driver to use for continuous row/column pin cycling and data flushing */
@@ -224,16 +224,28 @@ void my937x_frame_instruction(void);
 /* Write val to each MY937X configuration register. */
 void my937x_write_command_data(void);
 
-void my937x_gck_segment_config(uint32_t cmd, uint16_t *segment_pulses, uint16_t *segments_per_frame);
 void extract_scan_count(uint32_t cmd, uint8_t *scan_count);
-void my937x_write_scan_segment(uint16_t scan_line[MY937X_NUM_DRIVER][MY937X_NUM_CHANNELS]);
 
 /* initialize my937x driver(s) */
+void my937x_init_drivers(void);
 void my937x_init_pins(void);
 void my937x_init_command_data(void);
-void my937x_init_pwm(void);
-void my937x_init_gpt(void);
+void my937x_init_timers(void);
 
+#if (MY937X_LED_TYPE == MY937X_LED_TYPE_RGB)
+/* write RGB color to back buffer at a specific index */
+void my937x_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
+/* write RGB color to entire back buffer */
+void my937x_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
+#elif (MY937X_LED_TYPE == MY937X_LED_TYPE_MONO)
+/* write grayscale value to back buffer at a specific index */
+void my937x_set_value(int index, uint8_t value);
+/* write grayscale value to entire back buffer */
+void my937x_set_value_all(uint8_t value);
+#endif
+/* updates front buffer from back buffer */
+void my937x_flush(void);
+/* activate row/column pin and update buffers for next row/column */
 void my937x_flush_isr(void);
 
 enum my937x_color_ch {

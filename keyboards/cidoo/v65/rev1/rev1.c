@@ -2,11 +2,11 @@
 // Copyright 2025 HorrorTroll <https://github.com/HorrorTroll>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-//#ifdef RGB_MATRIX_ENABLE
-//
-#include "my9373_test.h"
-//#include "rgb_matrix.h"
-//#include "host.h"
+#ifdef RGB_MATRIX_ENABLE
+
+#include "my937x.h"
+#include "rgb_matrix.h"
+#include "host.h"
 
 #define NO_LED 255
 
@@ -131,4 +131,4 @@ const uint8_t g_my937x_led_matrix_co[MY937X_NUM_LED_GPIO_PINS][MY937X_NUM_CHANNE
 //    return rgb_matrix_indicators_advanced_user(led_min, led_max);
 //}
 
-//#endif
+#endif
