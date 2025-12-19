@@ -36,69 +36,73 @@ typedef struct {
 // my937x_leds[1]: front buffer (sent to MY937X)
 static my937x_led_t my937x_leds[2][MY937X_LED_COUNT];
 
+uint16_t scan_data[MY937X_NUM_LED_GPIO_PINS][MY937X_NUM_DRIVER][MY937X_NUM_CHANNELS];
+
 inline void my937x_flush_isr(void) {
-    my937x_frame_instruction();
-    my937x_write_command_data();
+    my937x_frame_start();
+    my937x_command_data();
 
-    // Send only one scan per segment_tick
-    uint8_t scan_count;
-    extract_scan_count(MY937X_COMMAND_DATA, &scan_count);
-
-    for (int i = 0; i < scan_count; i++) {
-        /* Enable ROW/COL pins */
+    for (int i = 0; i < MY937X_NUM_LED_GPIO_PINS; i++) {
 #if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
-        gpio_write_pin_high(g_my937x_led_pins[led_gpio_idx]);
+        gpio_write_pin_high(g_my937x_led_pins[i]);
 #else
-        gpio_write_pin_low(g_my937x_led_pins[led_gpio_idx]);
+        gpio_write_pin_low(g_my937x_led_pins[i]);
+#endif
+    }
+
+    /* Enable ROW/COL pins */
+#if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
+    gpio_write_pin_low(g_my937x_led_pins[led_gpio_idx]);
+#else
+    gpio_write_pin_high(g_my937x_led_pins[led_gpio_idx]);
 #endif
 
-        led_gpio_idx += 1;
-        led_gpio_idx = (led_gpio_idx >= scan_count) ? 0 : led_gpio_idx;
+    led_gpio_idx += 1;
+    led_gpio_idx = (led_gpio_idx >= MY937X_NUM_LED_GPIO_PINS) ? 0 : led_gpio_idx;
 
-        /* Flush data for next ROW/COL */
-        for (int i = MY937X_NUM_CHANNELS - 1; i >= 0; i--) {
-            uint8_t color_ch;
-            uint8_t my937x_ch_idx;
-            uint8_t led_idx;
-            uint16_t color_val;
-            for (int j = MY937X_NUM_DRIVER - 1; j >= 0; j--) {
-                color_ch = g_my937x_channels[j][i].color_channel;
-                my937x_ch_idx = g_my937x_channels[j][i].color_index;
+    /* Flush data for next ROW/COL */
+    for (int i = MY937X_NUM_CHANNELS - 1; i >= 0; i--) {
+        uint8_t color_ch;
+        uint8_t my937x_ch_idx;
+        uint8_t led_idx;
+        uint16_t color_val;
+        for (int j = MY937X_NUM_DRIVER - 1; j >= 0; j--) {
+            color_ch = g_my937x_channels[j][i].color_channel;
+            my937x_ch_idx = g_my937x_channels[j][i].color_index;
 #if (MY937X_LED_DIRECTION == ROW2COL)
-                led_idx = g_my937x_led_matrix_co[led_gpio_idx][my937x_ch_idx];
+            led_idx = g_my937x_led_matrix_co[led_gpio_idx][my937x_ch_idx];
 #elif (MY937X_LED_DIRECTION == COL2ROW)
-                led_idx = g_my937x_led_matrix_co[my937x_ch_idx][led_gpio_idx];
+            led_idx = g_my937x_led_matrix_co[my937x_ch_idx][led_gpio_idx];
 #endif
-                switch (color_ch) {
+            switch (color_ch) {
 #if (MY937X_LED_TYPE == MY937X_LED_TYPE_RGB)
-                    case MY937X_RED_CH:
-                        color_val = my937x_leds[1][led_idx].r;
-                        break;
-                    case MY937X_GREEN_CH:
-                        color_val = my937x_leds[1][led_idx].g;
-                        break;
-                    case MY937X_BLUE_CH:
-                        color_val = my937x_leds[1][led_idx].b;
-                        break;
+                case MY937X_RED_CH:
+                    color_val = my937x_leds[1][led_idx].r;
+                    break;
+                case MY937X_GREEN_CH:
+                    color_val = my937x_leds[1][led_idx].g;
+                    break;
+                case MY937X_BLUE_CH:
+                    color_val = my937x_leds[1][led_idx].b;
+                    break;
 #elif (MY937X_LED_TYPE == MY937X_LED_TYPE_MONO)
-                    case MY937X_MONO_CH:
-                        color_val = my937x_leds[1][led_idx].v;
-                        break;
+                case MY937X_MONO_CH:
+                    color_val = my937x_leds[1][led_idx].v;
+                    break;
 #endif
-                    case MY937X_UNUSED_CH:
-                    default:
-                        color_val = 0;
-                }
+                case MY937X_UNUSED_CH:
+                default:
+                    color_val = 0;
             }
 
-            my937x_send_16bits(color_val);
+            scan_data[led_gpio_idx][j][i] = color_val;
         }
-
-        gpio_write_pin_high(MY937X_LAT_PIN);
-        my937x_io_wait;
-        gpio_write_pin_low(MY937X_LAT_PIN);
-        my937x_io_wait;
     }
+
+    my937x_scan(scan_data[led_gpio_idx]);
+
+    gpio_write_pin_low(MY937X_SDI_PIN);
+    gpio_write_pin_low(MY937X_DCK_PIN);
 }
 
 static void my937x_gpt_flush_isr(GPTDriver *gptp) {
@@ -110,6 +114,25 @@ static GPTConfig my937x_gpt_config = {
     .frequency = MY937X_GPT_COUNTER_FREQUENCY,
     .callback  = my937x_gpt_flush_isr,
 };
+
+/* Send 'instr' number of DCK pulses while LAT is asserted high. */
+void inline my937x_dck_pulses(uint8_t instr) {
+    gpio_write_pin_low(MY937X_LAT_PIN);
+    my937x_io_wait;
+    gpio_write_pin_high(MY937X_LAT_PIN);
+    while (instr-- > 0) {
+        my937x_io_wait;
+        gpio_write_pin_high(MY937X_DCK_PIN);
+        my937x_io_wait;
+        gpio_write_pin_low(MY937X_DCK_PIN);
+    }
+    gpio_write_pin_low(MY937X_LAT_PIN);
+}
+
+/* 5 DCK pulses for frame start. */
+void inline my937x_frame_start(void) {
+    my937x_dck_pulses(5);
+}
 
 void inline my937x_sdi_bit(uint8_t bit) {
     if (bit) {
@@ -136,25 +159,8 @@ void inline my937x_send_16bits(uint16_t word) {
     }
 }
 
-/* Ensure DCK is returned to idle low at function entry/exit. */
-void inline my937x_dck_instruction(uint8_t instr) {
-    while (instr-- > 0) {
-        my937x_io_wait;
-        gpio_write_pin_high(MY937X_DCK_PIN);
-        my937x_io_wait;
-        gpio_write_pin_low(MY937X_DCK_PIN);
-    }
-}
-
-/* Initial instruction: LAT HIGH while sending 5 DCK pulses (frame start/end) */
-void inline my937x_frame_instruction(void) {
-    gpio_write_pin_high(MY937X_LAT_PIN);
-    my937x_dck_instruction(5);
-    gpio_write_pin_low(MY937X_LAT_PIN);
-}
-
-/* Write 32-bit command data to each driver (32 bits × M), then single LAT pulse */
-void my937x_write_command_data(void) {
+/* Write 32-bit command data to each driver (32 bits × M), then single LAT pulse. */
+void inline my937x_command_data(void) {
     for (int i = 0; i < MY937X_NUM_DRIVER; i++) {
         my937x_send_32bits(MY937X_COMMAND_DATA);
     }
@@ -165,16 +171,17 @@ void my937x_write_command_data(void) {
     my937x_io_wait;
 }
 
-void inline extract_scan_count(uint32_t cmd, uint8_t *scan_count) {
-    uint8_t scan_bits = (cmd >> 10) & 0x0F;
-
-    // Scan mode 0000 = static mode = 1 row
-    // 0001 = 1/2 scan (2 rows), ..., 1111 = 1/16 scan (16 rows)
-    if (scan_bits == 0) {
-        *scan_count = 1;
-    } else {
-        *scan_count = scan_bits + 1; // e.g., 0001 = 2 rows
+void inline my937x_scan(uint16_t scan_line[MY937X_NUM_DRIVER][MY937X_NUM_CHANNELS]) {
+    for (int j = MY937X_NUM_DRIVER - 1; j >= 0; j--) {
+        for (int i = MY937X_NUM_CHANNELS - 1; i >= 0; i--) {
+            my937x_send_16bits(scan_line[j][i]);
+        }
     }
+
+    gpio_write_pin_high(MY937X_LAT_PIN);
+    my937x_io_wait;
+    gpio_write_pin_low(MY937X_LAT_PIN);
+    my937x_io_wait;
 }
 
 /* Configure and initialize MY937X and LED pins */
@@ -184,20 +191,9 @@ __attribute__((weak)) void my937x_init_pins(void) {
     palSetLineMode(MY937X_LAT_PIN, MY937X_LAT_OUTPUT_MODE);
     palSetLineMode(MY937X_SDI_PIN, MY937X_SDI_OUTPUT_MODE);
 
-    gpio_write_pin_low(MY937X_DCK_PIN);
-    gpio_write_pin_low(MY937X_GCK_PIN);
-    gpio_write_pin_low(MY937X_LAT_PIN);
-    gpio_write_pin_low(MY937X_SDI_PIN);
-
     /* Setup LED ROW/COL pins*/
     for (int i = 0; i < MY937X_NUM_LED_GPIO_PINS; i++) {
         palSetLineMode(g_my937x_led_pins[i], MY937X_LED_GPIO_OUTPUT_MODE);
-
-//#if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
-//        gpio_write_pin_high(g_my937x_led_pins[i]);
-//#else
-//        gpio_write_pin_low(g_my937x_led_pins[i]);
-//#endif
     }
 
     /* Enable power to MY937X if managed by MCU */
@@ -228,12 +224,8 @@ __attribute__((weak)) void my937x_init_drivers(void) {
     /* Configure pins */
     my937x_init_pins();
 
-    my937x_frame_instruction();
-
     /* Start/configure GCK PWM and GPT */
     my937x_init_timers();
-
-    my937x_write_command_data();
 }
 
 #if (MY937X_LED_TYPE == MY937X_LED_TYPE_RGB)

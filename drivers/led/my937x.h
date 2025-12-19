@@ -200,19 +200,20 @@
         }                                       \
     } while (0)
 
+/* Send 'instr' number of DCK pulses while LAT is asserted high. */
+void my937x_dck_pulses(uint8_t instr);
+
+/* 5 DCK pulses for frame start. */
+void my937x_frame_start(void);
+
 void my937x_sdi_bit(uint8_t bit);
 void my937x_send_32bits(uint32_t word);
 void my937x_send_16bits(uint16_t word);
 
-/* Send 'instr' number of DCK pulses. */
-void my937x_dck_instruction(uint8_t instr);
+/* Write 32-bit command data to each driver (32 bits × M), then single LAT pulse. */
+void my937x_command_data(void);
 
-void my937x_frame_instruction(void);
-
-/* Write val to each MY937X configuration register. */
-void my937x_write_command_data(void);
-
-void extract_scan_count(uint32_t cmd, uint8_t *scan_count);
+void my937x_scan(uint16_t scan_line[MY937X_NUM_DRIVER][MY937X_NUM_CHANNELS]);
 
 /* initialize my937x driver(s) */
 void my937x_init_drivers(void);
