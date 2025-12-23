@@ -39,9 +39,7 @@ static my937x_led_t my937x_leds[2][MY937X_LED_COUNT];
 uint16_t scan_data[MY937X_NUM_LED_GPIO_PINS][MY937X_NUM_DRIVER][MY937X_NUM_CHANNELS];
 
 inline void my937x_flush_isr(void) {
-    my937x_frame_start();
-    my937x_command_data();
-
+    /* Deactivate all scan GPIOs */
     for (int i = 0; i < MY937X_NUM_LED_GPIO_PINS; i++) {
 #if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
         gpio_write_pin_high(g_my937x_led_pins[i]);
@@ -50,17 +48,10 @@ inline void my937x_flush_isr(void) {
 #endif
     }
 
-    /* Enable ROW/COL pins */
-#if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
-    gpio_write_pin_low(g_my937x_led_pins[led_gpio_idx]);
-#else
-    gpio_write_pin_high(g_my937x_led_pins[led_gpio_idx]);
-#endif
-
     led_gpio_idx += 1;
     led_gpio_idx = (led_gpio_idx >= MY937X_NUM_LED_GPIO_PINS) ? 0 : led_gpio_idx;
 
-    /* Flush data for next ROW/COL */
+    /* Update scan buffer for next scan line */
     for (int i = MY937X_NUM_CHANNELS - 1; i >= 0; i--) {
         uint8_t color_ch;
         uint8_t my937x_ch_idx;
@@ -99,10 +90,19 @@ inline void my937x_flush_isr(void) {
         }
     }
 
+    /* Flush data for next scan line */
+    my937x_frame_start();
+    my937x_command_data();
     my937x_scan(scan_data[led_gpio_idx]);
-
     gpio_write_pin_low(MY937X_SDI_PIN);
     gpio_write_pin_low(MY937X_DCK_PIN);
+
+    /* Enable scan ROW/COL pin */
+#if (MY937X_LED_GPIO_ACTIVE_STATE == ACTIVE_LOW)
+    gpio_write_pin_low(g_my937x_led_pins[led_gpio_idx]);
+#else
+    gpio_write_pin_high(g_my937x_led_pins[led_gpio_idx]);
+#endif
 }
 
 static void my937x_gpt_flush_isr(GPTDriver *gptp) {
